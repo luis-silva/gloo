@@ -642,6 +642,16 @@ push-kind-images: docker
 	kind load docker-image $(IMAGE_REPO)/sds:$(VERSION) --name $(CLUSTER_NAME)
 
 
+.PHONY: debug-create-kind-cluster
+debug-create-kind-cluster:
+	kind delete cluster --name $(CLUSTER_NAME)
+	kind create cluster --name $(CLUSTER_NAME)
+
+# should specify TAGGED_VERSION variable
+.PHONY: debug-tls-issue
+debug-tls-issue: debug-create-kind-cluster push-kind-images generate-helm-files
+	kubectl create namespace gloo-system; helm install gloo install/helm/gloo --debug -n gloo-system --set crds.create=true
+	kubectl apply -f test_vs.yaml
 #----------------------------------------------------------------------------------
 # Build assets for Kube2e tests
 #----------------------------------------------------------------------------------

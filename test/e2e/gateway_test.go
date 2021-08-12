@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/solo-io/gloo/projects/gloo/pkg/translator"
 
 	gatewaydefaults "github.com/solo-io/gloo/projects/gateway/pkg/defaults"
@@ -510,7 +511,7 @@ var _ = Describe("Gateway", func() {
 						v1helpers.TestUpstreamReachable(defaults.HttpsPort, tu, &cert)
 					}
 
-					It("should work with ssl", func() {
+					FIt("should work with ssl", func() {
 						// Check tls inspector has not been added yet
 						Eventually(func() (string, error) {
 							envoyConfig := ""
@@ -552,6 +553,7 @@ var _ = Describe("Gateway", func() {
 									Namespace: createdSecret.Metadata.Namespace,
 								},
 							},
+							DisableTlsSessionResumption: &wrappers.BoolValue{Value: true},
 						}
 
 						_, err = vscli.Write(vs, clients.WriteOpts{})
@@ -559,8 +561,8 @@ var _ = Describe("Gateway", func() {
 
 						TestUpstreamSslReachable()
 
+						envoyConfig := ""
 						Eventually(func() (string, error) {
-							envoyConfig := ""
 							resp, err := envoyInstance.EnvoyConfig()
 							if err != nil {
 								return "", err
@@ -571,8 +573,28 @@ var _ = Describe("Gateway", func() {
 							}
 							defer resp.Body.Close()
 							envoyConfig = p.String()
+
 							return envoyConfig, nil
 						}, "10s", "0.1s").Should(MatchRegexp("type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"))
+
+						Expect(envoyConfig).Should(MatchRegexp(`"disable_stateless_session_resumption": true`))
+
+						time.Sleep(10 * time.Second)
+
+						Eventually(func() (string, error) {
+							resp, err := envoyInstance.EnvoyConfig()
+							if err != nil {
+								return "", err
+							}
+							p := new(bytes.Buffer)
+							if _, err := io.Copy(p, resp.Body); err != nil {
+								return "", err
+							}
+							defer resp.Body.Close()
+							envoyConfig = p.String()
+
+							return envoyConfig, nil
+						}, "10s", "0.1s").Should(MatchRegexp(`"disable_stateless_session_resumption": true`))
 					})
 				})
 			})
