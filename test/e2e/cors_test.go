@@ -5,11 +5,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/writer"
 
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 	gloov1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
@@ -38,6 +41,35 @@ const (
 	requestACHMethods = "Access-Control-Allow-Methods"
 	requestACHOrigin  = "Access-Control-Allow-Origin"
 )
+
+// We can call this function with os.Stdout and os.Stderr as arguments to achieve the
+// behavior requested in the issue (i.e. setLogLocations(os.Stdout, os.Stderr)) (issue is here: https://github.com/solo-io/gloo/issues/4833)
+//
+// With that being said, I'm not sure of where to actually do that -- I guess I'm looking for where we start up/do initialization for the gloo pod
+// but I'm not really sure where that would be
+//
+// Also I just have this in a random e2e test file right now. I expect that it will become obvious where to actually place the test
+// once I figure out where to call the function below, but if you have any suggestions let me know :)
+func setLogLocations(infoWriter, errorWriter io.Writer) {
+	log.SetOutput(ioutil.Discard) // Send all logs to nowhere by default
+
+	log.AddHook(&writer.Hook{ // Send logs with level higher than warning to stderr
+		Writer: errorWriter,
+		LogLevels: []log.Level{
+			log.PanicLevel,
+			log.FatalLevel,
+			log.ErrorLevel,
+		},
+	})
+	log.AddHook(&writer.Hook{ // Send info and debug logs to stdout
+		Writer: infoWriter,
+		LogLevels: []log.Level{
+			log.InfoLevel,
+			log.DebugLevel,
+			log.WarnLevel,
+		},
+	})
+}
 
 var _ = Describe("CORS", func() {
 
@@ -78,6 +110,23 @@ var _ = Describe("CORS", func() {
 			if td.per.envoyInstance != nil {
 				td.per.envoyInstance.Clean()
 			}
+		})
+
+		FIt("Log test", func() {
+			var (
+				infoLog  bytes.Buffer
+				errorLog bytes.Buffer
+			)
+
+			// Write Info/Debug/Warn logs to infoLog
+			// Everything else to errorLog
+			setLogLocations(&infoLog, &errorLog)
+
+			log.Info("This will go to infoLog")
+			log.Error("This will go to errorLog")
+
+			Expect(infoLog.String()).To(ContainSubstring("msg=\"This will go to infoLog\""))
+			Expect(errorLog.String()).To(ContainSubstring("msg=\"This will go to errorLog\""))
 		})
 
 		It("should run with cors", func() {
