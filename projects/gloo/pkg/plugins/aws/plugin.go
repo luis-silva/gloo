@@ -260,6 +260,9 @@ func (p *plugin) HttpFilters(_ plugins.Params, _ *v1.HttpListener) ([]plugins.St
 			ServiceAccountCredentials: typedFetcher.ServiceAccountCredentials,
 		}
 	}
+
+	// Support new setting in filter config
+	filterconfig.PayloadPassthrough = p.settings.GetPayloadPassthrough()
 	f, err := plugins.NewStagedFilterWithConfig(FilterName, filterconfig, pluginStage)
 	if err != nil {
 		return nil, err

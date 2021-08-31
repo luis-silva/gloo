@@ -1,6 +1,8 @@
 package aws_test
 
 import (
+	"fmt"
+
 	envoy_config_cluster_v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	envoyauth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
@@ -27,7 +29,7 @@ const (
 	sessionTokenValue = "some session token value"
 )
 
-var _ = Describe("Plugin", func() {
+var _ = FDescribe("Plugin", func() {
 
 	var (
 		initParams  plugins.InitParams
@@ -445,6 +447,7 @@ var _ = Describe("Plugin", func() {
 						CredentialsFetcher: &v1.GlooOptions_AWSOptions_ServiceAccountCredentials{
 							ServiceAccountCredentials: saCredentials,
 						},
+						PayloadPassthrough: false,
 					},
 				},
 			}
@@ -463,11 +466,12 @@ var _ = Describe("Plugin", func() {
 			Expect(filters).To(HaveLen(1))
 			goTypedConfig := filters[0].HttpFilter.GetTypedConfig()
 			err = ptypes.UnmarshalAny(goTypedConfig, cfg)
+			fmt.Printf("\n\nLogging CFG: %+v", cfg)
 			Expect(err).NotTo(HaveOccurred())
 
 		}
 
-		It("should enable service account credentials in the filter", func() {
+		FIt("should enable service account credentials in the filter", func() {
 			process()
 			saCredentialsExpected := cfg.GetServiceAccountCredentials()
 			Expect(saCredentialsExpected).NotTo(BeNil())
