@@ -32,9 +32,10 @@ import (
 	"github.com/solo-io/gloo/projects/gloo/pkg/defaults"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
-	aws_plugin "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws"
-
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	aws_plugin "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws"
+	"github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/headers"
+	envoy_core "github.com/solo-io/solo-kit/pkg/api/external/envoy/api/v2/core"
 )
 
 var _ = Describe("AWS Lambda", func() {
@@ -71,17 +72,29 @@ var _ = Describe("AWS Lambda", func() {
 
 	validateLambda := func(offset int, envoyPort uint32, substring string) {
 
-		body := []byte("\"solo.io\"")
+		body := []byte("This string is the request body.\nThis is the second line of the request body.")
 
 		EventuallyWithOffset(offset, func() (string, error) {
 			// send a request with a body
 			var buf bytes.Buffer
 			buf.Write(body)
 
-			res, err := http.Post(fmt.Sprintf("http://%s:%d/1", "localhost", envoyPort), "application/octet-stream", &buf)
+			// res, err := http.Post(fmt.Sprintf("http://%s:%d/1", "localhost", envoyPort), "application/octet-stream", &buf)
+			reqUrl := fmt.Sprintf("http://%s:%d/1", "localhost", envoyPort)
+			req, err := http.NewRequest("POST", reqUrl, &buf)
 			if err != nil {
 				return "", err
 			}
+
+			req.Header = http.Header{
+				"X-test-header": []string{"test_header_val"},
+			}
+
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				return "", err
+			}
+
 			if res.StatusCode != http.StatusOK {
 				return "", errors.New(fmt.Sprintf("%v is not OK", res.StatusCode))
 			}
@@ -92,11 +105,13 @@ var _ = Describe("AWS Lambda", func() {
 				return "", err
 			}
 
+			fmt.Printf("\nLogging body: %s", string(body))
+
 			return string(body), nil
-		}, "5m", "1s").Should(ContainSubstring(substring))
+		}, "5m", "1s").Should(ContainSubstring(""))
 	}
 	validateLambdaUppercase := func(envoyPort uint32) {
-		validateLambda(2, envoyPort, "SOLO.IO")
+		validateLambda(2, envoyPort, "")
 	}
 
 	addUpstream := func() {
@@ -128,8 +143,8 @@ var _ = Describe("AWS Lambda", func() {
 			}
 			return us.GetAws().GetLambdaFunctions()
 		}, "2m", "1s").Should(ContainElement(&aws_plugin.LambdaFunctionSpec{
-			LogicalName:        "uppercase",
-			LambdaFunctionName: "uppercase",
+			LogicalName:        "dumpContext",
+			LambdaFunctionName: "dumpContext",
 			Qualifier:          "$LATEST",
 		}))
 	}
@@ -163,12 +178,25 @@ var _ = Describe("AWS Lambda", func() {
 												DestinationSpec: &gloov1.DestinationSpec{
 													DestinationType: &gloov1.DestinationSpec_Aws{
 														Aws: &aws_plugin.DestinationSpec{
-															LogicalName: "uppercase",
+															LogicalName: "dumpContext",
 														},
 													},
 												},
 											},
 										},
+									},
+								},
+								// Add header to request
+								Options: &gloov1.RouteOptions{
+									HeaderManipulation: &headers.HeaderManipulation{
+										RequestHeadersToAdd: []*envoy_core.HeaderValueOption{{
+											HeaderOption: &envoy_core.HeaderValueOption_Header{
+												Header: &envoy_core.HeaderValue{
+													Key:   "X-test-option-header",
+													Value: "test option value",
+												},
+											},
+										}},
 									},
 								},
 							}},
@@ -183,6 +211,9 @@ var _ = Describe("AWS Lambda", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		validateLambdaUppercase(defaults.HttpPort)
+
+		// Intentionally throw error so we can get envoy debug output
+		Expect(1).To(BeNumerically("==", 2))
 	}
 
 	testProxyWithResponseTransform := func() {
@@ -214,7 +245,7 @@ var _ = Describe("AWS Lambda", func() {
 												DestinationSpec: &gloov1.DestinationSpec{
 													DestinationType: &gloov1.DestinationSpec_Aws{
 														Aws: &aws_plugin.DestinationSpec{
-															LogicalName:            "contact-form",
+															LogicalName:            "dumpContext",
 															ResponseTransformation: true,
 														},
 													},
@@ -322,7 +353,7 @@ var _ = Describe("AWS Lambda", func() {
 			addUpstream()
 		})
 
-		It("should be able to call lambda", testProxy)
+		FIt("should be able to call lambda", testProxy)
 
 		It("should be able to call lambda with response transform", testProxyWithResponseTransform)
 
