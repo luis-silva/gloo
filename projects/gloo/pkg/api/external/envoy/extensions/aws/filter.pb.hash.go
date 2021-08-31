@@ -127,6 +127,11 @@ func (m *AWSLambdaConfig) Hash(hasher hash.Hash64) (uint64, error) {
 		return 0, err
 	}
 
+	err = binary.Write(hasher, binary.LittleEndian, m.GetPayloadPassthrough())
+	if err != nil {
+		return 0, err
+	}
+
 	switch m.CredentialsFetcher.(type) {
 
 	case *AWSLambdaConfig_UseDefaultCredentials:

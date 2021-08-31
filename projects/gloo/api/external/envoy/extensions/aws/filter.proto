@@ -95,4 +95,6 @@ message AWSLambdaConfig {
     google.protobuf.Duration timeout = 3;
   }
 
+  // Whether to transform the request (headers and body) to a JSON payload or pass it as is.
+  bool payload_passthrough = 3;
 }

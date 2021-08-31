@@ -439,6 +439,9 @@ message GlooOptions {
             // and therefore must be explicitly specified via the uri
             envoy.config.filter.http.aws_lambda.v2.AWSLambdaConfig.ServiceAccountCredentials service_account_credentials = 2;
         }
+
+        // Whether to transform the request (headers and body) to a JSON payload or pass it as is.
+        bool payload_passthrough = 3;
     }
 
     AWSOptions aws_options = 5;

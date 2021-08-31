@@ -1281,6 +1281,10 @@ func (m *GlooOptions_AWSOptions) Equal(that interface{}) bool {
 		return false
 	}
 
+	if m.GetPayloadPassthrough() != target.GetPayloadPassthrough() {
+		return false
+	}
+
 	switch m.CredentialsFetcher.(type) {
 
 	case *GlooOptions_AWSOptions_EnableCredentialsDiscovey:

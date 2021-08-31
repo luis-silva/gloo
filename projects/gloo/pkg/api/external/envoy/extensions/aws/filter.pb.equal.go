@@ -140,6 +140,10 @@ func (m *AWSLambdaConfig) Equal(that interface{}) bool {
 		return false
 	}
 
+	if m.GetPayloadPassthrough() != target.GetPayloadPassthrough() {
+		return false
+	}
+
 	switch m.CredentialsFetcher.(type) {
 
 	case *AWSLambdaConfig_UseDefaultCredentials:

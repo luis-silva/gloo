@@ -234,6 +234,8 @@ spec:
                   properties:
                     enableCredentialsDiscovey:
                       type: boolean
+                    payloadPassthrough:
+                      type: boolean
                     serviceAccountCredentials:
                       properties:
                         cluster:
