@@ -1525,6 +1525,15 @@ spec:
 							Expect(serviceStr.ObjectMeta.Annotations).To(Equal(map[string]string{"override": "override"}))
 						})
 
+						FIt("does not merge extraAnnotations to default gatewayProxy", func() {
+							serviceUns := testManifest.ExpectCustomResource("Service", namespace, defaults.GatewayProxyName)
+							service, err := kuberesource.ConvertUnstructured(serviceUns)
+							Expect(err).NotTo(HaveOccurred())
+							Expect(service).To(BeAssignableToTypeOf(&v1.Service{}))
+							serviceStr := *service.(*v1.Service)
+							Expect(serviceStr.ObjectMeta.Annotations).To(Equal(map[string]string{"original": "original"}))
+						})
+
 					})
 
 				})
