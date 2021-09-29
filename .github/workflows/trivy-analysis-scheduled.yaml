@@ -60,7 +60,7 @@ jobs:
         run: |
           mkdir -p ${{ env.SCAN_DIR }}
           make run-security-scan
-          make publish-security-scan
+          # make publish-security-scan
       - name: Alert on workflow failure
         if: ${{ failure() }}
         run : |
