@@ -721,7 +721,7 @@ SCAN_BUCKET ?= solo-gloo-security-scans
 run-security-scan:
 	# Run security scan on gloo and solo-projects
 	# Generates scan files to _output/scans directory
-	GO111MODULE=on go run docs/cmd/generate_docs.go run-security-scan
+	go run  github.com/solo-io/go-utils/securityscanutils/cli  run-security-scan -f docs/cmd/osImageVersionConstraints.csv -m v1.6.0 -r gloo -w gloo -c opensource.out
 
 .PHONY: publish-security-scan
 publish-security-scan:

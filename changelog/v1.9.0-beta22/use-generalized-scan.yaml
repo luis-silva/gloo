@@ -1,0 +1,4 @@
+changelog:
+  - type: NON_USER_FACING
+    description: >
+      Use migrated and generalized CLI for running CVE scan in makefile command.
