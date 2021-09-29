@@ -722,7 +722,7 @@ run-security-scan:
 	# Run security scan on gloo and solo-projects
 	# Generates scan files to _output/scans directory
 	# GO111MODULE=on go run docs/cmd/generate_docs.go run-security-scan
-	GO111MODULE=on go run  github.com/solo-io/go-utils/securityscanutils/cli  run-security-scan -f docs/cmd/osImageVersionConstraints.csv -m v1.8.17 -r gloo -w gloo -c opensource.out -u=true -i=false
+	GO111MODULE=on go run  github.com/solo-io/go-utils/securityscanutils/cli  run-security-scan -f docs/cmd/osImageVersionConstraints.csv -m v1.8.10 -r gloo -w gloo -c opensource.out -u=true -i=false
 
 .PHONY: publish-security-scan
 publish-security-scan:
