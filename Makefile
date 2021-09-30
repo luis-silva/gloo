@@ -730,7 +730,7 @@ publish-security-scan:
 	# of gloo and gloo enterprise. Do NOT change these directories without changing the corresponding output directories in
 	# generate_docs.go
 	gsutil cp -r $(SCAN_DIR)/gloo/markdown_results/** gs://$(SCAN_BUCKET)/gloo
-	gsutil cp -r $(SCAN_DIR)/solo-projects/markdown_results/** gs://$(SCAN_BUCKET)/solo-projects
+	#gsutil cp -r $(SCAN_DIR)/solo-projects/markdown_results/** gs://$(SCAN_BUCKET)/solo-projects
 
 #----------------------------------------------------------------------------------
 # Third Party License Management
