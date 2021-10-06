@@ -204,7 +204,7 @@ func (s *validator) Validate(ctx context.Context, req *validation.GlooValidation
 		validationReports = append(validationReports, convertToValidationReport(proxyReport, resourceReports, proxy))
 	}
 
-	if !req.DryRun {
+	if !req.GetDryRun() {
 		*s.latestSnapshot = snapCopy
 	}
 
