@@ -607,6 +607,7 @@ func (v *validator) ValidateUpstream(ctx context.Context, us *gloov1.Upstream, d
 		// Sending a nil proxy causes the upstream to be translated with all proxies in gloo's snapshot
 		Proxy:     nil,
 		Upstreams: []*gloov1.Upstream{us},
+		DryRun: dryRun,
 	})
 	if err != nil {
 		if v.ignoreProxyValidationFailure {

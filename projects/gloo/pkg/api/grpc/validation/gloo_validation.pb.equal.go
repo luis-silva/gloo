@@ -73,6 +73,10 @@ func (m *GlooValidationServiceRequest) Equal(that interface{}) bool {
 
 	}
 
+	if m.GetDryRun() != target.GetDryRun() {
+		return false
+	}
+
 	return true
 }
 

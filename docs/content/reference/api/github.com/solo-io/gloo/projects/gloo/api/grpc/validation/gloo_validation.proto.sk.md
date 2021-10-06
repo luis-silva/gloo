@@ -56,6 +56,7 @@ weight: 5
 ```yaml
 "proxy": .gloo.solo.io.Proxy
 "upstreams": []gloo.solo.io.Upstream
+"dryRun": bool
 
 ```
 
@@ -63,6 +64,7 @@ weight: 5
 | ----- | ---- | ----------- | 
 | `proxy` | [.gloo.solo.io.Proxy](../../../v1/proxy.proto.sk/#proxy) | If a proxy is provided in the request, the response will contain only the report for that proxy. If no proxy is provided, the response will contain a report for each proxy in the Gloo API snapshot. |
 | `upstreams` | [[]gloo.solo.io.Upstream](../../../v1/upstream.proto.sk/#upstream) |  |
+| `dryRun` | `bool` |  |
 
 
 

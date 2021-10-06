@@ -28,6 +28,8 @@ message GlooValidationServiceRequest {
     gloo.solo.io.Proxy proxy = 1;
 
     repeated gloo.solo.io.Upstream upstreams = 2;
+
+    bool dry_run = 3;
 }
 
 message GlooValidationServiceResponse {
