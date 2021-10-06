@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -233,6 +234,20 @@ var _ = Describe("Validation Server", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Consistently(getNotifications, time.Second).Should(HaveLen(5))
+		})
+	})
+
+	Context("Upstream validation", func() {
+		It("Saves validated upstreams in the snapshot when dry-run is false", func() {
+			s := NewValidator(context.TODO(), translator, xdsSanitizer)
+			us := &v1.Upstream{
+				Metadata: &core.Metadata{
+					Namespace: "test-ns",
+					Name:      "us1",
+				},
+			}
+			_, _ = s.Validate(context.TODO(), &validationgrpc.GlooValidationServiceRequest{Upstreams: []*v1.Upstream{us}, DryRun: false})
+			Expect(params.Snapshot.Upstreams).To(HaveLen(1))
 		})
 	})
 })
