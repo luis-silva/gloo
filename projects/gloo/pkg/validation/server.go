@@ -205,11 +205,11 @@ func (s *validator) Validate(ctx context.Context, req *validation.GlooValidation
 	}
 
 	// Handle race condition where a subsequent validation request comes in before the next snapshot sync.
-	s.lock.RLock()
+	s.lock.Lock()
 	if !req.GetDryRun() {
 		*s.latestSnapshot = snapCopy
 	}
-	s.lock.RUnlock()
+	s.lock.Unlock()
 
 	return &validation.GlooValidationServiceResponse{
 		ValidationReports: validationReports,
