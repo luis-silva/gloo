@@ -1,3 +1,4 @@
 changelog:
-  - type: NON_USER_FACING
+  - type: FIX
+    issueLink: https://github.com/solo-io/gloo/issues/5173
     description: Add dry-run support to upstream validation
