@@ -90,7 +90,7 @@ You can find out more about deploying Gloo Edge on Kubernetes by [following this
 
 ## HashiCorp Consul, Vault, and Nomad
 
-Gloo Edge can use some of the HashiCorp products to provide the necessary primitives for container management, persistent storage, and secrets management. The diagram below provides and example of how HashiCorp products could be used to host a Gloo Edge deployment.
+Gloo Edge can use some of the HashiCorp products to provide the necessary primitives for container management, persistent storage, and secrets management. The diagram below provides an example of how HashiCorp products could be used to host a Gloo Edge deployment.
 
 ![HashiCorp Example]({{% versioned_link_path fromRoot="/img/gloo-architecture-nomad-consul-vault.png" %}})
 
