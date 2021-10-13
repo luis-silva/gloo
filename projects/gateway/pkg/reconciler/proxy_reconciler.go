@@ -205,6 +205,17 @@ func transitionFunc(proxiesToWrite GeneratedProxies) gloov1.TransitionProxyFunc 
 		// hosts on those listeners, and then process the original.Listeners to reconcile
 		// invalid listeners.
 
+		// if any listeners from the old proxy were rejected in the new reports, preserve those
+		if err := forEachListener(original, proxiesToWrite[desired], func(listener *gloov1.Listener, accepted bool) {
+			// old listener was rejected, preserve it on the desired proxy
+			if !accepted {
+				desired.Listeners = append(desired.Listeners, listener)
+			}
+		}); err != nil {
+			// should never happen
+			return false, err
+		}
+
 		// preserve previous vhosts if new vservice was errored
 		for _, desiredListener := range desired.Listeners {
 
@@ -241,17 +252,6 @@ func transitionFunc(proxiesToWrite GeneratedProxies) gloov1.TransitionProxyFunc 
 				return desiredHttpListener.VirtualHosts[i].Name < desiredHttpListener.VirtualHosts[j].Name
 			})
 
-		}
-
-		// if any listeners from the old proxy were rejected in the new reports, preserve those
-		if err := forEachListener(original, proxiesToWrite[desired], func(listener *gloov1.Listener, accepted bool) {
-			// old listener was rejected, preserve it on the desired proxy
-			if !accepted {
-				desired.Listeners = append(desired.Listeners, listener)
-			}
-		}); err != nil {
-			// should never happen
-			return false, err
 		}
 
 		sort.SliceStable(desired.Listeners, func(i, j int) bool {

@@ -230,7 +230,7 @@ var _ = Describe("ReconcileGatewayProxies", func() {
 				Expect(vhosts[0]).To(HaveGeneration(0))
 			})
 
-			It("only updates the valid virtual hosts, without duplicating any", func() {
+			FIt("only updates the valid virtual hosts, without duplicating any", func() {
 				samples.AddVsToSnap(snap, us, ns)
 				genProxy()
 				reconcile()

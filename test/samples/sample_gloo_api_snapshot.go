@@ -162,7 +162,21 @@ func SimpleGatewaySnapshot(us *core.ResourceRef, namespace string) *gwv1.ApiSnap
 			{
 				Metadata: &core.Metadata{Namespace: namespace, Name: "virtualservice"},
 				VirtualHost: &gwv1.VirtualHost{
-					Domains: []string{"*"},
+					Domains: []string{"foo"},
+					Routes:  routes,
+				},
+			},
+			{
+				Metadata: &core.Metadata{Namespace: namespace, Name: "virtualservice2"},
+				VirtualHost: &gwv1.VirtualHost{
+					Domains: []string{"foo"},
+					Routes:  routes,
+				},
+			},
+			{
+				Metadata: &core.Metadata{Namespace: namespace, Name: "virtualservice3"},
+				VirtualHost: &gwv1.VirtualHost{
+					Domains: []string{"foo"},
 					Routes:  routes,
 				},
 			},
