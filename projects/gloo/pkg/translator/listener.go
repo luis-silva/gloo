@@ -2,6 +2,7 @@ package translator
 
 import (
 	"fmt"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"reflect"
 	"sort"
 
@@ -55,6 +56,31 @@ func (t *translatorInstance) computeListener(
 	}
 
 	CheckForDuplicateFilterChainMatches(filterChains, listenerReport)
+
+	if listener.GetClientIpMatchingConfig() != nil {
+		ips := listener.GetClientIpMatchingConfig().GetIps()
+
+		// create ranges to match on
+		ranges := make([]*envoy_config_core_v3.CidrRange, len(ips))
+		for i, ip := range listener.GetClientIpMatchingConfig().GetIps() {
+			ranges[i] = &envoy_config_core_v3.CidrRange{
+				AddressPrefix: ip,
+				PrefixLen: &wrappers.UInt32Value{
+					Value: 32,
+				},
+			}
+		}
+
+		for _, fc := range filterChains {
+			// add ranges to existing matchers
+			fc.GetFilterChainMatch().SourcePrefixRanges = ranges
+		}
+
+		defaultFilterChain := &envoy_config_listener_v3.FilterChain{
+			// TODO: what goes here?
+		}
+		filterChains = append(filterChains, defaultFilterChain)
+	}
 
 	out := &envoy_config_listener_v3.Listener{
 		Name: listener.GetName(),
