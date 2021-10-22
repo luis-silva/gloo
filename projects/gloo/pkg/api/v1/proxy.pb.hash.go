@@ -199,6 +199,26 @@ func (m *Listener) Hash(hasher hash.Hash64) (uint64, error) {
 		}
 	}
 
+	if h, ok := interface{}(m.GetClientIpMatchingConfig()).(safe_hasher.SafeHasher); ok {
+		if _, err = hasher.Write([]byte("ClientIpMatchingConfig")); err != nil {
+			return 0, err
+		}
+		if _, err = h.Hash(hasher); err != nil {
+			return 0, err
+		}
+	} else {
+		if fieldValue, err := hashstructure.Hash(m.GetClientIpMatchingConfig(), nil); err != nil {
+			return 0, err
+		} else {
+			if _, err = hasher.Write([]byte("ClientIpMatchingConfig")); err != nil {
+				return 0, err
+			}
+			if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+				return 0, err
+			}
+		}
+	}
+
 	switch m.ListenerType.(type) {
 
 	case *Listener_HttpListener:
@@ -1177,6 +1197,50 @@ func (m *DirectResponseAction) Hash(hasher hash.Hash64) (uint64, error) {
 }
 
 // Hash function
+func (m *ClientIPMatchingConfig) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1.ClientIPMatchingConfig")); err != nil {
+		return 0, err
+	}
+
+	for _, v := range m.GetIps() {
+
+		if _, err = hasher.Write([]byte(v)); err != nil {
+			return 0, err
+		}
+
+	}
+
+	if h, ok := interface{}(m.GetDefaultFilterChain()).(safe_hasher.SafeHasher); ok {
+		if _, err = hasher.Write([]byte("DefaultFilterChain")); err != nil {
+			return 0, err
+		}
+		if _, err = h.Hash(hasher); err != nil {
+			return 0, err
+		}
+	} else {
+		if fieldValue, err := hashstructure.Hash(m.GetDefaultFilterChain(), nil); err != nil {
+			return 0, err
+		} else {
+			if _, err = hasher.Write([]byte("DefaultFilterChain")); err != nil {
+				return 0, err
+			}
+			if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+				return 0, err
+			}
+		}
+	}
+
+	return hasher.Sum64(), nil
+}
+
+// Hash function
 func (m *TcpHost_TcpAction) Hash(hasher hash.Hash64) (uint64, error) {
 	if m == nil {
 		return 0, nil
@@ -1279,6 +1343,22 @@ func (m *TcpHost_TcpAction) Hash(hasher hash.Hash64) (uint64, error) {
 			}
 		}
 
+	}
+
+	return hasher.Sum64(), nil
+}
+
+// Hash function
+func (m *ClientIPMatchingConfig_DefaultFilterChain) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1.ClientIPMatchingConfig_DefaultFilterChain")); err != nil {
+		return 0, err
 	}
 
 	return hasher.Sum64(), nil

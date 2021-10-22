@@ -180,6 +180,16 @@ func (m *Listener) Equal(that interface{}) bool {
 		}
 	}
 
+	if h, ok := interface{}(m.GetClientIpMatchingConfig()).(equality.Equalizer); ok {
+		if !h.Equal(target.GetClientIpMatchingConfig()) {
+			return false
+		}
+	} else {
+		if !proto.Equal(m.GetClientIpMatchingConfig(), target.GetClientIpMatchingConfig()) {
+			return false
+		}
+	}
+
 	switch m.ListenerType.(type) {
 
 	case *Listener_HttpListener:
@@ -1098,6 +1108,51 @@ func (m *DirectResponseAction) Equal(that interface{}) bool {
 }
 
 // Equal function
+func (m *ClientIPMatchingConfig) Equal(that interface{}) bool {
+	if that == nil {
+		return m == nil
+	}
+
+	target, ok := that.(*ClientIPMatchingConfig)
+	if !ok {
+		that2, ok := that.(ClientIPMatchingConfig)
+		if ok {
+			target = &that2
+		} else {
+			return false
+		}
+	}
+	if target == nil {
+		return m == nil
+	} else if m == nil {
+		return false
+	}
+
+	if len(m.GetIps()) != len(target.GetIps()) {
+		return false
+	}
+	for idx, v := range m.GetIps() {
+
+		if strings.Compare(v, target.GetIps()[idx]) != 0 {
+			return false
+		}
+
+	}
+
+	if h, ok := interface{}(m.GetDefaultFilterChain()).(equality.Equalizer); ok {
+		if !h.Equal(target.GetDefaultFilterChain()) {
+			return false
+		}
+	} else {
+		if !proto.Equal(m.GetDefaultFilterChain(), target.GetDefaultFilterChain()) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Equal function
 func (m *TcpHost_TcpAction) Equal(that interface{}) bool {
 	if that == nil {
 		return m == nil
@@ -1185,6 +1240,30 @@ func (m *TcpHost_TcpAction) Equal(that interface{}) bool {
 		if m.Destination != target.Destination {
 			return false
 		}
+	}
+
+	return true
+}
+
+// Equal function
+func (m *ClientIPMatchingConfig_DefaultFilterChain) Equal(that interface{}) bool {
+	if that == nil {
+		return m == nil
+	}
+
+	target, ok := that.(*ClientIPMatchingConfig_DefaultFilterChain)
+	if !ok {
+		that2, ok := that.(ClientIPMatchingConfig_DefaultFilterChain)
+		if ok {
+			target = &that2
+		} else {
+			return false
+		}
+	}
+	if target == nil {
+		return m == nil
+	} else if m == nil {
+		return false
 	}
 
 	return true

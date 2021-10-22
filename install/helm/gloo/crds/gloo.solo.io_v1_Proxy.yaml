@@ -32,6 +32,15 @@ spec:
                     bindPort:
                       format: int32
                       type: integer
+                    clientIpMatchingConfig:
+                      properties:
+                        defaultFilterChain:
+                          type: object
+                        ips:
+                          items:
+                            type: string
+                          type: array
+                      type: object
                     httpListener:
                       properties:
                         options:

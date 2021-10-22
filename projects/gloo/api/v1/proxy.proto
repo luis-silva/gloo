@@ -100,6 +100,7 @@ message Listener {
     // Route Configuration Options
     RouteConfigurationOptions route_options = 10;
 
+    ClientIPMatchingConfig client_ip_matching_config = 11;
 }
 
 message TcpListener {
@@ -408,4 +409,14 @@ message DirectResponseAction {
     //   Note: Headers can be specified using the Header Modification feature in the enclosing
     //   Route, Virtual Host, or Listener options.
     string body = 2;
+}
+
+message ClientIPMatchingConfig {
+    repeated string ips = 1;
+
+    message DefaultFilterChain {
+
+    }
+
+    DefaultFilterChain default_filter_chain = 2;
 }
