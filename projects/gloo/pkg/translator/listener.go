@@ -2,9 +2,10 @@ package translator
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"reflect"
 	"sort"
+
+	"github.com/golang/protobuf/ptypes/wrappers"
 
 	envoy_config_core_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	envoy_config_listener_v3 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"

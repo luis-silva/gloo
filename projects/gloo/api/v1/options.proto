@@ -254,6 +254,7 @@ message VirtualHostOptions {
     // If the `regular` field is set in here, the `transformations` field is ignored.
     transformation.options.gloo.solo.io.TransformationStages staged_transformations = 17;
 
+    repeated string client_ips_to_match = 20;
 }
 
 // Optional, feature-specific configuration that lives on routes.

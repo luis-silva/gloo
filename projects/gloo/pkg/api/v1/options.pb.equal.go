@@ -529,6 +529,17 @@ func (m *VirtualHostOptions) Equal(that interface{}) bool {
 		}
 	}
 
+	if len(m.GetClientIpsToMatch()) != len(target.GetClientIpsToMatch()) {
+		return false
+	}
+	for idx, v := range m.GetClientIpsToMatch() {
+
+		if strings.Compare(v, target.GetClientIpsToMatch()[idx]) != 0 {
+			return false
+		}
+
+	}
+
 	switch m.RateLimitConfigType.(type) {
 
 	case *VirtualHostOptions_Ratelimit:

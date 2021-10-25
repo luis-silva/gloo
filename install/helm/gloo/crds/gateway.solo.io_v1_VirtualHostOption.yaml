@@ -45,6 +45,10 @@ spec:
                       disabled:
                         type: boolean
                     type: object
+                  clientIpsToMatch:
+                    items:
+                      type: string
+                    type: array
                   cors:
                     properties:
                       allowCredentials:
