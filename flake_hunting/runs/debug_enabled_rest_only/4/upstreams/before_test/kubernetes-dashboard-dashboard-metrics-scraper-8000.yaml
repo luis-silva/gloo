@@ -1,0 +1,30 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"dashboard-metrics-scraper"},"name":"dashboard-metrics-scraper","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":8000,"targetPort":8000}],"selector":{"k8s-app":"dashboard-metrics-scraper"}}}
+  creationTimestamp: "2021-10-25T19:58:27Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: kubernetes-dashboard-dashboard-metrics-scraper-8000
+  namespace: gloo-system
+  resourceVersion: "7135"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/kubernetes-dashboard-dashboard-metrics-scraper-8000
+  uid: f6f3c2b4-76ea-423c-9f87-7ab2395a45ea
+spec:
+  discoveryMetadata:
+    labels:
+      k8s-app: dashboard-metrics-scraper
+  kube:
+    selector:
+      k8s-app: dashboard-metrics-scraper
+    serviceName: dashboard-metrics-scraper
+    serviceNamespace: kubernetes-dashboard
+    servicePort: 8000
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1

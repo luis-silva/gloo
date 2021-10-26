@@ -1,0 +1,89 @@
+go mod download
+mkdir -p /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin
+chmod +x /Users/gunnar/.gvm/pkgsets/go1.16.3/global/pkg/mod/k8s.io/code-generator@v0.20.9/generate-groups.sh
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/solo-io/protoc-gen-ext
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/sam-heilbron/protoc-gen-openapi
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/envoyproxy/protoc-gen-validate
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/protobuf/protoc-gen-go
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install golang.org/x/tools/cmd/goimports
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/cratonica/2goarray
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/gomock
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/mockgen
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/onsi/ginkgo/ginkgo
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go get github.com/saiskee/gettercheck
+/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin/ginkgo -ldflags="-X github.com/solo-io/gloo/pkg/version.Version=1.10.0-beta1-4-g27de12691-dirty" -r -failFast -trace -progress -race -compilers=4 -failOnPending -noColor ./test/kube2e/...
+[1635189002] Endpoint discovery (EDS) Suite - 2/2 specs Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+
+Received interrupt.  Emitting contents of GinkgoWriter...
+---------------------------------------------------------
+[BeforeEach] endpoint discovery (EDS) works
+  /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/eds_test.go:100
+Executing: kubectl [--context  -n gloo-system patch deployment discovery --patch {"spec": {"template": {"spec": {"containers": [{"name": "discovery","command": ["sleep", "20h"]}]}}}}] 
+<kubectl [--context  -n gloo-system patch deployment discovery --patch {"spec": {"template": {"spec": {"containers": [{"name": "discovery","command": ["sleep", "20h"]}]}}}}]> output: deployment.apps/discovery patched
+
+deployment.apps/discovery patched
+
+[BeforeEach] rest EDS
+  /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/eds_test.go:165
+[It] can modify upstreams repeatedly, and endpoints don't lag via EDS
+  /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/eds_test.go:169
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+STEP: check that endpoints were discovered
+
+---------------------------------------------------------
+Received interrupt.  Running AfterSuite...
+^C again to terminate immediately
+
+JUnit report was created: /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/junit.xml
+
+Ran 1 of 1 Specs in 98.267 seconds
+FAIL! -- 1 Passed | 0 Failed | 0 Pending | 0 Skipped
+
+Ginkgo ran 1 suite in 1m46.70890466s
+Test Suite Failed

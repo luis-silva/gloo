@@ -11,7 +11,6 @@ import (
 	"github.com/solo-io/gloo/pkg/cliutil"
 	"github.com/solo-io/gloo/projects/gloo/pkg/defaults"
 	"github.com/solo-io/gloo/test/helpers"
-	"github.com/solo-io/go-utils/log"
 	"github.com/solo-io/solo-kit/pkg/utils/statusutils"
 	skhelpers "github.com/solo-io/solo-kit/test/helpers"
 )
@@ -31,11 +30,11 @@ var (
 )
 
 func TestDiscovery(t *testing.T) {
-	if os.Getenv("KUBE2E_TESTS") != "eds" {
-		log.Warnf("This test is disabled. " +
-			"To enable, set KUBE2E_TESTS to 'eds' in your env.")
-		return
-	}
+	// if os.Getenv("KUBE2E_TESTS") != "eds" {
+	// 	log.Warnf("This test is disabled. " +
+	// 		"To enable, set KUBE2E_TESTS to 'eds' in your env.")
+	// 	return
+	// }
 	skhelpers.RegisterCommonFailHandlers()
 	skhelpers.SetupLog()
 	_ = os.Remove(cliutil.GetLogsPath())

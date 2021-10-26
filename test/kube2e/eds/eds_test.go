@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/solo-io/gloo/test/helpers"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources"
@@ -59,6 +62,11 @@ var _ = Describe("endpoint discovery (EDS) works", func() {
 		}
 		findConfigDumpHttp2Count = func() int {
 			configDump := kubeutils.CurlWithEphemeralPod(ctx, ioutil.Discard, kubeCtx, defaults.GlooSystem, gatewayProxyPodName, configDumpPath, "-s")
+
+			f, _ := os.Create(os.Getenv("CONFIG_OUT_DIR") + "/" + strconv.Itoa(int(time.Now().Unix())))
+			f.WriteString(configDump)
+			f.Close()
+
 			http2Configs := regexp.MustCompile("http2_protocol_options")
 			matches := http2Configs.FindAllStringIndex(configDump, -1)
 			fmt.Println(fmt.Sprintf("Number of http2_protocol_options (i.e., clusters) on config dump page: %d", len(matches)))
@@ -144,6 +152,10 @@ var _ = Describe("endpoint discovery (EDS) works", func() {
 			_, err = upstreamClient.Write(us, clients.WriteOpts{Ctx: ctx, OverwriteExisting: true})
 			Expect(err).NotTo(HaveOccurred())
 
+			f, err := os.OpenFile(os.Getenv("CONFIG_OUT_DIR")+"/../toggle_tracking", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			f.WriteString(strconv.FormatBool(us.UseHttp2.GetValue()) + "\n")
+			f.Close()
+
 			// Check that the changed was picked up and the new config has the correct endpoints
 			checkClusterEndpoints()
 
@@ -161,16 +173,16 @@ var _ = Describe("endpoint discovery (EDS) works", func() {
 		It("can modify upstreams repeatedly, and endpoints don't lag via EDS", endpointsDontLagTest)
 	})
 
-	Context("gRPC", func() {
+	// Context("gRPC", func() {
 
-		BeforeEach(func() {
-			kube2e.UpdateRestEdsSetting(ctx, false, defaults.GlooSystem)
-		})
+	// 	BeforeEach(func() {
+	// 		kube2e.UpdateRestEdsSetting(ctx, false, defaults.GlooSystem)
+	// 	})
 
-		It("can modify upstreams repeatedly, and endpoints don't lag via EDS", func() {
-			failures := InterceptGomegaFailures(endpointsDontLagTest)
-			Expect(failures).To(BeEmpty())
-		})
-	})
+	// 	It("can modify upstreams repeatedly, and endpoints don't lag via EDS", func() {
+	// 		failures := InterceptGomegaFailures(endpointsDontLagTest)
+	// 		Expect(failures).To(BeEmpty())
+	// 	})
+	// })
 
 })

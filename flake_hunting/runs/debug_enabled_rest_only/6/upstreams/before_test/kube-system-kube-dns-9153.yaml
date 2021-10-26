@@ -1,0 +1,32 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    prometheus.io/port: "9153"
+    prometheus.io/scrape: "true"
+  creationTimestamp: "2021-10-25T19:24:32Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: kube-system-kube-dns-9153
+  namespace: gloo-system
+  resourceVersion: "888"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/kube-system-kube-dns-9153
+  uid: 00dd66cc-a45b-4d31-9fdf-cae7feeef9ce
+spec:
+  discoveryMetadata:
+    labels:
+      k8s-app: kube-dns
+      kubernetes.io/cluster-service: "true"
+      kubernetes.io/name: KubeDNS
+  kube:
+    selector:
+      k8s-app: kube-dns
+    serviceName: kube-dns
+    serviceNamespace: kube-system
+    servicePort: 9153
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1
