@@ -3,6 +3,7 @@ package eds_test
 import (
 	"context"
 	"fmt"
+	"github.com/solo-io/gloo/test/debugprint"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -149,11 +150,11 @@ var _ = Describe("endpoint discovery (EDS) works", func() {
 			us, err := upstreamClient.Read(defaults.GlooSystem, "default-petstore-8080", clients.ReadOpts{Ctx: ctx})
 			Expect(err).NotTo(HaveOccurred())
 			us.UseHttp2 = &wrappers.BoolValue{Value: !us.UseHttp2.GetValue()}
-			_, err = upstreamClient.Write(us, clients.WriteOpts{Ctx: ctx, OverwriteExisting: true})
+			us, err = upstreamClient.Write(us, clients.WriteOpts{Ctx: ctx, OverwriteExisting: true})
 			Expect(err).NotTo(HaveOccurred())
 
-			f, err := os.OpenFile(os.Getenv("CONFIG_OUT_DIR")+"/../toggle_tracking", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-			f.WriteString(strconv.FormatBool(us.UseHttp2.GetValue()) + "\n")
+			f, err := os.OpenFile(os.Getenv("CONFIG_OUT_DIR")+"/../upstream_tracking", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			f.WriteString(fmt.Sprintf("---/n%s\n", debugprint.SprintAny(us))) //strconv.FormatBool(us.UseHttp2.GetValue()) + "\n")
 			f.Close()
 
 			// Check that the changed was picked up and the new config has the correct endpoints

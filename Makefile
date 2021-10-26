@@ -148,7 +148,7 @@ run-tests:
 	$(DEPSGOBIN)/ginkgo -ldflags=$(LDFLAGS) -r -failFast -trace -progress -race -compilers=4 -failOnPending -noColor $(TEST_PKG)
 
 .PHONY: run-ci-regression-tests
-run-ci-regression-tests: TEST_PKG=./test/kube2e/...
+run-ci-regression-tests: TEST_PKG=./test/kube2e/eds/...
 run-ci-regression-tests: install-go-tools run-tests
 
 .PHONY: check-format
