@@ -1,0 +1,33 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    meta.helm.sh/release-name: gloo
+    meta.helm.sh/release-namespace: gloo-system
+  creationTimestamp: "2021-10-25T19:24:28Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: gloo-system-gloo-9977
+  namespace: gloo-system
+  resourceVersion: "805"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/gloo-system-gloo-9977
+  uid: c0f4c66a-72c6-49e2-95b4-a7e5485fe8ac
+spec:
+  discoveryMetadata:
+    labels:
+      app: gloo
+      app.kubernetes.io/managed-by: Helm
+      gloo: gloo
+  kube:
+    selector:
+      gloo: gloo
+    serviceName: gloo
+    serviceNamespace: gloo-system
+    servicePort: 9977
+  useHttp2: true
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1

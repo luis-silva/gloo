@@ -1,0 +1,17 @@
+go mod download
+mkdir -p /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin
+chmod +x /Users/gunnar/.gvm/pkgsets/go1.16.3/global/pkg/mod/k8s.io/code-generator@v0.20.9/generate-groups.sh
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/solo-io/protoc-gen-ext
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/sam-heilbron/protoc-gen-openapi
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/envoyproxy/protoc-gen-validate
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/protobuf/protoc-gen-go
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install golang.org/x/tools/cmd/goimports
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/cratonica/2goarray
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/gomock
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/mockgen
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/onsi/ginkgo/ginkgo
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go get github.com/saiskee/gettercheck
+/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin/ginkgo -ldflags="-X github.com/solo-io/gloo/pkg/version.Version=1.10.0-beta1-7-g705666746-dirty" -r -failFast -trace -progress -race -compilers=4 -failOnPending -noColor ./test/kube2e/eds/...
+
+Ginkgo ran 1 suite in 5.124913446s
+Test Suite Failed

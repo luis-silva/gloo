@@ -1,0 +1,34 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    meta.helm.sh/release-name: gloo
+    meta.helm.sh/release-namespace: gloo-system
+  creationTimestamp: "2021-10-25T19:24:32Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: gloo-system-gateway-proxy-443
+  namespace: gloo-system
+  resourceVersion: "895"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/gloo-system-gateway-proxy-443
+  uid: 8fcc6233-a962-4243-a70e-1e84b1ec6a4d
+spec:
+  discoveryMetadata:
+    labels:
+      app: gloo
+      app.kubernetes.io/managed-by: Helm
+      gateway-proxy-id: gateway-proxy
+      gloo: gateway-proxy
+  kube:
+    selector:
+      gateway-proxy: live
+      gateway-proxy-id: gateway-proxy
+    serviceName: gateway-proxy
+    serviceNamespace: gloo-system
+    servicePort: 443
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1

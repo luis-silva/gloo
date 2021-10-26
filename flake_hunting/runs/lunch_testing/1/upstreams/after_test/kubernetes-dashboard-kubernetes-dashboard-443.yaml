@@ -1,0 +1,30 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":443,"targetPort":8443}],"selector":{"k8s-app":"kubernetes-dashboard"}}}
+  creationTimestamp: "2021-10-25T19:58:27Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: kubernetes-dashboard-kubernetes-dashboard-443
+  namespace: gloo-system
+  resourceVersion: "7136"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/kubernetes-dashboard-kubernetes-dashboard-443
+  uid: 9e103d61-ad48-4233-8185-49f26b9a4376
+spec:
+  discoveryMetadata:
+    labels:
+      k8s-app: kubernetes-dashboard
+  kube:
+    selector:
+      k8s-app: kubernetes-dashboard
+    serviceName: kubernetes-dashboard
+    serviceNamespace: kubernetes-dashboard
+    servicePort: 443
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1

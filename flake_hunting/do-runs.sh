@@ -91,7 +91,7 @@ function record_upstreams() {
 }
 
 
-for i in {1..10}; do
+for i in {1..30}; do
     init_run $1/$i
 
     record_upstreams before_test

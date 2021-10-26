@@ -1,0 +1,132 @@
+go mod download
+mkdir -p /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin
+chmod +x /Users/gunnar/.gvm/pkgsets/go1.16.3/global/pkg/mod/k8s.io/code-generator@v0.20.9/generate-groups.sh
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/solo-io/protoc-gen-ext
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/sam-heilbron/protoc-gen-openapi
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/envoyproxy/protoc-gen-validate
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/protobuf/protoc-gen-go
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install golang.org/x/tools/cmd/goimports
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/cratonica/2goarray
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/gomock
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/golang/mock/mockgen
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go install github.com/onsi/ginkgo/ginkgo
+GOBIN=/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin go get github.com/saiskee/gettercheck
+/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/_output/.bin/ginkgo -ldflags="-X github.com/solo-io/gloo/pkg/version.Version=1.10.0-beta1-5-ged5e5afcf-dirty" -r -failFast -trace -progress -race -compilers=4 -failOnPending -noColor ./test/kube2e/...
+[1635260978] Endpoint discovery (EDS) Suite - 1/1 specs Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Number of http2_protocol_options (i.e., clusters) on config dump page: 7
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+Number of http2_protocol_options (i.e., clusters) on config dump page: 6
+Upstream changes picked up! (cluster exists)
+Number of cluster stats for petstore (i.e., checking for endpoints) on clusters page: 18
+Endpoints exist for cluster!
+
+------------------------------
+• [SLOW TEST:187.177 seconds]
+endpoint discovery (EDS) works rest EDS can modify upstreams repeatedly, and endpoints don't lag via EDS 
+/Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/eds_test.go:173
+------------------------------
+
+JUnit report was created: /Users/gunnar/.gvm/pkgsets/go1.16.3/global/src/github.com/solo-io/gloo/test/kube2e/eds/junit.xml
+ SUCCESS! 3m7.177637665s PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:54 EDT: github.com/solo-io/gloo/test/kube2e/gateway/gateway_suite_test.go:32[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'gateway' in your env.
+
+PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:55 EDT: github.com/solo-io/gloo/test/kube2e/gloo-mtls/gloo_mtls_suite_test.go:40[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'gloomtls' in your env.
+
+PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:56 EDT: github.com/solo-io/gloo/test/kube2e/glooctl/glooctl_suite_test.go:29[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'glooctl' in your env.
+
+PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:57 EDT: github.com/solo-io/gloo/test/kube2e/helm/helm_suite_test.go:32[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'helm' in your env.
+
+PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:57 EDT: github.com/solo-io/gloo/test/kube2e/ingress/ingress_suite_test.go:27[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'ingress' in your env.
+
+PASS
+[31m[1m"[0m[31mTue, 26 Oct 2021 11:12:58 EDT: github.com/solo-io/gloo/test/kube2e/knative/knative_suite_test.go:26[0m[31m[1m"[0m	WARNING:
+This test is disabled. To enable, set KUBE2E_TESTS to 'knative' in your env.
+
+PASS
+
+Ginkgo ran 7 suites in 3m20.625143077s
+Test Suite Passed

@@ -3,12 +3,13 @@ package eds_test
 import (
 	"context"
 	"fmt"
-	"github.com/solo-io/gloo/test/debugprint"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/solo-io/gloo/test/debugprint"
 
 	"github.com/solo-io/gloo/test/helpers"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources"
@@ -174,16 +175,16 @@ var _ = Describe("endpoint discovery (EDS) works", func() {
 		It("can modify upstreams repeatedly, and endpoints don't lag via EDS", endpointsDontLagTest)
 	})
 
-	// Context("gRPC", func() {
+	Context("gRPC", func() {
 
-	// 	BeforeEach(func() {
-	// 		kube2e.UpdateRestEdsSetting(ctx, false, defaults.GlooSystem)
-	// 	})
+		BeforeEach(func() {
+			kube2e.UpdateRestEdsSetting(ctx, false, defaults.GlooSystem)
+		})
 
-	// 	It("can modify upstreams repeatedly, and endpoints don't lag via EDS", func() {
-	// 		failures := InterceptGomegaFailures(endpointsDontLagTest)
-	// 		Expect(failures).To(BeEmpty())
-	// 	})
-	// })
+		It("can modify upstreams repeatedly, and endpoints don't lag via EDS", func() {
+			failures := InterceptGomegaFailures(endpointsDontLagTest)
+			Expect(failures).To(BeEmpty())
+		})
+	})
 
 })

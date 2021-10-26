@@ -1,0 +1,26 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  creationTimestamp: "2021-10-25T19:24:28Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-kubernetes-443
+  namespace: gloo-system
+  resourceVersion: "801"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/default-kubernetes-443
+  uid: 05d6fe66-746a-4754-9a0a-2b0d6487cac8
+spec:
+  discoveryMetadata:
+    labels:
+      component: apiserver
+      provider: kubernetes
+  kube:
+    serviceName: kubernetes
+    serviceNamespace: default
+    servicePort: 443
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1
