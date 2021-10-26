@@ -64,7 +64,7 @@ for line in open("$logs_dir/full.log", "r").readlines():
         lines = trim_prefix(line).split("\n")
     elif "LOGS FROM gloo-system.gateway-proxy" in line:
         out = open("$logs_dir/gateway_proxy.log", "w")
-        lines = trim_prefix(line).split("[8]")
+        lines = trim_prefix(line).split("[9]")
     elif "LOGS FROM gloo-system.gateway" in line:
         out = open("$logs_dir/gateway.log", "w")
         lines = json_dump(trim_prefix(line))
