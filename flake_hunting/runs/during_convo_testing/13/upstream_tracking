@@ -1,0 +1,912 @@
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1644
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81351"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1645
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81388"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1646
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81423"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1647
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81450"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1648
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81484"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1649
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81508"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1650
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81541"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1651
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81575"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1652
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81609"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1653
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81642"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1654
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81675"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1655
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81709"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1656
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81743"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1657
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81769"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1658
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81804"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1659
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81838"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1660
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81904"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1661
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81928"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1662
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81956"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1663
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "81990"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1664
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82024"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1665
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82057"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1666
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82090"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1667
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82123"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1668
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82157"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1669
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82191"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1670
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82214"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1671
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82247"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1672
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82280"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1673
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82313"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1674
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82347"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2:
+  value: true
+
+---
+UpstreamType:
+  Kube:
+    selector:
+      app: petstore
+    service_name: petstore
+    service_namespace: default
+    service_port: 8080
+discovery_metadata:
+  labels:
+    service: petstore
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"service":"petstore"},"name":"petstore","namespace":"default"},"spec":{"ports":[{"port":8080,"protocol":"TCP"}],"selector":{"app":"petstore"}}}
+  generation: 1675
+  labels:
+    discovered_by: kubernetesplugin
+  name: default-petstore-8080
+  namespace: gloo-system
+  resource_version: "82382"
+namespaced_statuses:
+  statuses:
+    gloo-system:
+      reported_by: gloo
+      state: 1
+use_http2: {}
+
+---

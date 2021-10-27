@@ -1,0 +1,33 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  annotations:
+    meta.helm.sh/release-name: gloo
+    meta.helm.sh/release-namespace: gloo-system
+  creationTimestamp: "2021-10-25T19:24:31Z"
+  generation: 2
+  labels:
+    discovered_by: kubernetesplugin
+  name: gloo-system-gateway-443
+  namespace: gloo-system
+  resourceVersion: "849"
+  selfLink: /apis/gloo.solo.io/v1/namespaces/gloo-system/upstreams/gloo-system-gateway-443
+  uid: 5f328e2b-327c-4842-9744-d58ed1cad42b
+spec:
+  discoveryMetadata:
+    labels:
+      app: gloo
+      app.kubernetes.io/managed-by: Helm
+      discovery.solo.io/function_discovery: disabled
+      gloo: gateway
+  kube:
+    selector:
+      gloo: gateway
+    serviceName: gateway
+    serviceNamespace: gloo-system
+    servicePort: 443
+status:
+  statuses:
+    gloo-system:
+      reportedBy: gloo
+      state: 1
