@@ -25,6 +25,7 @@ func NewSetupFunc() setuputils.SetupFunc {
 	return setup.NewSetupFuncWithRunAndExtensions(RunFDS, nil)
 }
 
+// Used as extension point for external repo
 func NewSetupFuncWithExtensions(extensions Extensions) setuputils.SetupFunc {
 	runWithExtensions := func(opts bootstrap.Opts) error {
 		return RunFDSWithExtensions(opts, extensions)

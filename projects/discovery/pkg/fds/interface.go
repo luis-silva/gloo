@@ -25,13 +25,13 @@ type AdditionalClients struct {
 }
 
 /*
-upstreams can be obviously functional like AWS λ, fission,...  or an Upstream that was already detected and marked as such.
+upstreams can be obviously functional like AWS λ, fission,...  or an upstream that was already detected and marked as such.
 or potentially like static upstreams.
 */
 // detectors detect a specific type of functional service
 // if they detect the service, they return service info and
 // annotations (optional) for the service
-// we want to bake sure that detect Upstream for aws doesn't do anything
+// we want to bake sure that detect upstream for aws doesn't do anything
 // perhaps we can do just that
 type FunctionDiscoveryFactory interface {
 	NewFunctionDiscovery(u *v1.Upstream, clients AdditionalClients) UpstreamFunctionDiscovery
@@ -43,10 +43,10 @@ type Dependencies struct {
 
 type UpstreamFunctionDiscovery interface {
 	// if this returns true we can skip DetectUpstreamType and go straight to DetectFunctions
-	// if this returns false we should call detect Upstream type.
+	// if this returns false we should call detect upstream type.
 	// if detect Upstream type returns true, we have the type!
 	// if it returns false and nil error, it means it was detected to not be of this type -
-	// ideally this means that this detector will no longer be used with this Upstream. in practice this can be logged/ignored.
+	// ideally this means that this detector will no longer be used with this upstream. in practice this can be logged/ignored.
 	// if it returns false and some error, try again later with back-off/timeout.
 	IsFunctional() bool
 
@@ -80,12 +80,12 @@ func (resolvers Resolvers) Resolve(us *v1.Upstream) (*url.URL, error) {
 			return u, nil
 		}
 	}
-	return nil, errors.Errorf("no resolver found for Upstream %v", us.GetMetadata().GetName())
+	return nil, errors.Errorf("no resolver found for upstream %v", us.GetMetadata().GetName())
 }
 
-// STEP ONE, for generic Upstream, detect
+// STEP ONE, for generic upstream, detect
 // NEW -> DETECTING -> TYPED()
 
 // flow:
-// Upstream type: aws
+// upstream type: aws
 // detector type: swagger (can only be used with upstreams that have a url that's resolvable)
