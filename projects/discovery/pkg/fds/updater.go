@@ -101,7 +101,7 @@ func (u *Updater) createDiscoveries(upstream *v1.Upstream) []UpstreamFunctionDis
 	var ret []UpstreamFunctionDiscovery
 	for _, e := range u.functionalPlugins {
 		ret = append(ret, e.NewFunctionDiscovery(upstream, AdditionalClients{
-			graphqlClient: u.graphqlclient,
+			GraphqlClient: u.graphqlclient,
 		}))
 	}
 	return ret

@@ -21,7 +21,7 @@ type Upgradable interface {
 }
 
 type AdditionalClients struct {
-	graphqlClient v1alpha1.GraphQLSchemaClient
+	GraphqlClient v1alpha1.GraphQLSchemaClient
 }
 
 /*
