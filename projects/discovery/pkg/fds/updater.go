@@ -3,6 +3,7 @@ package fds
 import (
 	"context"
 	"errors"
+	"github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/graphql/v1alpha1"
 	"net/url"
 	"sync"
 	"sync/atomic"
@@ -42,6 +43,7 @@ type Updater struct {
 	logger            *zap.SugaredLogger
 
 	upstreamWriter UpstreamWriterClient
+	graphqlclient  v1alpha1.GraphQLSchemaClient
 
 	maxInParallelSemaphore chan struct{}
 
@@ -62,7 +64,7 @@ func getConcurrencyChan(maxoncurrency uint) chan struct{} {
 
 }
 
-func NewUpdater(ctx context.Context, resolver Resolver, upstreamclient UpstreamWriterClient, maxconncurrency uint, functionalPlugins []FunctionDiscoveryFactory) *Updater {
+func NewUpdater(ctx context.Context, resolver Resolver, graphqlClient v1alpha1.GraphQLSchemaClient, upstreamclient UpstreamWriterClient, maxconncurrency uint, functionalPlugins []FunctionDiscoveryFactory) *Updater {
 	ctx = contextutils.WithLogger(ctx, "function-discovery-updater")
 	return &Updater{
 		logger:                 contextutils.LoggerFrom(ctx),
@@ -72,6 +74,7 @@ func NewUpdater(ctx context.Context, resolver Resolver, upstreamclient UpstreamW
 		activeupstreams:        make(map[string]*updaterUpdater),
 		maxInParallelSemaphore: getConcurrencyChan(maxconncurrency),
 		upstreamWriter:         upstreamclient,
+		graphqlclient:          graphqlClient,
 	}
 }
 
@@ -97,7 +100,9 @@ func (u *Updater) GetSecrets() v1.SecretList {
 func (u *Updater) createDiscoveries(upstream *v1.Upstream) []UpstreamFunctionDiscovery {
 	var ret []UpstreamFunctionDiscovery
 	for _, e := range u.functionalPlugins {
-		ret = append(ret, e.NewFunctionDiscovery(upstream))
+		ret = append(ret, e.NewFunctionDiscovery(upstream, AdditionalClients{
+			graphqlClient: u.graphqlclient,
+		}))
 	}
 	return ret
 }
