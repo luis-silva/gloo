@@ -25,7 +25,6 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible
 	github.com/frankban/quicktest v1.8.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/getkin/kin-openapi v0.80.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-openapi/loads v0.19.4
 	github.com/go-openapi/spec v0.19.6
@@ -75,6 +74,8 @@ require (
 	github.com/prometheus/prometheus v2.5.0+incompatible
 	github.com/rotisserie/eris v0.4.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/saiskee/gettercheck v0.0.0-20210820204958-38443d06ebe0 // indirect
+	github.com/sam-heilbron/protoc-gen-openapi v0.0.0-20210826234431-905e0eb8fa8e // indirect
 	github.com/sergi/go-diff v1.1.0
 	github.com/sirupsen/logrus v1.8.0 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect

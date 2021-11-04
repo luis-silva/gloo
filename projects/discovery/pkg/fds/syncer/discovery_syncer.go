@@ -2,7 +2,6 @@ package syncer
 
 import (
 	"context"
-
 	"github.com/solo-io/go-utils/hashutils"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -40,7 +39,6 @@ func (s *syncer) Sync(ctx context.Context, snap *v1.DiscoverySnapshot) error {
 	if contextutils.GetLogLevel() == zapcore.DebugLevel {
 		logger.Debug(syncutil.StringifySnapshot(snap))
 	}
-
 	upstreamsToDetect := selectUpstreamsForDiscovery(s.fdsMode, snap.Upstreams, snap.Kubenamespaces)
 
 	return s.fd.Update(upstreamsToDetect, snap.Secrets)

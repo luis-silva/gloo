@@ -2,6 +2,7 @@ package setup
 
 import (
 	"context"
+
 	"github.com/solo-io/gloo/projects/discovery/pkg/fds/syncer"
 
 	"github.com/solo-io/gloo/pkg/version"
