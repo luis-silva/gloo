@@ -3,6 +3,7 @@ package fds
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/rotisserie/eris"
 	"net/url"
 	"sync"
@@ -174,7 +175,7 @@ func (u *updaterUpdater) saveUpstream(mutator UpstreamMutator) error {
 			return err
 		}
 	} else {
-		u.upstream = newupstream
+		mutator(u.upstream)
 		return nil
 	}
 	// try again with the new one
@@ -191,7 +192,7 @@ func (u *updaterUpdater) saveUpstream(mutator UpstreamMutator) error {
 	if err != nil {
 		logger.Warnw("error updating upstream on second try", "upstream", u.upstream.GetMetadata().GetName(), "error", err)
 	} else {
-		u.upstream = newupstream
+		mutator(u.upstream)
 	}
 	// TODO: if write failed, we are retrying. we should consider verifying that the error is indeed due to resource conflict,
 
@@ -268,19 +269,17 @@ func (u *updaterUpdater) dependencies() Dependencies {
 func (u *updaterUpdater) Run() error {
 	// more than one discovery can operate on an upstream, e.g. Swagger discovery and openapi spec -> graphql schema discovery
 	// this is a (temporary?) work around
-	var discoveriesForUpstream []UpstreamFunctionDiscovery
+	var discoveriesForUpstream []*UpstreamFunctionDiscovery
 	for _, fp := range u.functionalPlugins {
 		if fp.IsFunctional() {
-			discoveriesForUpstream = append(discoveriesForUpstream, fp)
+			discoveriesForUpstream = append(discoveriesForUpstream, &fp)
 		}
 	}
-
 	upstreamSave := func(m UpstreamMutator) error {
 		return u.saveUpstream(m)
 	}
 
 	resolvedUrl, resolvedErr := u.parent.resolver.Resolve(u.upstream)
-
 	if len(discoveriesForUpstream) == 0 {
 		// TODO: this is probably not going to work unless the upstream type will also have the method required
 		_, ok := u.upstream.GetUpstreamType().(v1.ServiceSpecSetter)
@@ -302,7 +301,7 @@ func (u *updaterUpdater) Run() error {
 			}
 			return err
 		}
-		discoveriesForUpstream = append(discoveriesForUpstream, res.fp)
+		discoveriesForUpstream = append(discoveriesForUpstream, &res.fp)
 		upstreamSave(func(upstream *v1.Upstream) error {
 			servicespecupstream, ok := upstream.GetUpstreamType().(v1.ServiceSpecSetter)
 			if !ok {
@@ -313,7 +312,7 @@ func (u *updaterUpdater) Run() error {
 		})
 	}
 	for _, discoveryForUpstream := range discoveriesForUpstream {
-		err := discoveryForUpstream.DetectFunctions(u.ctx, resolvedUrl, u.dependencies, upstreamSave)
+		err := (*discoveryForUpstream).DetectFunctions(context.Background(), resolvedUrl, u.dependencies, upstreamSave)
 		if err != nil {
 			return eris.Wrapf(err, "Error doing discovery %T", discoveryForUpstream)
 		}
