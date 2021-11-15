@@ -3,6 +3,7 @@ package translator_test
 import (
 	"context"
 	"fmt"
+	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 
 	"github.com/onsi/ginkgo/extensions/table"
 
@@ -224,6 +225,103 @@ var _ = Describe("Translator", func() {
 				},
 			},
 		}
+		hybridListener := &v1.Listener{
+			Name: "hybrid-listner",
+			BindAddress: "127.0.0.1",
+			BindPort: 8080,
+			ListenerType: &v1.Listener_HybridListener{
+				HybridListener: &v1.HybridListener{
+					MatchedListeners: []*v1.MatchedListener{
+						{
+							Matcher: &v1.Matcher{
+								SslConfig: &v1.SslConfig{
+									SslSecrets: &v1.SslConfig_SslFiles{
+										SslFiles: &v1.SSLFiles{
+											TlsCert: "cert1",
+											TlsKey:  "key1",
+										},
+									},
+									SniDomains: []string{
+										"sni1",
+									},
+								},
+								SourcePrefixRanges: []*v3.CidrRange{
+									{
+										AddressPrefix: "1.2.3.4",
+										PrefixLen: &wrappers.UInt32Value{
+											Value: 32,
+										},
+									},
+								},
+							},
+							ListenerType: &v1.MatchedListener_TcpListener{
+								TcpListener: &v1.TcpListener{
+									TcpHosts: []*v1.TcpHost{
+										{
+											Destination: &v1.TcpHost_TcpAction{
+												Destination: &v1.TcpHost_TcpAction_Single{
+													Single: &v1.Destination{
+														DestinationType: &v1.Destination_Upstream{
+															Upstream: &core.ResourceRef{
+																Name:      "test",
+																Namespace: "gloo-system",
+															},
+														},
+													},
+												},
+											},
+											SslConfig: &v1.SslConfig{
+												SslSecrets: &v1.SslConfig_SslFiles{
+													SslFiles: &v1.SSLFiles{
+														TlsCert: "cert1",
+														TlsKey:  "key1",
+													},
+												},
+												SniDomains: []string{
+													"sni1",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Matcher: &v1.Matcher{
+								SslConfig: &v1.SslConfig{
+									SslSecrets: &v1.SslConfig_SslFiles{
+										SslFiles: &v1.SSLFiles{
+											TlsCert: "cert2",
+											TlsKey:  "key2",
+										},
+									},
+									SniDomains: []string{
+										"sni2",
+									},
+								},
+								SourcePrefixRanges: []*v3.CidrRange{
+									{
+										AddressPrefix: "5.6.7.8",
+										PrefixLen: &wrappers.UInt32Value{
+											Value: 32,
+										},
+									},
+								},
+							},
+							ListenerType: &v1.MatchedListener_HttpListener{
+								HttpListener: &v1.HttpListener{
+									VirtualHosts: []*v1.VirtualHost{{
+										Name:    virtualHostName,
+										Domains: []string{"*"},
+										Routes:  routes,
+									}},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
 		proxy = &v1.Proxy{
 			Metadata: &core.Metadata{
 				Name:      "test",
@@ -232,6 +330,7 @@ var _ = Describe("Translator", func() {
 			Listeners: []*v1.Listener{
 				httpListener,
 				tcpListener,
+				hybridListener,
 			},
 		}
 	})
