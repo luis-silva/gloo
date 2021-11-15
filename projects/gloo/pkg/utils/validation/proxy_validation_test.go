@@ -1,8 +1,10 @@
 package validation_test
 
 import (
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 	"github.com/solo-io/gloo/projects/gloo/pkg/api/grpc/validation"
 	v1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
 	. "github.com/solo-io/gloo/projects/gloo/pkg/utils/validation"
@@ -13,7 +15,9 @@ var _ = Describe("validation utils", func() {
 	numListeners := 3
 	numVhosts := 5
 	numRoutes := 8
-	makeProxy := func(http bool) *v1.Proxy {
+	numTcpListeners := 4
+	numHttpListeners := 2
+	makeProxy := func(http, tcp bool) *v1.Proxy {
 		proxy := &v1.Proxy{}
 		for i := 0; i < numListeners; i++ {
 			if http {
@@ -33,7 +37,7 @@ var _ = Describe("validation utils", func() {
 						vh.Routes = append(vh.Routes, &v1.Route{})
 					}
 				}
-			} else {
+			} else if tcp {
 
 				tcpListener := &v1.TcpListener{}
 				proxy.Listeners = append(proxy.Listeners, &v1.Listener{
@@ -46,6 +50,59 @@ var _ = Describe("validation utils", func() {
 					vh := &v1.TcpHost{}
 					tcpListener.TcpHosts = append(tcpListener.TcpHosts, vh)
 				}
+			} else { // hybrid
+
+				hybridListener := &v1.HybridListener{}
+				proxy.Listeners = append(proxy.Listeners, &v1.Listener{
+					ListenerType: &v1.Listener_HybridListener{
+						HybridListener: hybridListener,
+					},
+				})
+
+				for l := 0; l < numTcpListeners; l++ {
+					tcpListener := &v1.TcpListener{}
+
+					for j := 0; j < numVhosts; j++ {
+						vh := &v1.TcpHost{}
+						tcpListener.TcpHosts = append(tcpListener.TcpHosts, vh)
+					}
+					hybridListener.MatchedListeners = append(hybridListener.MatchedListeners, &v1.MatchedListener{
+						Matcher: &v1.Matcher{
+							SourcePrefixRanges: []*v3.CidrRange{
+								&v3.CidrRange{
+									AddressPrefix: fmt.Sprintf("tcp-%d", l),
+								},
+							},
+						},
+						ListenerType: &v1.MatchedListener_TcpListener{
+							TcpListener: tcpListener,
+						},
+					})
+				}
+				for l := 0; l < numHttpListeners; l++ {
+					httpListener := &v1.HttpListener{}
+
+					for j := 0; j < numVhosts; j++ {
+						vh := &v1.VirtualHost{}
+						httpListener.VirtualHosts = append(httpListener.VirtualHosts, vh)
+
+						for k := 0; k < numRoutes; k++ {
+							vh.Routes = append(vh.Routes, &v1.Route{})
+						}
+					}
+					hybridListener.MatchedListeners = append(hybridListener.MatchedListeners, &v1.MatchedListener{
+						Matcher: &v1.Matcher{
+							SourcePrefixRanges: []*v3.CidrRange{
+								&v3.CidrRange{
+									AddressPrefix: fmt.Sprintf("http-%d", l),
+								},
+							},
+						},
+						ListenerType: &v1.MatchedListener_HttpListener{
+							HttpListener: httpListener,
+						},
+					})
+				}
 			}
 		}
 		return proxy
@@ -54,7 +111,7 @@ var _ = Describe("validation utils", func() {
 	var _ = Describe("MakeReport", func() {
 		It("generates a report which matches an http proxy", func() {
 
-			proxy := makeProxy(true)
+			proxy := makeProxy(true, false)
 
 			rpt := MakeReport(proxy)
 			Expect(rpt.ListenerReports).To(HaveLen(len(proxy.Listeners)))
@@ -63,14 +120,13 @@ var _ = Describe("validation utils", func() {
 				Expect(vhReports).To(HaveLen(len(proxy.Listeners[i].GetHttpListener().VirtualHosts)))
 				for j := range vhReports {
 					Expect(vhReports[i].RouteReports).To(HaveLen(len(proxy.Listeners[i].GetHttpListener().VirtualHosts[j].Routes)))
-
 				}
 			}
 		})
 
 		It("generates a report which matches a tcp proxy", func() {
 
-			proxy := makeProxy(false)
+			proxy := makeProxy(false, true)
 
 			rpt := MakeReport(proxy)
 			Expect(rpt.ListenerReports).To(HaveLen(len(proxy.Listeners)))
@@ -80,11 +136,53 @@ var _ = Describe("validation utils", func() {
 			}
 
 		})
+
+		It("generates a report which matches a hybrid proxy", func() {
+
+			proxy := makeProxy(false, false)
+
+			rpt := MakeReport(proxy)
+			Expect(rpt.ListenerReports).To(HaveLen(len(proxy.Listeners)))
+			for i := range rpt.ListenerReports {
+				hybridListenerReports := rpt.ListenerReports[i].GetHybridListenerReport().GetMatchedListenerReports()
+				Expect(hybridListenerReports).NotTo(BeNil())
+				for j, matchedListener := range proxy.Listeners[i].GetHybridListener().GetMatchedListeners() {
+					matchPrefix, matchNum := "tcp", j
+					if j >= numTcpListeners {
+						matchPrefix = "http"
+						matchNum -= numTcpListeners
+					}
+					expMatcher := &v1.Matcher{
+						SourcePrefixRanges: []*v3.CidrRange{
+							&v3.CidrRange{
+								AddressPrefix: fmt.Sprintf("%s-%d", matchPrefix, matchNum),
+							},
+						},
+					}
+					mlr, ok := hybridListenerReports[expMatcher.String()]
+					Expect(ok).To(BeTrue())
+					if matchPrefix == "tcp" {
+						tcpListenerReport := mlr.GetTcpListenerReport()
+						Expect(tcpListenerReport).NotTo(BeNil())
+						tcpHostReports := tcpListenerReport.TcpHostReports
+						Expect(tcpHostReports).To(HaveLen(len(matchedListener.GetTcpListener().GetTcpHosts())))
+					} else {
+						httpListenerReport := mlr.GetHttpListenerReport()
+						Expect(httpListenerReport).NotTo(BeNil())
+						vhReports := httpListenerReport.VirtualHostReports
+						Expect(vhReports).To(HaveLen(len(matchedListener.GetHttpListener().GetVirtualHosts())))
+						for k := range vhReports {
+							Expect(vhReports[i].RouteReports).To(HaveLen(len(matchedListener.GetHttpListener().VirtualHosts[k].Routes)))
+						}
+					}
+				}
+			}
+		})
 	})
 
 	var _ = Describe("GetProxyError", func() {
 		It("aggregates the errors at every level", func() {
-			rpt := MakeReport(makeProxy(true))
+			rpt := MakeReport(makeProxy(true, false))
 
 			rpt.ListenerReports[1].Errors = append(rpt.ListenerReports[1].Errors,
 				&validation.ListenerReport_Error{
