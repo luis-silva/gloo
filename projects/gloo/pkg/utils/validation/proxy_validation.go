@@ -54,6 +54,52 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 					},
 				},
 			}
+		case *v1.Listener_HybridListener:
+			matchedListenerReports := make(map[string]*validation.MatchedListenerReport)
+			for _, matchedListener := range listenerType.HybridListener.GetMatchedListeners() {
+				matchedListenerReport := &validation.MatchedListenerReport{}
+				switch matchedListenerType := matchedListener.GetListenerType().(type) {
+				case *v1.MatchedListener_HttpListener:
+					vhostReports := make([]*validation.VirtualHostReport, len(matchedListenerType.HttpListener.GetVirtualHosts()))
+
+					for j, vh := range matchedListenerType.HttpListener.GetVirtualHosts() {
+						routeReports := make([]*validation.RouteReport, len(vh.GetRoutes()))
+						for k := range vh.GetRoutes() {
+							routeReports[k] = &validation.RouteReport{}
+						}
+
+						vhostReports[j] = &validation.VirtualHostReport{
+							RouteReports: routeReports,
+						}
+					}
+
+					matchedListenerReport.ListenerReportType = &validation.MatchedListenerReport_HttpListenerReport{
+						HttpListenerReport: &validation.HttpListenerReport{
+							VirtualHostReports: vhostReports,
+						},
+					}
+				case *v1.MatchedListener_TcpListener:
+					tcpHostReports := make([]*validation.TcpHostReport, len(matchedListenerType.TcpListener.GetTcpHosts()))
+					for j := range matchedListenerType.TcpListener.GetTcpHosts() {
+						tcpHostReports[j] = &validation.TcpHostReport{}
+					}
+
+					matchedListenerReport.ListenerReportType = &validation.MatchedListenerReport_TcpListenerReport{
+						TcpListenerReport: &validation.TcpListenerReport{
+							TcpHostReports: tcpHostReports,
+						},
+					}
+				}
+				matchedListenerReports[matchedListener.GetMatcher().String()] = matchedListenerReport
+			}
+
+			listenerReports[i] = &validation.ListenerReport{
+				ListenerTypeReport: &validation.ListenerReport_HybridListenerReport{
+					HybridListenerReport: &validation.HybridListenerReport{
+						MatchedListenerReports: matchedListenerReports,
+					},
+				},
+			}
 		}
 	}
 
