@@ -89,6 +89,7 @@ In the future we may add support for regex and subgroups
 ```yaml
 "argName": string
 "path": []graphql.gloo.solo.io.PathSegment
+"required": bool
 
 ```
 
@@ -96,6 +97,7 @@ In the future we may add support for regex and subgroups
 | ----- | ---- | ----------- | 
 | `argName` | `string` | The argument name to fetch. The argument value fetched will have a type from the schema that we validate in envoy. If the name is invalid, returns the zero-value primitive or null. |
 | `path` | [[]graphql.gloo.solo.io.PathSegment](../graphql.proto.sk/#pathsegment) | Optional: fetches the value in the argument selected at this key. If the key is invalid, returns the zero-value primitive or null. |
+| `required` | `bool` | If this is set to true, then a schema error will be returned to user when the graphql arg is not found. Defaults to false, so schema error will not be returned to user when the graphql arg is not found. |
 
 
 

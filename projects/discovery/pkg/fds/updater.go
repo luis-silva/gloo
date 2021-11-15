@@ -3,11 +3,11 @@ package fds
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/rotisserie/eris"
 	"net/url"
 	"sync"
 	"sync/atomic"
+
+	"github.com/rotisserie/eris"
 
 	"github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/graphql/v1alpha1"
 

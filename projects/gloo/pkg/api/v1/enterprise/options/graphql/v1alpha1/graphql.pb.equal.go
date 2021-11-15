@@ -584,6 +584,10 @@ func (m *ValueProvider_GraphQLArgExtraction) Equal(that interface{}) bool {
 
 	}
 
+	if m.GetRequired() != target.GetRequired() {
+		return false
+	}
+
 	return true
 }
 

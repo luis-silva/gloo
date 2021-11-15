@@ -622,6 +622,11 @@ func (m *ValueProvider_GraphQLArgExtraction) Hash(hasher hash.Hash64) (uint64, e
 
 	}
 
+	err = binary.Write(hasher, binary.LittleEndian, m.GetRequired())
+	if err != nil {
+		return 0, err
+	}
+
 	return hasher.Sum64(), nil
 }
 
