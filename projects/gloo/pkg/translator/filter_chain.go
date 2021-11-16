@@ -24,6 +24,7 @@ type FilterChainTranslator interface {
 
 var _ FilterChainTranslator = new(tcpFilterChainTranslator)
 var _ FilterChainTranslator = new(httpFilterChainTranslator)
+var _ FilterChainTranslator = new(httpFilterChainTranslator)
 
 type tcpFilterChainTranslator struct {
 	plugins []plugins.TcpFilterChainPlugin
@@ -232,6 +233,101 @@ func newSslFilterChain(
 		},
 		TransportSocketConnectTimeout: timeout,
 	}
+}
+
+type hybridFilterChainTranslator struct {
+	plugins             []plugins.Plugin
+	tcpPlugins []plugins.TcpFilterChainPlugin
+	sslConfigTranslator sslutils.SslConfigTranslator
+
+	parentListener *v1.Listener
+	listener       *v1.HybridListener
+
+	parentReport *validationapi.ListenerReport
+	report       *validationapi.HybridListenerReport
+
+	routeConfigName string
+}
+
+func (h *hybridFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
+	var outFilterChains []*envoy_config_listener_v3.FilterChain
+	for _, matchedListener := range h.listener.GetMatchedListeners() {
+		switch listenerType := matchedListener.GetListenerType().(type) {
+		case *v1.MatchedListener_HttpListener:
+			sublistenerFilterChainTranslator := httpFilterChainTranslator{
+				plugins: h.plugins,
+				sslConfigTranslator: h.sslConfigTranslator,
+
+				parentListener: h.parentListener,
+				listener:       listenerType.HttpListener,
+
+				parentReport: h.parentReport,
+				report:	h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
+
+				routeConfigName: h.routeConfigName,
+			}
+			listenerFilters := sublistenerFilterChainTranslator.computeNetworkFilters(params)
+			if len(listenerFilters) == 0 {
+				return nil
+			}
+
+			outFilterChains = append(outFilterChains, h.computeFilterChainFromMatchedListener(params.Snapshot, listenerFilters, matchedListener))
+		case *v1.MatchedListener_TcpListener:
+			sublistenerFilterChainTranslator := tcpFilterChainTranslator{
+				plugins: h.tcpPlugins,
+
+				parentListener: h.parentListener,
+				listener: matchedListener.GetTcpListener(),
+
+				// TODO: not sure what to do with these vis-a-vis matchers
+				report:  h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
+			}
+
+
+			outFilterChains = append(outFilterChains, sublistenerFilterChainTranslator.ComputeFilterChains(params)...)
+		}
+	}
+
+	return outFilterChains
+}
+
+func (h *hybridFilterChainTranslator) computeFilterChainFromMatchedListener(snap *v1.ApiSnapshot, listenerFilters []*envoy_config_listener_v3.Filter, matchedListener *v1.MatchedListener) *envoy_config_listener_v3.FilterChain {
+	fc := &envoy_config_listener_v3.FilterChain{
+		Filters: listenerFilters,
+	}
+	fcm := &envoy_config_listener_v3.FilterChainMatch{}
+
+	if sslConfig := matchedListener.GetMatcher().GetSslConfig(); sslConfig != nil {
+		// Logic derived from computeFilterChainsFromSslConfig()
+		downstreamConfig, err := h.sslConfigTranslator.ResolveDownstreamSslConfig(snap.Secrets, sslConfig)
+		if err != nil {
+			validation.AppendListenerError(h.parentReport,
+				validationapi.ListenerReport_Error_SSLConfigError, err.Error())
+			return nil
+		}
+
+		fcm.ServerNames = sslConfig.GetSniDomains()
+
+		fc.TransportSocket = &envoy_config_core_v3.TransportSocket{
+			Name:       wellknown.TransportSocketTls,
+			ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: sslutils.MustMessageToAny(downstreamConfig)},
+		}
+		fc.TransportSocketConnectTimeout = sslConfig.GetTransportSocketConnectTimeout()
+	}
+
+	var sourcePrefixRanges []*envoy_config_core_v3.CidrRange
+	for _, spr := range matchedListener.GetMatcher().GetSourcePrefixRanges() {
+		outSpr := &envoy_config_core_v3.CidrRange{
+			AddressPrefix: spr.GetAddressPrefix(),
+			PrefixLen: spr.GetPrefixLen(),
+		}
+		sourcePrefixRanges = append(sourcePrefixRanges, outSpr)
+	}
+
+	fcm.SourcePrefixRanges = sourcePrefixRanges
+
+
+	return fc
 }
 
 func sortListenerFilters(filters plugins.StagedListenerFilterList) []*envoy_config_listener_v3.Filter {
