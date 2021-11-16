@@ -49,6 +49,30 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 	case *v1.Listener_TcpListener:
 		return l.GetTcpListenerTranslators(ctx, listener, listenerReport)
 
+	case *v1.Listener_HybridListener:
+		hybridListenerReport := listenerReport.GetHybridListenerReport()
+		if hybridListenerReport == nil {
+			contextutils.LoggerFrom(ctx).DPanic("internal error: listener report was not hybrid type")
+		}
+
+		routeConfigurationName := routeConfigName(listener)
+
+		listenerTranslator := &listenerTranslatorInstance{
+			listener: listener,
+			report:   listenerReport,
+			plugins:  l.pluginRegistry.GetPlugins(),
+			filterChainTranslator: &hybridFilterChainTranslator{
+				plugins:             l.pluginRegistry.GetPlugins(),
+				sslConfigTranslator: l.sslConfigTranslator,
+				parentListener:      listener,
+				listener:            listener.GetHybridListener(),
+				parentReport:        listenerReport,
+				report:              hybridListenerReport,
+				routeConfigName:     routeConfigurationName,
+			},
+		}
+
+		return listenerTranslator, nil
 	default:
 		// This case should never occur
 		return &emptyListenerTranslator{}, &emptyRouteConfigurationTranslator{}
