@@ -22,35 +22,18 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 		switch listenerType := listener.GetListenerType().(type) {
 		case *v1.Listener_HttpListener:
 
-			vhostReports := make([]*validation.VirtualHostReport, len(listenerType.HttpListener.GetVirtualHosts()))
-
-			for j, vh := range listenerType.HttpListener.GetVirtualHosts() {
-				routeReports := make([]*validation.RouteReport, len(vh.GetRoutes()))
-				for k := range vh.GetRoutes() {
-					routeReports[k] = &validation.RouteReport{}
-				}
-
-				vhostReports[j] = &validation.VirtualHostReport{
-					RouteReports: routeReports,
-				}
-			}
-
 			listenerReports[i] = &validation.ListenerReport{
 				ListenerTypeReport: &validation.ListenerReport_HttpListenerReport{
 					HttpListenerReport: &validation.HttpListenerReport{
-						VirtualHostReports: vhostReports,
+						VirtualHostReports: makeVhostReports(listenerType.HttpListener.GetVirtualHosts()),
 					},
 				},
 			}
 		case *v1.Listener_TcpListener:
-			tcpHostReports := make([]*validation.TcpHostReport, len(listenerType.TcpListener.GetTcpHosts()))
-			for j := range listenerType.TcpListener.GetTcpHosts() {
-				tcpHostReports[j] = &validation.TcpHostReport{}
-			}
 			listenerReports[i] = &validation.ListenerReport{
 				ListenerTypeReport: &validation.ListenerReport_TcpListenerReport{
 					TcpListenerReport: &validation.TcpListenerReport{
-						TcpHostReports: tcpHostReports,
+						TcpHostReports: makeTcpHostReports(listenerType.TcpListener.GetTcpHosts()),
 					},
 				},
 			}
@@ -60,33 +43,15 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 				matchedListenerReport := &validation.MatchedListenerReport{}
 				switch matchedListenerType := matchedListener.GetListenerType().(type) {
 				case *v1.MatchedListener_HttpListener:
-					vhostReports := make([]*validation.VirtualHostReport, len(matchedListenerType.HttpListener.GetVirtualHosts()))
-
-					for j, vh := range matchedListenerType.HttpListener.GetVirtualHosts() {
-						routeReports := make([]*validation.RouteReport, len(vh.GetRoutes()))
-						for k := range vh.GetRoutes() {
-							routeReports[k] = &validation.RouteReport{}
-						}
-
-						vhostReports[j] = &validation.VirtualHostReport{
-							RouteReports: routeReports,
-						}
-					}
-
 					matchedListenerReport.ListenerReportType = &validation.MatchedListenerReport_HttpListenerReport{
 						HttpListenerReport: &validation.HttpListenerReport{
-							VirtualHostReports: vhostReports,
+							VirtualHostReports: makeVhostReports(matchedListenerType.HttpListener.GetVirtualHosts()),
 						},
 					}
 				case *v1.MatchedListener_TcpListener:
-					tcpHostReports := make([]*validation.TcpHostReport, len(matchedListenerType.TcpListener.GetTcpHosts()))
-					for j := range matchedListenerType.TcpListener.GetTcpHosts() {
-						tcpHostReports[j] = &validation.TcpHostReport{}
-					}
-
 					matchedListenerReport.ListenerReportType = &validation.MatchedListenerReport_TcpListenerReport{
 						TcpListenerReport: &validation.TcpListenerReport{
-							TcpHostReports: tcpHostReports,
+							TcpHostReports: makeTcpHostReports(matchedListenerType.TcpListener.GetTcpHosts()),
 						},
 					}
 				}
@@ -106,6 +71,31 @@ func MakeReport(proxy *v1.Proxy) *validation.ProxyReport {
 	return &validation.ProxyReport{
 		ListenerReports: listenerReports,
 	}
+}
+
+func makeVhostReports(virtualHosts []*v1.VirtualHost) []*validation.VirtualHostReport {
+	vhostReports := make([]*validation.VirtualHostReport, len(virtualHosts))
+
+	for j, vh := range virtualHosts {
+		routeReports := make([]*validation.RouteReport, len(vh.GetRoutes()))
+		for k := range vh.GetRoutes() {
+			routeReports[k] = &validation.RouteReport{}
+		}
+
+		vhostReports[j] = &validation.VirtualHostReport{
+			RouteReports: routeReports,
+		}
+	}
+
+	return vhostReports
+}
+
+func makeTcpHostReports(tcpHosts []*v1.TcpHost) []*validation.TcpHostReport {
+	tcpHostReports := make([]*validation.TcpHostReport, len(tcpHosts))
+	for j := range tcpHosts {
+		tcpHostReports[j] = &validation.TcpHostReport{}
+	}
+	return tcpHostReports
 }
 
 func mkErr(level, errType, reason string) error {
