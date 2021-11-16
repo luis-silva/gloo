@@ -41,6 +41,7 @@ type RouteConfigurationTranslator interface {
 
 var _ RouteConfigurationTranslator = new(emptyRouteConfigurationTranslator)
 var _ RouteConfigurationTranslator = new(httpRouteConfigurationTranslator)
+var _ RouteConfigurationTranslator = new(hybridRouteConfigurationTranslator)
 
 type emptyRouteConfigurationTranslator struct {
 }
@@ -469,6 +470,56 @@ func (h *httpRouteConfigurationTranslator) setWeightedClusters(params plugins.Ro
 
 	return nil
 }
+
+type hybridRouteConfigurationTranslator struct {
+	plugins []plugins.Plugin
+	proxy   *v1.Proxy
+
+	parentListener *v1.Listener
+	listener       *v1.HybridListener
+
+	parentReport *validationapi.ListenerReport
+	report       *validationapi.HybridListenerReport
+
+	routeConfigName          string
+	requireTlsOnVirtualHosts bool
+}
+
+func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params plugins.Params) []*envoy_config_route_v3.RouteConfiguration {
+	var outRouteConfigs []*envoy_config_route_v3.RouteConfiguration
+	for _, matchedListener := range h.listener.GetMatchedListeners() {
+		httpListener := matchedListener.GetHttpListener()
+		if httpListener == nil {
+			continue
+		}
+
+		params.Ctx = contextutils.WithLogger(params.Ctx, "compute_route_config."+h.routeConfigName+"-"+matchedListener.GetMatcher().String())
+
+		matchedListenerRouteConfigurationTranslator := &httpRouteConfigurationTranslator{
+			plugins: h.plugins,
+			proxy: h.proxy,
+
+			parentListener: h.parentListener,
+			listener: httpListener,
+
+			parentReport: h.parentReport,
+			report: h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
+
+			routeConfigName:h.routeConfigName+"-"+matchedListener.GetMatcher().String(),
+			requireTlsOnVirtualHosts: h.requireTlsOnVirtualHosts,
+		}
+		virtualHosts := matchedListenerRouteConfigurationTranslator.computeVirtualHosts(params)
+
+		outRouteConfigs = append(outRouteConfigs, &envoy_config_route_v3.RouteConfiguration{
+			Name:                           h.routeConfigName+"-"+matchedListener.GetMatcher().String(),
+			VirtualHosts:                   virtualHosts,
+			MaxDirectResponseBodySizeBytes: h.parentListener.GetRouteOptions().GetMaxDirectResponseBodySizeBytes(),
+		})
+	}
+
+	return outRouteConfigs
+}
+
 
 // TODO(marco): when we update the routing API we should move this to a RouteActionPlugin
 func getSubsetMatch(destination *v1.Destination) *envoy_config_core_v3.Metadata {

@@ -114,6 +114,7 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 			plugins:  l.pluginRegistry.GetPlugins(),
 			filterChainTranslator: &hybridFilterChainTranslator{
 				plugins:             l.pluginRegistry.GetPlugins(),
+				tcpPlugins: l.pluginRegistry.GetTcpFilterChainPlugins(),
 				sslConfigTranslator: l.sslConfigTranslator,
 				parentListener:      listener,
 				listener:            listener.GetHybridListener(),
@@ -123,7 +124,18 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 			},
 		}
 
-		return listenerTranslator, nil
+		routeConfigurationTranslator := &hybridRouteConfigurationTranslator{
+			plugins: l.pluginRegistry.GetPlugins(),
+			proxy: l.proxy,
+			parentListener:           listener,
+			listener:                 listener.GetHybridListener(),
+			parentReport:             listenerReport,
+			report:                   hybridListenerReport,
+			routeConfigName:          routeConfigurationName,
+			requireTlsOnVirtualHosts: false, // TODO: how do we determine this for hybrid listeners
+		}
+
+		return listenerTranslator, routeConfigurationTranslator
 	default:
 		// This case should never occur
 		return &emptyListenerTranslator{}, &emptyRouteConfigurationTranslator{}
