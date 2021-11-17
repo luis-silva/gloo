@@ -2,6 +2,7 @@ package translator
 
 import (
 	"fmt"
+
 	envoy_config_core_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	envoyauth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
@@ -191,17 +192,16 @@ func merge(values []string, newValues ...string) []string {
 
 type matcherFilterChainTranslator struct {
 	// http
-	httpPlugins []plugins.HttpFilterPlugin
-	parentReport            *validationapi.ListenerReport
-	sslConfigTranslator     sslutils.SslConfigTranslator
+	httpPlugins         []plugins.HttpFilterPlugin
+	parentReport        *validationapi.ListenerReport
+	sslConfigTranslator sslutils.SslConfigTranslator
 
 	// List of TcpFilterChainPlugins to process
 	tcpPlugins []plugins.TcpFilterChainPlugin
 
-	listener *v1.HybridListener
+	listener       *v1.HybridListener
 	parentListener *v1.Listener
-	report *validationapi.HybridListenerReport
-
+	report         *validationapi.HybridListenerReport
 }
 
 func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
@@ -210,10 +210,10 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 		switch listenerType := matchedListener.GetListenerType().(type) {
 		case *v1.MatchedListener_HttpListener:
 			nft := &httpNetworkFilterTranslator{
-					plugins:         m.httpPlugins,
-					listener:        listenerType.HttpListener,
-					report:          m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
-					routeConfigName: matchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
+				plugins:         m.httpPlugins,
+				listener:        listenerType.HttpListener,
+				report:          m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
+				routeConfigName: matchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
 			}
 			networkFilters := nft.ComputeNetworkFilters(params)
 			if len(networkFilters) == 0 {
@@ -226,9 +226,9 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 				plugins: m.tcpPlugins,
 
 				parentListener: m.parentListener,
-				listener: matchedListener.GetTcpListener(),
+				listener:       matchedListener.GetTcpListener(),
 
-				report:  m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
+				report: m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
 			}
 
 			unmatchedFilterChains := sublistenerFilterChainTranslator.ComputeFilterChains(params)
@@ -276,13 +276,12 @@ func (m *matcherFilterChainTranslator) applyMatcherToFilterChain(snap *v1.ApiSna
 	for _, spr := range matcher.GetSourcePrefixRanges() {
 		outSpr := &envoy_config_core_v3.CidrRange{
 			AddressPrefix: spr.GetAddressPrefix(),
-			PrefixLen: spr.GetPrefixLen(),
+			PrefixLen:     spr.GetPrefixLen(),
 		}
 		sourcePrefixRanges = append(sourcePrefixRanges, outSpr)
 	}
 
 	fcm.SourcePrefixRanges = sourcePrefixRanges
-
 
 	return fc
 }

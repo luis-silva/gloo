@@ -496,15 +496,15 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 
 		matchedListenerRouteConfigurationTranslator := &httpRouteConfigurationTranslator{
 			plugins: h.plugins,
-			proxy: h.proxy,
+			proxy:   h.proxy,
 
 			parentListener: h.parentListener,
-			listener: httpListener,
+			listener:       httpListener,
 
 			parentReport: h.parentReport,
-			report: h.report.GetMatchedListenerReports()[matcher.String()].GetHttpListenerReport(),
+			report:       h.report.GetMatchedListenerReports()[matcher.String()].GetHttpListenerReport(),
 
-			routeConfigName:rcName,
+			routeConfigName:          rcName,
 			requireTlsOnVirtualHosts: matcher.GetSslConfig() != nil,
 		}
 		virtualHosts := matchedListenerRouteConfigurationTranslator.computeVirtualHosts(params)
@@ -518,7 +518,6 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 
 	return outRouteConfigs
 }
-
 
 // TODO(marco): when we update the routing API we should move this to a RouteActionPlugin
 func getSubsetMatch(destination *v1.Destination) *envoy_config_core_v3.Metadata {
