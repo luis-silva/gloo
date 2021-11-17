@@ -191,8 +191,8 @@ func merge(values []string, newValues ...string) []string {
 
 type matcherFilterChainTranslator struct {
 	// http
+	httpPlugins []plugins.HttpFilterPlugin
 	parentReport            *validationapi.ListenerReport
-	networkFilterTranslator NetworkFilterTranslator
 	sslConfigTranslator     sslutils.SslConfigTranslator
 
 	// List of TcpFilterChainPlugins to process
@@ -207,9 +207,15 @@ type matcherFilterChainTranslator struct {
 func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
 	var outFilterChains []*envoy_config_listener_v3.FilterChain
 	for _, matchedListener := range m.listener.GetMatchedListeners() {
-		switch _ := matchedListener.GetListenerType().(type) {
+		switch listenerType := matchedListener.GetListenerType().(type) {
 		case *v1.MatchedListener_HttpListener:
-			networkFilters := m.networkFilterTranslator.ComputeNetworkFilters(params)
+			nft := &httpNetworkFilterTranslator{
+					plugins:         m.httpPlugins,
+					listener:        listenerType.HttpListener,
+					report:          m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
+					routeConfigName: matchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
+			}
+			networkFilters := nft.ComputeNetworkFilters(params)
 			if len(networkFilters) == 0 {
 				return nil
 			}

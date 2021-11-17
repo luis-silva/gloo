@@ -60,16 +60,14 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 		listenerTranslator := &listenerTranslatorInstance{
 			listener: listener,
 			report:   listenerReport,
-			plugins:  l.pluginRegistry.GetPlugins(),
-			filterChainTranslator: &hybridFilterChainTranslator{
-				plugins:             l.pluginRegistry.GetPlugins(),
+			plugins:  l.pluginRegistry.GetListenerPlugins(),
+			filterChainTranslator: &matcherFilterChainTranslator{
 				tcpPlugins: l.pluginRegistry.GetTcpFilterChainPlugins(),
 				sslConfigTranslator: l.sslConfigTranslator,
 				parentListener:      listener,
 				listener:            listener.GetHybridListener(),
 				parentReport:        listenerReport,
 				report:              hybridListenerReport,
-				routeConfigName:     routeConfigurationName,
 			},
 		}
 
