@@ -228,7 +228,7 @@ var _ = Describe("Translator", func() {
 		hybridListener := &v1.Listener{
 			Name: "hybrid-listner",
 			BindAddress: "127.0.0.1",
-			BindPort: 8080,
+			BindPort: 8888,
 			ListenerType: &v1.Listener_HybridListener{
 				HybridListener: &v1.HybridListener{
 					MatchedListeners: []*v1.MatchedListener{
@@ -476,7 +476,7 @@ var _ = Describe("Translator", func() {
 					Reason: fmt.Sprintf("no path specifier provided. Route Name: %s", invalidMatcherName),
 				},
 			}
-			Expect(report).To(Equal(expectedReport))
+			Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0])) // hybridReports may not match due to map order
 		})
 		It("should error when path math is missing even if we have grpc spec", func() {
 			dest := routes[0].GetRouteAction().GetSingle()
@@ -512,7 +512,7 @@ var _ = Describe("Translator", func() {
 					Reason: fmt.Sprintf("*grpc.plugin: missing path for grpc route. Route Name: %s", processingErrorName),
 				},
 			}
-			Expect(report).To(Equal(expectedReport))
+			Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0]))
 		})
 	})
 
@@ -1279,7 +1279,7 @@ var _ = Describe("Translator", func() {
 					Reason: "invalid destination in weighted destination list: *v1.Upstream { gloo-system.notexist } not found",
 				},
 			}
-			Expect(report).To(Equal(expectedReport))
+			Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0]))
 		})
 
 		It("should use upstreamGroup's namespace as default if namespace is omitted on upstream destination", func() {
@@ -1555,7 +1555,7 @@ var _ = Describe("Translator", func() {
 						Reason: fmt.Sprintf("route has a subset config, but none of the subsets in the upstream match it. Route Name: %s", processingErrorName),
 					},
 				}
-				Expect(report).To(Equal(expectedReport))
+				Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0]))
 			})
 		})
 
@@ -1592,7 +1592,7 @@ var _ = Describe("Translator", func() {
 					},
 				}
 
-				Expect(report).To(Equal(expectedReport))
+				Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0]))
 			})
 		})
 	})
