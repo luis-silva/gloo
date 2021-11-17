@@ -101,13 +101,61 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 		return listenerTranslator, routeConfigurationTranslator
 
 	case *v1.Listener_HybridListener:
-		hybridListenerReport := listenerReport.GetHybridListenerReport()
-		if hybridListenerReport == nil {
-			contextutils.LoggerFrom(ctx).DPanic("internal error: listener report was not hybrid type")
+		
+		for _, hybridListener := range listener.GetHybridListener().GetMatchedListeners() {
+			switch hybridListener.GetListenerType().(type) {
+			case *v1.MatchedListener_HttpListener:
+
+				routeConfigurationName := "compute the proper route config name for this listener"
+
+				listenerTranslator := &listenerTranslatorInstance{
+					listener: listener,
+					report:   listenerReport,
+					plugins:  l.pluginRegistry.GetPlugins(),
+					filterChainTranslator: &httpFilterChainTranslator{
+						plugins:             l.pluginRegistry.GetPlugins(),
+						sslConfigTranslator: l.sslConfigTranslator,
+						parentListener:      listener,
+						listener:            listener.GetHttpListener(),
+						parentReport:        listenerReport,
+						report:              nil, // todo how do we get this report
+						routeConfigName:     routeConfigurationName,
+					},
+				}
+
+				routeConfigurationTranslator := &httpRouteConfigurationTranslator{
+					plugins:                  l.pluginRegistry.GetPlugins(),
+					proxy:                    l.proxy,
+					parentListener:           listener,
+					listener:                 hybridListener.GetHttpListener(),
+					parentReport:             listenerReport,
+					report:                   nil, // how do we get this report
+					routeConfigName:          routeConfigurationName,
+					requireTlsOnVirtualHosts: len(listener.GetSslConfigurations()) > 0,
+				}
+			case *v1.MatchedListener_TcpListener:
+				listenerTranslator := &listenerTranslatorInstance{
+					listener: listener,
+					report:   listenerReport,
+					plugins:  l.pluginRegistry.GetPlugins(),
+					filterChainTranslator: &tcpFilterChainTranslator{
+						plugins:        l.pluginRegistry.GetTcpFilterChainPlugins(),
+						parentListener: listener,
+						listener:       listener.GetTcpListener(),
+						report:         nil, // how do we get this report
+					},
+				}
+
+				// TPC Listeners do not support RouteConfig
+				routeConfigurationTranslator := emptyRouteConfigurationTranslator{}
+
+			}
 		}
 
-		routeConfigurationName := routeConfigName(listener)
-
+		// todo
+		// aggregate a list of listenerTranslators and list of routeCOnfiguaritonTranslators
+		// when we call compute, just call compute on all the sub-translators
+		// this way
 		listenerTranslator := &listenerTranslatorInstance{
 			listener: listener,
 			report:   listenerReport,
