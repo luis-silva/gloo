@@ -227,8 +227,45 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 				report:  m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
 			}
 
-			// TODO: not sure what to do with these vis-a-vis matchers
-			outFilterChains = append(outFilterChains, sublistenerFilterChainTranslator.ComputeFilterChains(params)...)
+			unmatchedFilterChains := sublistenerFilterChainTranslator.ComputeFilterChains(params)
+			for _, fc := range unmatchedFilterChains {
+				fcm := fc.GetFilterChainMatch()
+				if fcm == nil {
+					fcm = &envoy_config_listener_v3.FilterChainMatch{}
+				}
+
+				// Overwrite ssl config from plugins
+				if sslConfig := matchedListener.GetMatcher().GetSslConfig(); sslConfig != nil {
+					// Logic derived from computeFilterChainsFromSslConfig()
+					downstreamConfig, err := m.sslConfigTranslator.ResolveDownstreamSslConfig(params.Snapshot.Secrets, sslConfig)
+					if err != nil {
+						validation.AppendListenerError(m.parentReport,
+							validationapi.ListenerReport_Error_SSLConfigError, err.Error())
+						return nil
+					}
+
+					fcm.ServerNames = sslConfig.GetSniDomains()
+
+					fc.TransportSocket = &envoy_config_core_v3.TransportSocket{
+						Name:       wellknown.TransportSocketTls,
+						ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: sslutils.MustMessageToAny(downstreamConfig)},
+					}
+					fc.TransportSocketConnectTimeout = sslConfig.GetTransportSocketConnectTimeout()
+				}
+
+				var sourcePrefixRanges []*envoy_config_core_v3.CidrRange
+				for _, spr := range matchedListener.GetMatcher().GetSourcePrefixRanges() {
+					outSpr := &envoy_config_core_v3.CidrRange{
+						AddressPrefix: spr.GetAddressPrefix(),
+						PrefixLen: spr.GetPrefixLen(),
+					}
+					sourcePrefixRanges = append(sourcePrefixRanges, outSpr)
+				}
+
+				fcm.SourcePrefixRanges = sourcePrefixRanges
+
+				outFilterChains = append(outFilterChains, fc)
+			}
 		}
 	}
 
