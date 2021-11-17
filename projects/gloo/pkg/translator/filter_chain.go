@@ -2,8 +2,6 @@ package translator
 
 import (
 	"fmt"
-	"sort"
-
 	envoy_config_core_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	envoyauth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
@@ -216,7 +214,7 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 				return nil
 			}
 
-			outFilterChains = append(outFilterChains, m.computeFilterChainFromMatchedListener(params.Snapshot, networkFilters, matchedListener))
+			outFilterChains = append(outFilterChains, m.computeFilterChainFromMatchedListener(params.Snapshot, networkFilters, matchedListener.GetMatcher()))
 		case *v1.MatchedListener_TcpListener:
 			sublistenerFilterChainTranslator := tcpFilterChainTranslator{
 				plugins: m.tcpPlugins,
@@ -229,42 +227,7 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 
 			unmatchedFilterChains := sublistenerFilterChainTranslator.ComputeFilterChains(params)
 			for _, fc := range unmatchedFilterChains {
-				fcm := fc.GetFilterChainMatch()
-				if fcm == nil {
-					fcm = &envoy_config_listener_v3.FilterChainMatch{}
-				}
-
-				// Overwrite ssl config from plugins
-				if sslConfig := matchedListener.GetMatcher().GetSslConfig(); sslConfig != nil {
-					// Logic derived from computeFilterChainsFromSslConfig()
-					downstreamConfig, err := m.sslConfigTranslator.ResolveDownstreamSslConfig(params.Snapshot.Secrets, sslConfig)
-					if err != nil {
-						validation.AppendListenerError(m.parentReport,
-							validationapi.ListenerReport_Error_SSLConfigError, err.Error())
-						return nil
-					}
-
-					fcm.ServerNames = sslConfig.GetSniDomains()
-
-					fc.TransportSocket = &envoy_config_core_v3.TransportSocket{
-						Name:       wellknown.TransportSocketTls,
-						ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: sslutils.MustMessageToAny(downstreamConfig)},
-					}
-					fc.TransportSocketConnectTimeout = sslConfig.GetTransportSocketConnectTimeout()
-				}
-
-				var sourcePrefixRanges []*envoy_config_core_v3.CidrRange
-				for _, spr := range matchedListener.GetMatcher().GetSourcePrefixRanges() {
-					outSpr := &envoy_config_core_v3.CidrRange{
-						AddressPrefix: spr.GetAddressPrefix(),
-						PrefixLen: spr.GetPrefixLen(),
-					}
-					sourcePrefixRanges = append(sourcePrefixRanges, outSpr)
-				}
-
-				fcm.SourcePrefixRanges = sourcePrefixRanges
-
-				outFilterChains = append(outFilterChains, fc)
+				outFilterChains = append(outFilterChains, m.applyMatcherToFilterChain(params.Snapshot, matchedListener.GetMatcher(), fc))
 			}
 		}
 	}
@@ -272,13 +235,20 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 	return outFilterChains
 }
 
-func (m *matcherFilterChainTranslator) computeFilterChainFromMatchedListener(snap *v1.ApiSnapshot, listenerFilters []*envoy_config_listener_v3.Filter, matchedListener *v1.MatchedListener) *envoy_config_listener_v3.FilterChain {
+func (m *matcherFilterChainTranslator) computeFilterChainFromMatchedListener(snap *v1.ApiSnapshot, listenerFilters []*envoy_config_listener_v3.Filter, matcher *v1.Matcher) *envoy_config_listener_v3.FilterChain {
 	fc := &envoy_config_listener_v3.FilterChain{
 		Filters: listenerFilters,
 	}
-	fcm := &envoy_config_listener_v3.FilterChainMatch{}
+	return m.applyMatcherToFilterChain(snap, matcher, fc)
+}
 
-	if sslConfig := matchedListener.GetMatcher().GetSslConfig(); sslConfig != nil {
+func (m *matcherFilterChainTranslator) applyMatcherToFilterChain(snap *v1.ApiSnapshot, matcher *v1.Matcher, fc *envoy_config_listener_v3.FilterChain) *envoy_config_listener_v3.FilterChain {
+	fcm := fc.GetFilterChainMatch()
+	if fcm == nil {
+		fcm = &envoy_config_listener_v3.FilterChainMatch{}
+	}
+
+	if sslConfig := matcher.GetSslConfig(); sslConfig != nil {
 		// Logic derived from computeFilterChainsFromSslConfig()
 		downstreamConfig, err := m.sslConfigTranslator.ResolveDownstreamSslConfig(snap.Secrets, sslConfig)
 		if err != nil {
@@ -297,7 +267,7 @@ func (m *matcherFilterChainTranslator) computeFilterChainFromMatchedListener(sna
 	}
 
 	var sourcePrefixRanges []*envoy_config_core_v3.CidrRange
-	for _, spr := range matchedListener.GetMatcher().GetSourcePrefixRanges() {
+	for _, spr := range matcher.GetSourcePrefixRanges() {
 		outSpr := &envoy_config_core_v3.CidrRange{
 			AddressPrefix: spr.GetAddressPrefix(),
 			PrefixLen: spr.GetPrefixLen(),
@@ -309,13 +279,4 @@ func (m *matcherFilterChainTranslator) computeFilterChainFromMatchedListener(sna
 
 
 	return fc
-}
-
-func sortListenerFilters(filters plugins.StagedNetworkFilterList) []*envoy_config_listener_v3.Filter {
-	sort.Sort(filters)
-	var sortedFilters []*envoy_config_listener_v3.Filter
-	for _, filter := range filters {
-		sortedFilters = append(sortedFilters, filter.NetworkFilter)
-	}
-	return sortedFilters
 }
