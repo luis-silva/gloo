@@ -24,6 +24,7 @@ type FilterChainTranslator interface {
 
 var _ FilterChainTranslator = new(tcpFilterChainTranslator)
 var _ FilterChainTranslator = new(sslDuplicatedFilterChainTranslator)
+var _ FilterChainTranslator = new(matcherFilterChainTranslator)
 
 type tcpFilterChainTranslator struct {
 	// List of TcpFilterChainPlugins to process
@@ -190,55 +191,43 @@ func merge(values []string, newValues ...string) []string {
 	return values
 }
 
-type hybridFilterChainTranslator struct {
-	plugins             []plugins.Plugin
+type matcherFilterChainTranslator struct {
+	// http
+	parentReport            *validationapi.ListenerReport
+	networkFilterTranslator NetworkFilterTranslator
+	sslConfigTranslator     sslutils.SslConfigTranslator
+
+	// List of TcpFilterChainPlugins to process
 	tcpPlugins []plugins.TcpFilterChainPlugin
-	sslConfigTranslator sslutils.SslConfigTranslator
 
+	listener *v1.HybridListener
 	parentListener *v1.Listener
-	listener       *v1.HybridListener
+	report *validationapi.HybridListenerReport
 
-	parentReport *validationapi.ListenerReport
-	report       *validationapi.HybridListenerReport
-
-	routeConfigName string
 }
 
-func (h *hybridFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
+func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
 	var outFilterChains []*envoy_config_listener_v3.FilterChain
-	for _, matchedListener := range h.listener.GetMatchedListeners() {
+	for _, matchedListener := range m.listener.GetMatchedListeners() {
 		switch _ := matchedListener.GetListenerType().(type) {
 		case *v1.MatchedListener_HttpListener:
-			//sublistenerFilterChainTranslator := httpFilterChainTranslator{
-			//	plugins: h.plugins,
-			//	sslConfigTranslator: h.sslConfigTranslator,
-			//
-			//	parentListener: h.parentListener,
-			//	listener:       listenerType.HttpListener,
-			//
-			//	parentReport: h.parentReport,
-			//	report:	h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
-			//
-			//	routeConfigName: h.routeConfigName,
-			//}
-			//listenerFilters := sublistenerFilterChainTranslator.computeNetworkFilters(params)
-			//if len(listenerFilters) == 0 {
-			//	return nil
-			//}
-			//
-			//outFilterChains = append(outFilterChains, h.computeFilterChainFromMatchedListener(params.Snapshot, listenerFilters, matchedListener))
-		case *v1.MatchedListener_TcpListener:
-			sublistenerFilterChainTranslator := tcpFilterChainTranslator{
-				plugins: h.tcpPlugins,
-
-				parentListener: h.parentListener,
-				listener: matchedListener.GetTcpListener(),
-
-				// TODO: not sure what to do with these vis-a-vis matchers
-				report:  h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
+			networkFilters := m.networkFilterTranslator.ComputeNetworkFilters(params)
+			if len(networkFilters) == 0 {
+				return nil
 			}
 
+			outFilterChains = append(outFilterChains, m.computeFilterChainFromMatchedListener(params.Snapshot, networkFilters, matchedListener))
+		case *v1.MatchedListener_TcpListener:
+			sublistenerFilterChainTranslator := tcpFilterChainTranslator{
+				plugins: m.tcpPlugins,
 
+				parentListener: m.parentListener,
+				listener: matchedListener.GetTcpListener(),
+
+				report:  m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
+			}
+
+			// TODO: not sure what to do with these vis-a-vis matchers
 			outFilterChains = append(outFilterChains, sublistenerFilterChainTranslator.ComputeFilterChains(params)...)
 		}
 	}
@@ -246,7 +235,7 @@ func (h *hybridFilterChainTranslator) ComputeFilterChains(params plugins.Params)
 	return outFilterChains
 }
 
-func (h *hybridFilterChainTranslator) computeFilterChainFromMatchedListener(snap *v1.ApiSnapshot, listenerFilters []*envoy_config_listener_v3.Filter, matchedListener *v1.MatchedListener) *envoy_config_listener_v3.FilterChain {
+func (m *matcherFilterChainTranslator) computeFilterChainFromMatchedListener(snap *v1.ApiSnapshot, listenerFilters []*envoy_config_listener_v3.Filter, matchedListener *v1.MatchedListener) *envoy_config_listener_v3.FilterChain {
 	fc := &envoy_config_listener_v3.FilterChain{
 		Filters: listenerFilters,
 	}
@@ -254,9 +243,9 @@ func (h *hybridFilterChainTranslator) computeFilterChainFromMatchedListener(snap
 
 	if sslConfig := matchedListener.GetMatcher().GetSslConfig(); sslConfig != nil {
 		// Logic derived from computeFilterChainsFromSslConfig()
-		downstreamConfig, err := h.sslConfigTranslator.ResolveDownstreamSslConfig(snap.Secrets, sslConfig)
+		downstreamConfig, err := m.sslConfigTranslator.ResolveDownstreamSslConfig(snap.Secrets, sslConfig)
 		if err != nil {
-			validation.AppendListenerError(h.parentReport,
+			validation.AppendListenerError(m.parentReport,
 				validationapi.ListenerReport_Error_SSLConfigError, err.Error())
 			return nil
 		}
