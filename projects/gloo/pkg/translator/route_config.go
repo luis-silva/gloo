@@ -489,8 +489,10 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 		if httpListener == nil {
 			continue
 		}
+		matcher := matchedListener.GetMatcher()
+		rcName := fmt.Sprintf("%s-%s", h.routeConfigName, matcher.String())
 
-		params.Ctx = contextutils.WithLogger(params.Ctx, "compute_route_config."+h.routeConfigName+"-"+matchedListener.GetMatcher().String())
+		params.Ctx = contextutils.WithLogger(params.Ctx, "compute_route_config."+rcName)
 
 		matchedListenerRouteConfigurationTranslator := &httpRouteConfigurationTranslator{
 			plugins: h.plugins,
@@ -500,15 +502,15 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 			listener: httpListener,
 
 			parentReport: h.parentReport,
-			report: h.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
+			report: h.report.GetMatchedListenerReports()[matcher.String()].GetHttpListenerReport(),
 
-			routeConfigName:h.routeConfigName+"-"+matchedListener.GetMatcher().String(),
-			requireTlsOnVirtualHosts: h.requireTlsOnVirtualHosts,
+			routeConfigName:rcName,
+			requireTlsOnVirtualHosts: matcher.GetSslConfig() != nil,
 		}
 		virtualHosts := matchedListenerRouteConfigurationTranslator.computeVirtualHosts(params)
 
 		outRouteConfigs = append(outRouteConfigs, &envoy_config_route_v3.RouteConfiguration{
-			Name:                           h.routeConfigName+"-"+matchedListener.GetMatcher().String(),
+			Name:                           rcName,
 			VirtualHosts:                   virtualHosts,
 			MaxDirectResponseBodySizeBytes: h.parentListener.GetRouteOptions().GetMaxDirectResponseBodySizeBytes(),
 		})

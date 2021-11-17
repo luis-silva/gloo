@@ -81,7 +81,6 @@ func (l *ListenerSubsystemTranslatorFactory) GetTranslators(ctx context.Context,
 			parentReport:             listenerReport,
 			report:                   hybridListenerReport,
 			routeConfigName:          routeConfigurationName,
-			requireTlsOnVirtualHosts: false, // TODO: how do we determine this for hybrid listeners
 		}
 
 		return listenerTranslator, routeConfigurationTranslator
