@@ -27,6 +27,7 @@ message PathSegment {
     option (validate.required) = true;
     string key = 1 [(validate.rules).string = {min_len: 1}];
     uint32 index = 2;
+    bool all = 3;
   }
 }
 
@@ -94,19 +95,19 @@ message ValueProvider {
   string provider_template = 4;
 }
 
+message JsonValueList {
+  repeated JsonValue values = 1;
+}
+
+message JsonValue {
+  oneof json_val {
+    JsonNode node = 1;
+    ValueProvider value_provider = 2;
+    JsonValueList list = 3;
+  }
+}
+
 message JsonKeyValue {
-  message JsonValueList {
-    repeated JsonValue values = 1;
-  }
-
-  message JsonValue {
-    oneof json_val {
-      JsonNode node = 1;
-      ValueProvider value_provider = 2;
-      JsonValueList list = 3;
-    }
-  }
-
   string key = 1;
   JsonValue value = 2;
 }
@@ -143,12 +144,13 @@ message RequestTemplate {
   map<string, ValueProvider> query_params = 2;
 
   // implementation specific, gRPC will want gRPC message and struct to instantiate
-  oneof outgoing_body {
-    // json representation of outgoing body.
-    // empty string key can be used to signal parsing the value as json and using it
-    // as the whole json body.
-    JsonNode json = 3;
-  }
+//  oneof outgoing_body {
+//    // json representation of outgoing body.
+//    // empty string key can be used to signal parsing the value as json and using it
+//    // as the whole json body.
+//    JsonNode json = 3;
+//  }
+  JsonValue outgoing_body = 3;
 }
 
 // control-plane API
