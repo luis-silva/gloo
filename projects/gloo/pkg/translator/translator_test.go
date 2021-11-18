@@ -455,6 +455,24 @@ var _ = Describe("Translator", func() {
 			Expect(errs.Validate()).To(HaveOccurred())
 			Expect(errs.Validate().Error()).To(ContainSubstring("VirtualHost Error: ProcessingError. Reason: auth config not found:"))
 		})
+
+		It("will error if auth config is missing from a hybrid listener", func() {
+			proxyClone := proto.Clone(proxy).(*v1.Proxy)
+			proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetHttpListener().GetVirtualHosts()[0].Options =
+				&v1.VirtualHostOptions{
+					Extauth: &extauth.ExtAuthExtension{
+						Spec: &extauth.ExtAuthExtension_ConfigRef{
+							ConfigRef: &core.ResourceRef{},
+						},
+					},
+				}
+
+			_, errs, _, err := translator.Translate(params, proxyClone)
+
+			Expect(err).To(BeNil())
+			Expect(errs.Validate()).To(HaveOccurred())
+			Expect(errs.Validate().Error()).To(ContainSubstring("VirtualHost Error: ProcessingError. Reason: auth config not found:"))
+		})
 	})
 
 	Context("service spec", func() {
