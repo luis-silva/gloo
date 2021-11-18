@@ -226,7 +226,7 @@ var _ = Describe("Translator", func() {
 			},
 		}
 		hybridListener := &v1.Listener{
-			Name: "hybrid-listner",
+			Name: "hybrid-listener",
 			BindAddress: "127.0.0.1",
 			BindPort: 8888,
 			ListenerType: &v1.Listener_HybridListener{
@@ -391,6 +391,26 @@ var _ = Describe("Translator", func() {
 		routes := snap.GetResources(resource.RouteTypeV3)
 		Expect(routes.Items).To(HaveKey("http-listener-routes"))
 		routeResource := routes.Items["http-listener-routes"]
+		routeConfiguration = routeResource.ResourceProto().(*envoy_config_route_v3.RouteConfiguration)
+		Expect(routeConfiguration).NotTo(BeNil())
+		Expect(routeConfiguration.GetVirtualHosts()).To(HaveLen(1))
+		Expect(routeConfiguration.GetVirtualHosts()[0].Name).To(Equal("invalid_name"))
+	})
+
+	It("sanitizes an invalid virtual host name in a hybrid listener", func() {
+		proxyClone := proto.Clone(proxy).(*v1.Proxy)
+		proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetHttpListener().GetVirtualHosts()[0].Name = "invalid.name"
+
+		snap, errs, report, err := translator.Translate(params, proxyClone)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(errs.Validate()).NotTo(HaveOccurred())
+		Expect(snap).NotTo(BeNil())
+		Expect(report).To(Equal(validationutils.MakeReport(proxy)))
+
+		routes := snap.GetResources(resource.RouteTypeV3)
+		Expect(routes.Items).To(HaveKey(fmt.Sprintf("hybrid-listener-routes-%s",proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher().String())))
+		routeResource := routes.Items[fmt.Sprintf("hybrid-listener-routes-%s",proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher().String())]
 		routeConfiguration = routeResource.ResourceProto().(*envoy_config_route_v3.RouteConfiguration)
 		Expect(routeConfiguration).NotTo(BeNil())
 		Expect(routeConfiguration.GetVirtualHosts()).To(HaveLen(1))
