@@ -501,7 +501,7 @@ var _ = Describe("Translator", func() {
 				},
 			}
 		})
-		It("should error when path math is missing", func() {
+		It("should error when path match is missing", func() {
 			_, errs, report, err := translator.Translate(params, proxy)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(errs.Validate()).To(HaveOccurred())
@@ -516,7 +516,7 @@ var _ = Describe("Translator", func() {
 			}
 			Expect(report.ListenerReports[0]).To(Equal(expectedReport.ListenerReports[0])) // hybridReports may not match due to map order
 		})
-		It("should error when path math is missing even if we have grpc spec", func() {
+		It("should error when path match is missing even if we have grpc spec", func() {
 			dest := routes[0].GetRouteAction().GetSingle()
 			dest.DestinationSpec = &v1.DestinationSpec{
 				DestinationType: &v1.DestinationSpec_Grpc{
