@@ -34,7 +34,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 				SourcePrefixRanges: matchedGateway.GetMatcher().GetSourcePrefixRanges(),
 			}
 
-			switch matchedGateway.GetGatewayType().(type) {
+			switch gt := matchedGateway.GetGatewayType().(type) {
 			case *v1.MatchedGateway_HttpGateway:
 				virtualServices := getVirtualServicesForMatchedHttpGateway(matchedGateway, gateway, snap.VirtualServices, reports)
 				applyGlobalVirtualServiceSettings(ctx, virtualServices)
@@ -48,7 +48,15 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 					},
 				})
 			case *v1.MatchedGateway_TcpGateway:
-				// TODO
+				hybridListener.MatchedListeners = append(hybridListener.MatchedListeners, &gloov1.MatchedListener{
+				Matcher: matcher,
+				ListenerType: &gloov1.MatchedListener_TcpListener{
+					TcpListener: &gloov1.TcpListener{
+						Options: gt.TcpGateway.GetOptions(),
+						TcpHosts: gt.TcpGateway.GetTcpHosts(),
+					},
+				},
+				})
 			}
 		}
 
