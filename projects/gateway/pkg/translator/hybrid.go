@@ -2,6 +2,7 @@ package translator
 
 import (
 	"context"
+
 	v1 "github.com/solo-io/gloo/projects/gateway/pkg/api/v1"
 	gloov1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
 	"github.com/solo-io/go-utils/contextutils"
@@ -30,7 +31,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 
 		for _, matchedGateway := range gateway.GetHybridGateway().GetMatchedGateways() {
 			matcher := &gloov1.Matcher{
-				SslConfig: matchedGateway.GetMatcher().GetSslConfig(),
+				SslConfig:          matchedGateway.GetMatcher().GetSslConfig(),
 				SourcePrefixRanges: matchedGateway.GetMatcher().GetSourcePrefixRanges(),
 			}
 
@@ -41,21 +42,21 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 				validateVirtualServiceDomains(gateway, virtualServices, reports)
 				httpListener := t.desiredHttpListenerForHybrid(gateway, proxyName, virtualServices, snap, reports)
 
-				hybridListener.MatchedListeners = append(hybridListener.MatchedListeners, &gloov1.MatchedListener{
+				hybridListener.MatchedListeners = append(hybridListener.GetMatchedListeners(), &gloov1.MatchedListener{
 					Matcher: matcher,
 					ListenerType: &gloov1.MatchedListener_HttpListener{
 						HttpListener: httpListener,
 					},
 				})
 			case *v1.MatchedGateway_TcpGateway:
-				hybridListener.MatchedListeners = append(hybridListener.MatchedListeners, &gloov1.MatchedListener{
-				Matcher: matcher,
-				ListenerType: &gloov1.MatchedListener_TcpListener{
-					TcpListener: &gloov1.TcpListener{
-						Options: gt.TcpGateway.GetOptions(),
-						TcpHosts: gt.TcpGateway.GetTcpHosts(),
+				hybridListener.MatchedListeners = append(hybridListener.GetMatchedListeners(), &gloov1.MatchedListener{
+					Matcher: matcher,
+					ListenerType: &gloov1.MatchedListener_TcpListener{
+						TcpListener: &gloov1.TcpListener{
+							Options:  gt.TcpGateway.GetOptions(),
+							TcpHosts: gt.TcpGateway.GetTcpHosts(),
+						},
 					},
-				},
 				})
 			}
 		}
@@ -89,10 +90,10 @@ func (t *HybridTranslator) desiredHttpListenerForHybrid(gateway *v1.Gateway, pro
 	if httpGateway := gateway.GetHttpGateway(); httpGateway != nil {
 		httpPlugins = httpGateway.GetOptions()
 	}
-		httpListener := &gloov1.HttpListener{
-			VirtualHosts: virtualHosts,
-			Options:      httpPlugins,
-		}
+	httpListener := &gloov1.HttpListener{
+		VirtualHosts: virtualHosts,
+		Options:      httpPlugins,
+	}
 
 	return httpListener
 }
