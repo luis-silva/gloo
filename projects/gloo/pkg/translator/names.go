@@ -1,9 +1,8 @@
 package translator
 
 import (
-	"crypto/md5"
 	"fmt"
-	"io"
+	"hash/fnv"
 	"sort"
 
 	v1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
@@ -29,8 +28,8 @@ func matcherID(matcher *v1.Matcher) string {
 	sort.Strings(matcher.GetSslConfig().GetSniDomains())
 	sort.Strings(matcher.GetSslConfig().GetVerifySubjectAltName())
 
-	h := md5.New()
-	io.WriteString(h, matcher.String())
+	h := fnv.New64()
+	h.Write([]byte(matcher.String()))
 
 	return fmt.Sprintf("%x", h.Sum(nil))
 }

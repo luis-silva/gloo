@@ -33,7 +33,7 @@ var _ = Describe("matcherID", func() {
 			},
 		}
 		It("produces a deterministic unique ID", func() {
-			Expect(matcherID(matcher)).To(Equal("3107de82d662fb9a452ba47fa401f1c8"))
+			Expect(matcherID(matcher)).To(Equal("d91ebade3dc8b77d"))
 		})
 	})
 	When("matchers are identical", func() {
