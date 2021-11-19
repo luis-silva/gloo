@@ -2,6 +2,7 @@ package translator
 
 import (
 	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
+	"reflect"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	. "github.com/onsi/ginkgo"
@@ -32,7 +33,7 @@ var _ = Describe("matcherID", func() {
 			},
 		}
 		It("produces a deterministic unique ID", func() {
-			Expect(matcherID(matcher)).To(Equal("8380e12a0f262b4a49d84e9e2b322160"))
+			Expect(matcherID(matcher)).To(Equal("3107de82d662fb9a452ba47fa401f1c8"))
 		})
 	})
 	When("matchers are identical", func() {
@@ -151,5 +152,11 @@ var _ = Describe("matcherID", func() {
 		It("produces different IDs", func() {
 			Expect(matcherID(matcher1)).NotTo(Equal(matcherID(matcher2)))
 		})
+	})
+	It("does not have new fields", func() {
+		Expect(reflect.TypeOf(v1.Matcher{}).NumField()).To(
+			Equal(5),
+			"wrong number of fields found",
+		)
 	})
 })
