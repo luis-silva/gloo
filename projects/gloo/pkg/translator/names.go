@@ -18,16 +18,16 @@ func matchedRouteConfigName(listener *v1.Listener, matcher *v1.Matcher) string {
 }
 
 func matcherID(matcher *v1.Matcher) string {
-	sort.Slice(matcher.SourcePrefixRanges, func(i, j int) bool {
-		if matcher.SourcePrefixRanges[i].AddressPrefix != matcher.SourcePrefixRanges[j].AddressPrefix {
-			return matcher.SourcePrefixRanges[i].AddressPrefix < matcher.SourcePrefixRanges[j].AddressPrefix
+	sort.Slice(matcher.GetSourcePrefixRanges(), func(i, j int) bool {
+		if matcher.GetSourcePrefixRanges()[i].GetAddressPrefix() != matcher.GetSourcePrefixRanges()[j].GetAddressPrefix() {
+			return matcher.GetSourcePrefixRanges()[i].GetAddressPrefix() < matcher.GetSourcePrefixRanges()[j].GetAddressPrefix()
 		}
-		return matcher.SourcePrefixRanges[i].PrefixLen.Value < matcher.SourcePrefixRanges[j].PrefixLen.Value
+		return matcher.GetSourcePrefixRanges()[i].GetPrefixLen().GetValue() < matcher.GetSourcePrefixRanges()[j].GetPrefixLen().GetValue()
 	})
 
-	sort.Strings(matcher.SslConfig.AlpnProtocols)
-	sort.Strings(matcher.SslConfig.SniDomains)
-	sort.Strings(matcher.SslConfig.VerifySubjectAltName)
+	sort.Strings(matcher.GetSslConfig().GetAlpnProtocols())
+	sort.Strings(matcher.GetSslConfig().GetSniDomains())
+	sort.Strings(matcher.GetSslConfig().GetVerifySubjectAltName())
 
 	h := md5.New()
 	io.WriteString(h, matcher.String())

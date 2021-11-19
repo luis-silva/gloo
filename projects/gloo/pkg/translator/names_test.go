@@ -95,7 +95,7 @@ var _ = Describe("matcherID", func() {
 				},
 			},
 			SslConfig: &v1.SslConfig{
-				SniDomains: []string{"def","abc"},
+				SniDomains: []string{"def", "abc"},
 			},
 		}
 		matcher2 := &v1.Matcher{
