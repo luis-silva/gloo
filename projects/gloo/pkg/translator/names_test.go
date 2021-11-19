@@ -11,6 +11,30 @@ import (
 )
 
 var _ = Describe("matcherID", func() {
+	When("we get a matcher ID", func() {
+		matcher := &v1.Matcher{
+			SourcePrefixRanges: []*v3.CidrRange{
+				{
+					AddressPrefix: "foo",
+					PrefixLen: &wrappers.UInt32Value{
+						Value: 123,
+					},
+				},
+				{
+					AddressPrefix: "bar",
+					PrefixLen: &wrappers.UInt32Value{
+						Value: 456,
+					},
+				},
+			},
+			SslConfig: &v1.SslConfig{
+				SniDomains: []string{"abc", "def"},
+			},
+		}
+		It("produces a deterministic unique ID", func() {
+			Expect(matcherID(matcher)).To(Equal("8380e12a0f262b4a49d84e9e2b322160"))
+		})
+	})
 	When("matchers are identical", func() {
 		matcher1 := &v1.Matcher{
 			SourcePrefixRanges: []*v3.CidrRange{
