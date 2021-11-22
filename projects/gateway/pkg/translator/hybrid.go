@@ -61,6 +61,10 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 			}
 		}
 
+		listener.ListenerType = &gloov1.Listener_HybridListener{
+			HybridListener: hybridListener,
+		}
+
 		if err := appendSource(listener, gateway); err != nil {
 			// should never happen
 			reports.AddError(gateway, err)

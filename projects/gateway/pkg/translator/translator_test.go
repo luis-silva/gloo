@@ -41,7 +41,7 @@ var _ = Describe("Translator", func() {
 
 	Context("translator", func() {
 		BeforeEach(func() {
-			translator = NewTranslator([]ListenerFactory{&HttpTranslator{}, &TcpTranslator{}}, Opts{})
+			translator = NewTranslator([]ListenerFactory{&HttpTranslator{}, &TcpTranslator{}, &HybridTranslator{}}, Opts{})
 			snap = &v1.ApiSnapshot{
 				Gateways: v1.GatewayList{
 					{
@@ -155,7 +155,7 @@ var _ = Describe("Translator", func() {
 			Expect(httpListener.Options.Waf).To(Equal(waf))
 		})
 
-		It("should translate two gateways with same name (different types) to one proxy with the same name", func() {
+		It("should translate three gateways with same name (different types) to one proxy with the same name", func() {
 			snap.Gateways = append(
 				snap.Gateways,
 				&v1.Gateway{
@@ -164,6 +164,13 @@ var _ = Describe("Translator", func() {
 						TcpGateway: &v1.TcpGateway{},
 					},
 				},
+				&v1.Gateway{
+					Metadata: &core.Metadata{Namespace: ns, Name: "name2"},
+					GatewayType: &v1.Gateway_HybridGateway{
+						HybridGateway: &v1.HybridGateway{},
+					},
+					BindPort: 3,
+				},
 			)
 
 			proxy, errs := translator.Translate(context.Background(), defaults.GatewayProxyName, ns, snap, snap.Gateways)
@@ -171,7 +178,7 @@ var _ = Describe("Translator", func() {
 			Expect(errs.ValidateStrict()).NotTo(HaveOccurred())
 			Expect(proxy.Metadata.Name).To(Equal(defaults.GatewayProxyName))
 			Expect(proxy.Metadata.Namespace).To(Equal(ns))
-			Expect(proxy.Listeners).To(HaveLen(2))
+			Expect(proxy.Listeners).To(HaveLen(3))
 		})
 
 		It("should translate two gateways with same name (and types) to one proxy with the same name", func() {
@@ -775,7 +782,7 @@ var _ = Describe("Translator", func() {
 					}
 				})
 
-				It("should warn when a virtual services does not specify a virtual host", func() {
+				It("should warn when a virtual service does not specify a virtual host", func() {
 					snap.VirtualServices[0].VirtualHost = nil
 
 					_, reports := translator.Translate(context.Background(), defaults.GatewayProxyName, ns, snap, snap.Gateways)
@@ -787,7 +794,7 @@ var _ = Describe("Translator", func() {
 					Expect(errs.Error()).To(ContainSubstring(NoVirtualHostErr(snap.VirtualServices[0]).Error()))
 				})
 
-				It("should error when a virtual services has invalid regex", func() {
+				It("should error when a virtual service has invalid regex", func() {
 					snap.VirtualServices[0].VirtualHost.Routes[0].Matchers[0] = &matchers.Matcher{PathSpecifier: &matchers.Matcher_Regex{Regex: "["}}
 
 					_, reports := translator.Translate(context.Background(), defaults.GatewayProxyName, ns, snap, snap.Gateways)
@@ -803,7 +810,7 @@ var _ = Describe("Translator", func() {
 			Context("validate matcher short-circuiting warnings", func() {
 
 				BeforeEach(func() {
-					translator = NewTranslator([]ListenerFactory{&HttpTranslator{WarnOnRouteShortCircuiting: true}, &TcpTranslator{}}, Opts{})
+					translator = NewTranslator([]ListenerFactory{&HttpTranslator{WarnOnRouteShortCircuiting: true}, &TcpTranslator{}, &HybridTranslator{WarnOnRouteShortCircuiting: true}}, Opts{})
 				})
 
 				DescribeTable("warns on route short-circuiting", func(earlyMatcher, lateMatcher *matchers.Matcher, expectedErr error) {
