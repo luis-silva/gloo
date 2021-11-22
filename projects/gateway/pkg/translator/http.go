@@ -92,7 +92,7 @@ func (t *HttpTranslator) GenerateListeners(ctx context.Context, proxyName string
 			continue
 		}
 
-		virtualServices := getVirtualServicesForGateway(gateway, snap.VirtualServices, reports)
+		virtualServices := getVirtualServicesForHttpGateway(gateway.GetHttpGateway(), gateway, snap.VirtualServices, reports, gateway.GetSsl())
 		applyGlobalVirtualServiceSettings(ctx, virtualServices)
 		validateVirtualServiceDomains(gateway, virtualServices, reports)
 		listener := t.desiredListenerForHttp(gateway, proxyName, virtualServices, snap, reports)
@@ -157,13 +157,13 @@ func validateVirtualServiceDomains(gateway *v1.Gateway, virtualServices v1.Virtu
 	}
 }
 
-func getVirtualServicesForGateway(gateway *v1.Gateway, virtualServices v1.VirtualServiceList, reports reporter.ResourceReports) v1.VirtualServiceList {
+func getVirtualServicesForHttpGateway(httpGateway *v1.HttpGateway, parentGateway *v1.Gateway, virtualServices v1.VirtualServiceList, reports reporter.ResourceReports, gatewaySsl bool) v1.VirtualServiceList {
 
 	var virtualServicesForGateway v1.VirtualServiceList
 	for _, vs := range virtualServices {
-		contains, err := GatewayContainsVirtualService(gateway, vs)
+		contains, err := HttpGatewayContainsVirtualService(httpGateway, vs, gatewaySsl)
 		if err != nil {
-			reports.AddError(gateway, err)
+			reports.AddError(parentGateway, err)
 			continue
 		}
 		if contains {
@@ -174,12 +174,8 @@ func getVirtualServicesForGateway(gateway *v1.Gateway, virtualServices v1.Virtua
 	return virtualServicesForGateway
 }
 
-func GatewayContainsVirtualService(gateway *v1.Gateway, virtualService *v1.VirtualService) (bool, error) {
-	httpGateway := gateway.GetHttpGateway()
-	if httpGateway == nil {
-		return false, nil
-	}
-	if gateway.GetSsl() != hasSsl(virtualService) {
+func HttpGatewayContainsVirtualService(httpGateway *v1.HttpGateway, virtualService *v1.VirtualService, ssl bool) (bool, error) {
+	if ssl != hasSsl(virtualService) {
 		return false, nil
 	}
 
@@ -208,6 +204,7 @@ func GatewayContainsVirtualService(gateway *v1.Gateway, virtualService *v1.Virtu
 
 	return false, nil
 }
+
 func virtualServiceMatchesLabels(virtualService *v1.VirtualService, validLabels map[string]string, virtualServiceNamespaces []string) bool {
 	vsLabels := labels.Set(virtualService.GetMetadata().GetLabels())
 	var labelSelector labels.Selector

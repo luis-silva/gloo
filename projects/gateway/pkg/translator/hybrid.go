@@ -40,7 +40,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 					continue // TODO: do we want the entire listener to fail or just this matched listener?
 				}
 
-				virtualServices := getVirtualServicesForMatchedHttpGateway(matchedGateway, gateway, snap.VirtualServices, reports)
+				virtualServices := getVirtualServicesForHttpGateway(matchedGateway.GetHttpGateway(), gateway, snap.VirtualServices, reports, matchedGateway.GetMatcher().GetSslConfig() != nil)
 				applyGlobalVirtualServiceSettings(ctx, virtualServices)
 				validateVirtualServiceDomains(gateway, virtualServices, reports)
 				httpListener := t.HttpTranslator.desiredHttpListener(gateway, proxyName, virtualServices, snap, reports)
@@ -77,56 +77,4 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 		result = append(result, listener)
 	}
 	return result
-}
-
-// logic mirrors getVirtualServicesForGateway()
-func getVirtualServicesForMatchedHttpGateway(matchedGateway *v1.MatchedGateway, parentGateway *v1.Gateway, virtualServices v1.VirtualServiceList, reports reporter.ResourceReports) v1.VirtualServiceList {
-	var virtualServicesForGateway v1.VirtualServiceList
-	if matchedGateway.GetHttpGateway() == nil {
-		return virtualServicesForGateway
-	}
-	for _, vs := range virtualServices {
-		contains, err := HttpGatewayContainsVirtualService(matchedGateway.GetHttpGateway(), vs, matchedGateway.GetMatcher().GetSslConfig() != nil)
-		if err != nil {
-			reports.AddError(parentGateway, err)
-			continue
-		}
-		if contains {
-			virtualServicesForGateway = append(virtualServicesForGateway, vs)
-		}
-	}
-
-	return virtualServicesForGateway
-}
-
-// logic mirrors GatewayContainsVirtualService()
-func HttpGatewayContainsVirtualService(httpGateway *v1.HttpGateway, virtualService *v1.VirtualService, ssl bool) (bool, error) {
-	if ssl != hasSsl(virtualService) {
-		return false, nil
-	}
-
-	if httpGateway.GetVirtualServiceExpressions() != nil {
-		return virtualServiceValidForSelectorExpressions(virtualService, httpGateway.GetVirtualServiceExpressions(),
-			httpGateway.GetVirtualServiceNamespaces())
-	}
-	if httpGateway.GetVirtualServiceSelector() != nil {
-		return virtualServiceMatchesLabels(virtualService, httpGateway.GetVirtualServiceSelector(),
-			httpGateway.GetVirtualServiceNamespaces()), nil
-	}
-	// use individual refs to collect virtual services
-	virtualServiceRefs := httpGateway.GetVirtualServices()
-
-	if len(virtualServiceRefs) == 0 {
-		return virtualServiceNamespaceValidForGateway(httpGateway.GetVirtualServiceNamespaces(), virtualService), nil
-	}
-
-	vsRef := virtualService.GetMetadata().Ref()
-
-	for _, ref := range virtualServiceRefs {
-		if ref.Equal(vsRef) {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
