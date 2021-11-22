@@ -106,7 +106,9 @@ func (t *HybridTranslator) virtualServiceToVirtualHost(vs *v1.VirtualService, ga
 	converter := NewRouteConverter(NewRouteTableSelector(snapshot.RouteTables), NewRouteTableIndexer())
 	t.mergeDelegatedVirtualHostOptions(vs, snapshot.VirtualHostOptions, reports)
 
-	routes, err := converter.ConvertVirtualService(vs, gateway, proxyName, snapshot, reports) // TODO: determine whether we need to account for matcher
+	// note: in the future it may be necessary to create unique routes per matcher within a hybrid gateway
+	// in order to apply settings, such as rate limiting, on a per-matched gateway basis
+	routes, err := converter.ConvertVirtualService(vs, gateway, proxyName, snapshot, reports)
 	if err != nil {
 		// internal error, should never happen
 		return nil, err

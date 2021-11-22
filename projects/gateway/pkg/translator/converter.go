@@ -361,7 +361,7 @@ func routeName(resource resources.InputResource, gateway *gatewayv1.Gateway, pro
 		nameBuilder.WriteString("vs:")
 
 		// for virtual services, add gateway and proxy name to ensure name uniqueness
-		nameBuilder.WriteString(gateway.GetMetadata().GetName()) // TODO: do we need to add matcher ID?
+		nameBuilder.WriteString(gateway.GetMetadata().GetName())
 		nameBuilder.WriteString(sep)
 		nameBuilder.WriteString(proxyName)
 		nameBuilder.WriteString(sep)
