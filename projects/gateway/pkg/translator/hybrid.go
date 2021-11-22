@@ -12,7 +12,7 @@ import (
 )
 
 type HybridTranslator struct {
-	WarnOnRouteShortCircuiting bool
+	HttpTranslator *HttpTranslator
 }
 
 func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName string, snap *v1.ApiSnapshot, filteredGateways []*v1.Gateway, reports reporter.ResourceReports) []*gloov1.Listener {
@@ -43,7 +43,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 				virtualServices := getVirtualServicesForMatchedHttpGateway(matchedGateway, gateway, snap.VirtualServices, reports)
 				applyGlobalVirtualServiceSettings(ctx, virtualServices)
 				validateVirtualServiceDomains(gateway, virtualServices, reports)
-				httpListener := t.desiredHttpListenerForHybrid(gateway, proxyName, virtualServices, snap, reports)
+				httpListener := t.HttpTranslator.desiredHttpListener(gateway, proxyName, virtualServices, snap, reports)
 
 				hybridListener.MatchedListeners = append(hybridListener.GetMatchedListeners(), &gloov1.MatchedListener{
 					Matcher: matcher,
@@ -77,88 +77,6 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 		result = append(result, listener)
 	}
 	return result
-}
-
-// logic mirrors HttpTranslator.desiredListenerForHttp()
-func (t *HybridTranslator) desiredHttpListenerForHybrid(gateway *v1.Gateway, proxyName string, virtualServicesForGateway v1.VirtualServiceList, snapshot *v1.ApiSnapshot, reports reporter.ResourceReports) *gloov1.HttpListener {
-	var virtualHosts []*gloov1.VirtualHost
-
-	for _, virtualService := range virtualServicesForGateway.Sort() {
-		if virtualService.GetVirtualHost() == nil {
-			virtualService.VirtualHost = &v1.VirtualHost{}
-		}
-		vh, err := t.virtualServiceToVirtualHost(virtualService, gateway, proxyName, snapshot, reports)
-		if err != nil {
-			reports.AddError(virtualService, err)
-			continue
-		}
-		virtualHosts = append(virtualHosts, vh)
-	}
-
-	var httpPlugins *gloov1.HttpListenerOptions
-	if httpGateway := gateway.GetHttpGateway(); httpGateway != nil {
-		httpPlugins = httpGateway.GetOptions()
-	}
-	httpListener := &gloov1.HttpListener{
-		VirtualHosts: virtualHosts,
-		Options:      httpPlugins,
-	}
-
-	return httpListener
-}
-
-// logic mirrors HttpTranslator.virtualServiceToVirtualHost()
-func (t *HybridTranslator) virtualServiceToVirtualHost(vs *v1.VirtualService, gateway *v1.Gateway, proxyName string, snapshot *v1.ApiSnapshot, reports reporter.ResourceReports) (*gloov1.VirtualHost, error) {
-	converter := NewRouteConverter(NewRouteTableSelector(snapshot.RouteTables), NewRouteTableIndexer())
-	t.mergeDelegatedVirtualHostOptions(vs, snapshot.VirtualHostOptions, reports)
-
-	// note: in the future it may be necessary to create unique routes per matcher within a hybrid gateway
-	// in order to apply settings, such as rate limiting, on a per-matched gateway basis
-	routes, err := converter.ConvertVirtualService(vs, gateway, proxyName, snapshot, reports)
-	if err != nil {
-		// internal error, should never happen
-		return nil, err
-	}
-
-	vh := &gloov1.VirtualHost{
-		Name:    VirtualHostName(vs),
-		Domains: vs.GetVirtualHost().GetDomains(),
-		Routes:  routes,
-		Options: vs.GetVirtualHost().GetOptions(),
-	}
-
-	validateRoutes(vs, vh, reports)
-
-	if t.WarnOnRouteShortCircuiting {
-		validateRouteShortCircuiting(vs, vh, reports)
-	}
-
-	if err := appendSource(vh, vs); err != nil {
-		// should never happen
-		return nil, err
-	}
-
-	return vh, nil
-}
-
-// finds delegated VirtualHostOption Objects and merges the options into the virtual service
-func (t *HybridTranslator) mergeDelegatedVirtualHostOptions(vs *v1.VirtualService, options v1.VirtualHostOptionList, reports reporter.ResourceReports) {
-	optionRefs := vs.GetVirtualHost().GetOptionsConfigRefs().GetDelegateOptions()
-	for _, optionRef := range optionRefs {
-		vhOption, err := options.Find(optionRef.GetNamespace(), optionRef.GetName())
-		if err != nil {
-			reports.AddError(vs, err)
-			continue
-		}
-		if vs.GetVirtualHost().GetOptions() == nil {
-			vs.GetVirtualHost().Options = vhOption.GetOptions()
-			continue
-		}
-		vs.GetVirtualHost().Options, err = mergeVirtualHostOptions(vs.GetVirtualHost().GetOptions(), vhOption.GetOptions())
-		if err != nil {
-			reports.AddError(vs, err)
-		}
-	}
 }
 
 // logic mirrors getVirtualServicesForGateway()

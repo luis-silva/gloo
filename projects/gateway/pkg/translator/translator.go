@@ -49,7 +49,7 @@ func NewDefaultTranslator(opts Opts) *translator {
 	return NewTranslator([]ListenerFactory{
 		&HttpTranslator{WarnOnRouteShortCircuiting: warnOnRouteShortCircuiting},
 		&TcpTranslator{},
-		&HybridTranslator{WarnOnRouteShortCircuiting: warnOnRouteShortCircuiting},
+		&HybridTranslator{HttpTranslator: &HttpTranslator{WarnOnRouteShortCircuiting: warnOnRouteShortCircuiting}},
 	}, opts)
 }
 

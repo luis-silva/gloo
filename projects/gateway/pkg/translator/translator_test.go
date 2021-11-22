@@ -812,7 +812,7 @@ var _ = Describe("Translator", func() {
 			Context("validate matcher short-circuiting warnings", func() {
 
 				BeforeEach(func() {
-					translator = NewTranslator([]ListenerFactory{&HttpTranslator{WarnOnRouteShortCircuiting: true}, &TcpTranslator{}, &HybridTranslator{WarnOnRouteShortCircuiting: true}}, Opts{})
+					translator = NewTranslator([]ListenerFactory{&HttpTranslator{WarnOnRouteShortCircuiting: true}, &TcpTranslator{}, &HybridTranslator{HttpTranslator: &HttpTranslator{WarnOnRouteShortCircuiting: true}}}, Opts{})
 				})
 
 				DescribeTable("warns on route short-circuiting", func(earlyMatcher, lateMatcher *matchers.Matcher, expectedErr error) {
@@ -1817,7 +1817,7 @@ var _ = Describe("Translator", func() {
 		)
 
 		BeforeEach(func() {
-			factory = &HybridTranslator{}
+			factory = &HybridTranslator{HttpTranslator: &HttpTranslator{}}
 			translator = NewTranslator([]ListenerFactory{factory}, Opts{})
 
 			idleTimeout = prototime.DurationToProto(5 * time.Second)
