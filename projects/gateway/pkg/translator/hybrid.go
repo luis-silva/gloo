@@ -32,6 +32,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 
 			switch gt := matchedGateway.GetGatewayType().(type) {
 			case *v1.MatchedGateway_HttpGateway:
+				// logic mirrors HttpTranslator.GenerateListeners
 				if len(snap.VirtualServices) == 0 {
 					snapHash := hashutils.MustHash(snap)
 					contextutils.LoggerFrom(ctx).Debugf("%v had no virtual services", snapHash)
@@ -50,6 +51,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 					},
 				})
 			case *v1.MatchedGateway_TcpGateway:
+				// logic mirrors TcpTranslator.GenerateListeners
 				hybridListener.MatchedListeners = append(hybridListener.GetMatchedListeners(), &gloov1.MatchedListener{
 					Matcher: matcher,
 					ListenerType: &gloov1.MatchedListener_TcpListener{
@@ -76,6 +78,7 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 	return result
 }
 
+// logic mirrors HttpTranslator.desiredListenerForHttp()
 func (t *HybridTranslator) desiredHttpListenerForHybrid(gateway *v1.Gateway, proxyName string, virtualServicesForGateway v1.VirtualServiceList, snapshot *v1.ApiSnapshot, reports reporter.ResourceReports) *gloov1.HttpListener {
 	var virtualHosts []*gloov1.VirtualHost
 
@@ -103,6 +106,7 @@ func (t *HybridTranslator) desiredHttpListenerForHybrid(gateway *v1.Gateway, pro
 	return httpListener
 }
 
+// logic mirrors HttpTranslator.virtualServiceToVirtualHost()
 func (t *HybridTranslator) virtualServiceToVirtualHost(vs *v1.VirtualService, gateway *v1.Gateway, proxyName string, snapshot *v1.ApiSnapshot, reports reporter.ResourceReports) (*gloov1.VirtualHost, error) {
 	converter := NewRouteConverter(NewRouteTableSelector(snapshot.RouteTables), NewRouteTableIndexer())
 	t.mergeDelegatedVirtualHostOptions(vs, snapshot.VirtualHostOptions, reports)
@@ -156,6 +160,7 @@ func (t *HybridTranslator) mergeDelegatedVirtualHostOptions(vs *v1.VirtualServic
 	}
 }
 
+// logic mirrors getVirtualServicesForGateway()
 func getVirtualServicesForMatchedHttpGateway(matchedGateway *v1.MatchedGateway, parentGateway *v1.Gateway, virtualServices v1.VirtualServiceList, reports reporter.ResourceReports) v1.VirtualServiceList {
 	var virtualServicesForGateway v1.VirtualServiceList
 	if matchedGateway.GetHttpGateway() == nil {
@@ -175,6 +180,7 @@ func getVirtualServicesForMatchedHttpGateway(matchedGateway *v1.MatchedGateway, 
 	return virtualServicesForGateway
 }
 
+// logic mirrors GatewayContainsVirtualService()
 func HttpGatewayContainsVirtualService(httpGateway *v1.HttpGateway, virtualService *v1.VirtualService, ssl bool) (bool, error) {
 	if ssl != hasSsl(virtualService) {
 		return false, nil
