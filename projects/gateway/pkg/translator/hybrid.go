@@ -2,11 +2,11 @@ package translator
 
 import (
 	"context"
+	"github.com/solo-io/go-utils/contextutils"
+	"github.com/solo-io/go-utils/hashutils"
 
 	v1 "github.com/solo-io/gloo/projects/gateway/pkg/api/v1"
 	gloov1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
-	"github.com/solo-io/go-utils/contextutils"
-	"github.com/solo-io/go-utils/hashutils"
 	"github.com/solo-io/solo-kit/pkg/api/v2/reporter"
 )
 
@@ -15,11 +15,6 @@ type HybridTranslator struct {
 }
 
 func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName string, snap *v1.ApiSnapshot, filteredGateways []*v1.Gateway, reports reporter.ResourceReports) []*gloov1.Listener {
-	if len(snap.VirtualServices) == 0 {
-		snapHash := hashutils.MustHash(snap)
-		contextutils.LoggerFrom(ctx).Debugf("%v had no virtual services", snapHash)
-		return nil
-	}
 	var result []*gloov1.Listener
 	for _, gateway := range filteredGateways {
 		if gateway.GetHybridGateway() == nil {
@@ -37,6 +32,12 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 
 			switch gt := matchedGateway.GetGatewayType().(type) {
 			case *v1.MatchedGateway_HttpGateway:
+				if len(snap.VirtualServices) == 0 {
+					snapHash := hashutils.MustHash(snap)
+					contextutils.LoggerFrom(ctx).Debugf("%v had no virtual services", snapHash)
+					continue // TODO: do we want the entire listener to fail or just this matched listener?
+				}
+
 				virtualServices := getVirtualServicesForMatchedHttpGateway(matchedGateway, gateway, snap.VirtualServices, reports)
 				applyGlobalVirtualServiceSettings(ctx, virtualServices)
 				validateVirtualServiceDomains(gateway, virtualServices, reports)
