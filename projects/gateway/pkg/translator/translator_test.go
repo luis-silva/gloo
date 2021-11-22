@@ -2,8 +2,9 @@ package translator_test
 
 import (
 	"context"
-	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 	"time"
+
+	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 
 	"github.com/solo-io/gloo/pkg/utils/settingsutil"
 
@@ -1808,7 +1809,7 @@ var _ = Describe("Translator", func() {
 
 	Context("hybrid", func() {
 		var (
-			factory            *HybridTranslator
+			factory *HybridTranslator
 
 			idleTimeout        *duration.Duration
 			tcpListenerOptions *gloov1.TcpListenerOptions
