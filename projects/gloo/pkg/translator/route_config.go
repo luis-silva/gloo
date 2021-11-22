@@ -490,7 +490,7 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 			continue
 		}
 		matcher := matchedListener.GetMatcher()
-		rcName := fmt.Sprintf("%s-%s", h.routeConfigName, matcher.String())
+		rcName := utils.MatchedRouteConfigName(h.parentListener, matcher)
 
 		params.Ctx = contextutils.WithLogger(params.Ctx, "compute_route_config."+rcName)
 
@@ -502,7 +502,7 @@ func (h *hybridRouteConfigurationTranslator) ComputeRouteConfiguration(params pl
 			listener:       httpListener,
 
 			parentReport: h.parentReport,
-			report:       h.report.GetMatchedListenerReports()[matcher.String()].GetHttpListenerReport(),
+			report:       h.report.GetMatchedListenerReports()[utils.MatchedRouteConfigName(h.parentListener, matcher)].GetHttpListenerReport(),
 
 			routeConfigName:          rcName,
 			requireTlsOnVirtualHosts: matcher.GetSslConfig() != nil,

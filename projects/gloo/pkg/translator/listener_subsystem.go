@@ -66,7 +66,7 @@ func (l *ListenerSubsystemTranslatorFactory) GetHttpListenerTranslators(ctx cont
 		contextutils.LoggerFrom(ctx).DPanic("internal error: listener report was not http type")
 	}
 
-	routeConfigurationName := routeConfigName(listener)
+	routeConfigurationName := utils.RouteConfigName(listener)
 
 	listenerTranslator := &listenerTranslatorInstance{
 		listener: listener,
@@ -135,7 +135,7 @@ func (l *ListenerSubsystemTranslatorFactory) GetHybridListenerTranslators(ctx co
 		contextutils.LoggerFrom(ctx).DPanic("internal error: listener report was not hybrid type")
 	}
 
-	routeConfigurationName := routeConfigName(listener)
+	routeConfigurationName := utils.RouteConfigName(listener)
 
 	listenerTranslator := &listenerTranslatorInstance{
 		listener: listener,

@@ -3,6 +3,7 @@ package translator_test
 import (
 	"context"
 	"fmt"
+
 	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 
 	"github.com/onsi/ginkgo/extensions/table"
@@ -226,9 +227,9 @@ var _ = Describe("Translator", func() {
 			},
 		}
 		hybridListener := &v1.Listener{
-			Name: "hybrid-listener",
+			Name:        "hybrid-listener",
 			BindAddress: "127.0.0.1",
-			BindPort: 8888,
+			BindPort:    8888,
 			ListenerType: &v1.Listener_HybridListener{
 				HybridListener: &v1.HybridListener{
 					MatchedListeners: []*v1.MatchedListener{
@@ -409,8 +410,9 @@ var _ = Describe("Translator", func() {
 		Expect(report).To(Equal(validationutils.MakeReport(proxy)))
 
 		routes := snap.GetResources(resource.RouteTypeV3)
-		Expect(routes.Items).To(HaveKey(fmt.Sprintf("hybrid-listener-routes-%s",proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher().String())))
-		routeResource := routes.Items[fmt.Sprintf("hybrid-listener-routes-%s",proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher().String())]
+		expRouteConfigName := glooutils.MatchedRouteConfigName(proxyClone.GetListeners()[2], proxyClone.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher())
+		Expect(routes.Items).To(HaveKey(expRouteConfigName))
+		routeResource := routes.Items[expRouteConfigName]
 		routeConfiguration = routeResource.ResourceProto().(*envoy_config_route_v3.RouteConfiguration)
 		Expect(routeConfiguration).NotTo(BeNil())
 		Expect(routeConfiguration.GetVirtualHosts()).To(HaveLen(1))

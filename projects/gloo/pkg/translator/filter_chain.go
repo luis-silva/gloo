@@ -13,7 +13,7 @@ import (
 	validationapi "github.com/solo-io/gloo/projects/gloo/pkg/api/grpc/validation"
 	v1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins"
-	sslutils "github.com/solo-io/gloo/projects/gloo/pkg/utils"
+	"github.com/solo-io/gloo/projects/gloo/pkg/utils"
 	"github.com/solo-io/gloo/projects/gloo/pkg/utils/validation"
 )
 
@@ -61,7 +61,7 @@ type sslDuplicatedFilterChainTranslator struct {
 	parentReport            *validationapi.ListenerReport
 	networkFilterTranslator NetworkFilterTranslator
 	sslConfigurations       []*v1.SslConfig
-	sslConfigTranslator     sslutils.SslConfigTranslator
+	sslConfigTranslator     utils.SslConfigTranslator
 }
 
 func (s *sslDuplicatedFilterChainTranslator) ComputeFilterChains(params plugins.Params) []*envoy_config_listener_v3.FilterChain {
@@ -126,7 +126,7 @@ func newSslFilterChain(
 		Filters: clonedListenerFilters,
 		TransportSocket: &envoy_config_core_v3.TransportSocket{
 			Name:       wellknown.TransportSocketTls,
-			ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: sslutils.MustMessageToAny(downstreamTlsContext)},
+			ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: utils.MustMessageToAny(downstreamTlsContext)},
 		},
 		TransportSocketConnectTimeout: timeout,
 	}
@@ -194,7 +194,7 @@ type matcherFilterChainTranslator struct {
 	// http
 	httpPlugins         []plugins.HttpFilterPlugin
 	parentReport        *validationapi.ListenerReport
-	sslConfigTranslator sslutils.SslConfigTranslator
+	sslConfigTranslator utils.SslConfigTranslator
 
 	// List of TcpFilterChainPlugins to process
 	tcpPlugins []plugins.TcpFilterChainPlugin
@@ -212,8 +212,8 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 			nft := &httpNetworkFilterTranslator{
 				plugins:         m.httpPlugins,
 				listener:        listenerType.HttpListener,
-				report:          m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetHttpListenerReport(),
-				routeConfigName: matchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
+				report:          m.report.GetMatchedListenerReports()[utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher())].GetHttpListenerReport(),
+				routeConfigName: utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
 			}
 			networkFilters := nft.ComputeNetworkFilters(params)
 			if len(networkFilters) == 0 {
@@ -267,7 +267,7 @@ func (m *matcherFilterChainTranslator) applyMatcherToFilterChain(snap *v1.ApiSna
 
 		fc.TransportSocket = &envoy_config_core_v3.TransportSocket{
 			Name:       wellknown.TransportSocketTls,
-			ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: sslutils.MustMessageToAny(downstreamConfig)},
+			ConfigType: &envoy_config_core_v3.TransportSocket_TypedConfig{TypedConfig: utils.MustMessageToAny(downstreamConfig)},
 		}
 		fc.TransportSocketConnectTimeout = sslConfig.GetTransportSocketConnectTimeout()
 	}
