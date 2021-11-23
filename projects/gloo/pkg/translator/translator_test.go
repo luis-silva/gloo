@@ -3,7 +3,6 @@ package translator_test
 import (
 	"context"
 	"fmt"
-
 	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 
 	"github.com/onsi/ginkgo/extensions/table"
@@ -2247,6 +2246,43 @@ var _ = Describe("Translator", func() {
 			clusterSpec := typedCfg.GetCluster()
 			Expect(clusterSpec).To(Equal("test_gloo-system"))
 			Expect(listener.GetListenerFilters()[0].GetName()).To(Equal(wellknown.TlsInspector))
+		})
+	})
+	Context("Hybrid", func() {
+		It("can properly create a hybrid listener", func() {
+			translate()
+			listeners := snapshot.GetResources(resource.ListenerTypeV3).Items
+			Expect(listeners).NotTo(HaveLen(0))
+			val, found := listeners["hybrid-listener"]
+			Expect(found).To(BeTrue())
+			listener, ok := val.ResourceProto().(*envoy_config_listener_v3.Listener)
+			Expect(ok).To(BeTrue())
+			Expect(listener.GetName()).To(Equal("hybrid-listener"))
+			Expect(listener.GetFilterChains()).To(HaveLen(2))
+
+			// tcp
+			tcpFc := listener.GetFilterChains()[0]
+			Expect(tcpFc.Filters).To(HaveLen(1))
+			tcpFilter := tcpFc.Filters[0]
+			tcpCfg := tcpFilter.GetTypedConfig()
+			Expect(tcpCfg).NotTo(BeNil())
+			var tcpTypedCfg envoytcp.TcpProxy
+			Expect(ParseTypedConfig(tcpFilter, &tcpTypedCfg)).NotTo(HaveOccurred())
+			clusterSpec := tcpTypedCfg.GetCluster()
+			Expect(clusterSpec).To(Equal("test_gloo-system"))
+			//Expect(listener.GetListenerFilters()[0].GetName()).To(Equal(wellknown.TlsInspector)) // TODO: implement for hybrid
+
+			// http
+			httpFc := listener.GetFilterChains()[1]
+			Expect(httpFc.Filters).To(HaveLen(1))
+			hcmFilter := httpFc.Filters[0]
+			hcmCfg := hcmFilter.GetConfigType()
+			Expect(hcmCfg).NotTo(BeNil())
+			var hcmTypedCfg envoyhttp.HttpConnectionManager
+			Expect(ParseTypedConfig(hcmFilter, &hcmTypedCfg)).NotTo(HaveOccurred())
+			Expect(hcmTypedCfg.GetRds()).NotTo(BeNil())
+			Expect(hcmTypedCfg.GetRds().RouteConfigName).To(Equal(glooutils.MatchedRouteConfigName(proxy.GetListeners()[2], proxy.GetListeners()[2].GetHybridListener().GetMatchedListeners()[1].GetMatcher())))
+			Expect(hcmTypedCfg.GetHttpFilters()).To(HaveLen(6)) // TODO: is this the right number? is there more we can/should do to ensure correctness?
 		})
 	})
 
