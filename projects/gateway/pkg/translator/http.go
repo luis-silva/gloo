@@ -265,9 +265,7 @@ func hasSsl(vs *v1.VirtualService) bool {
 }
 
 func (t *HttpTranslator) desiredListenerForHttp(gateway *v1.Gateway, proxyName string, virtualServicesForGateway v1.VirtualServiceList, snapshot *v1.ApiSnapshot, reports reporter.ResourceReports) *gloov1.Listener {
-	var (
-		sslConfigs []*gloov1.SslConfig
-	)
+	var sslConfigs []*gloov1.SslConfig
 
 	for _, virtualService := range virtualServicesForGateway.Sort() {
 		if virtualService.GetSslConfig() != nil {
