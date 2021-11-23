@@ -193,6 +193,7 @@ func merge(values []string, newValues ...string) []string {
 type matcherFilterChainTranslator struct {
 	// http
 	httpPlugins         []plugins.HttpFilterPlugin
+	hcmPlugins          []plugins.HttpConnectionManagerPlugin
 	parentReport        *validationapi.ListenerReport
 	sslConfigTranslator utils.SslConfigTranslator
 
@@ -209,12 +210,13 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 	for _, matchedListener := range m.listener.GetMatchedListeners() {
 		switch listenerType := matchedListener.GetListenerType().(type) {
 		case *v1.MatchedListener_HttpListener:
-			nft := &httpNetworkFilterTranslator{
-				plugins:         m.httpPlugins,
-				listener:        listenerType.HttpListener,
-				report:          m.report.GetMatchedListenerReports()[utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher())].GetHttpListenerReport(),
-				routeConfigName: utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()),
-			}
+			nft := NewHttpListenerNetworkFilterTranslator(
+				m.parentListener,
+				listenerType.HttpListener,
+				m.report.GetMatchedListenerReports()[utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher())].GetHttpListenerReport(),
+				m.httpPlugins,
+				m.hcmPlugins,
+				utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher()))
 			networkFilters := nft.ComputeNetworkFilters(params)
 			if len(networkFilters) == 0 {
 				return nil
@@ -228,7 +230,7 @@ func (m *matcherFilterChainTranslator) ComputeFilterChains(params plugins.Params
 				parentListener: m.parentListener,
 				listener:       matchedListener.GetTcpListener(),
 
-				report: m.report.GetMatchedListenerReports()[matchedListener.GetMatcher().String()].GetTcpListenerReport(),
+				report: m.report.GetMatchedListenerReports()[utils.MatchedRouteConfigName(m.parentListener, matchedListener.GetMatcher())].GetTcpListenerReport(),
 			}
 
 			unmatchedFilterChains := sublistenerFilterChainTranslator.ComputeFilterChains(params)

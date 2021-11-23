@@ -168,11 +168,13 @@ func (l *ListenerSubsystemTranslatorFactory) GetHybridListenerTranslators(ctx co
 		report:   listenerReport,
 		plugins:  l.pluginRegistry.GetListenerPlugins(),
 		filterChainTranslator: &matcherFilterChainTranslator{
-			tcpPlugins:          l.pluginRegistry.GetTcpFilterChainPlugins(),
-			sslConfigTranslator: l.sslConfigTranslator,
-			parentListener:      listener,
-			listener:            listener.GetHybridListener(),
+			httpPlugins:         l.pluginRegistry.GetHttpFilterPlugins(),
+			hcmPlugins:          l.pluginRegistry.GetHttpConnectionManagerPlugins(),
 			parentReport:        listenerReport,
+			sslConfigTranslator: l.sslConfigTranslator,
+			tcpPlugins:          l.pluginRegistry.GetTcpFilterChainPlugins(),
+			listener:            listener.GetHybridListener(),
+			parentListener:      listener,
 			report:              hybridListenerReport,
 		},
 	}
