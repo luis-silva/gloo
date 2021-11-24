@@ -16,7 +16,11 @@ type HybridTranslator struct {
 }
 
 func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName string, snap *v1.ApiSnapshot, filteredGateways []*v1.Gateway, reports reporter.ResourceReports) []*gloov1.Listener {
-	var result []*gloov1.Listener
+	var (
+		result []*gloov1.Listener
+		loggedError bool
+	)
+
 	for _, gateway := range filteredGateways {
 		if gateway.GetHybridGateway() == nil {
 			continue
@@ -35,8 +39,11 @@ func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName stri
 			case *v1.MatchedGateway_HttpGateway:
 				// logic mirrors HttpTranslator.GenerateListeners
 				if len(snap.VirtualServices) == 0 {
-					snapHash := hashutils.MustHash(snap)
-					contextutils.LoggerFrom(ctx).Debugf("%v had no virtual services", snapHash)
+					if !loggedError {
+						snapHash := hashutils.MustHash(snap)
+						contextutils.LoggerFrom(ctx).Debugf("%v had no virtual services", snapHash)
+						loggedError = true
+					}
 					continue // TODO: do we want the entire listener to fail or just this matched listener?
 				}
 
