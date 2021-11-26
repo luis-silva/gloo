@@ -117,9 +117,13 @@ spec:
 {{/* extauth have specified yaml in Enterprise (as opposed to generic yaml insertion for third party configs here) */}}
 {{- if .Values.global.extauthCustomYaml }}
 {{- if .Values.global.extensions }}
-{{- if .Values.global.extensions.extAuth }}
+{{- if or .Values.global.extauthCustomYamlBody .Values.global.extensions.extAuth }}
   extauth:
+{{- if .Values.global.extauthCustomYamlBody }}
+{{- toYaml .Values.global.extauthCustomYamlBody | nindent 4 }}
+{{- else }}
 {{- toYaml .Values.global.extensions.extAuth | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end -}}
