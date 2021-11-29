@@ -1,0 +1,6 @@
+gloo:
+  deployment:
+    image:
+      registry: lsilva
+      repository: gloo-luis
+      tag: 1
