@@ -2272,7 +2272,8 @@ var _ = Describe("Translator", func() {
 			Expect(ParseTypedConfig(tcpFilter, &tcpTypedCfg)).NotTo(HaveOccurred())
 			clusterSpec := tcpTypedCfg.GetCluster()
 			Expect(clusterSpec).To(Equal("test_gloo-system"))
-			//Expect(listener.GetListenerFilters()[0].GetName()).To(Equal(wellknown.TlsInspector)) // TODO: implement for hybrid
+			Expect(listener.GetListenerFilters()).To(HaveLen(1))
+			Expect(listener.GetListenerFilters()[0].GetName()).To(Equal(wellknown.TlsInspector))
 
 			// http
 			httpFc := listener.GetFilterChains()[1]
