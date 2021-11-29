@@ -17,7 +17,7 @@ type HybridTranslator struct {
 
 func (t *HybridTranslator) GenerateListeners(ctx context.Context, proxyName string, snap *v1.ApiSnapshot, filteredGateways []*v1.Gateway, reports reporter.ResourceReports) []*gloov1.Listener {
 	var (
-		result []*gloov1.Listener
+		result      []*gloov1.Listener
 		loggedError bool
 	)
 
