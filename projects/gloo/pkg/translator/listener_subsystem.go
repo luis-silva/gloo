@@ -161,8 +161,6 @@ func (l *ListenerSubsystemTranslatorFactory) GetHybridListenerTranslators(ctx co
 		contextutils.LoggerFrom(ctx).DPanic("internal error: listener report was not hybrid type")
 	}
 
-	routeConfigurationName := utils.RouteConfigName(listener)
-
 	listenerTranslator := &listenerTranslatorInstance{
 		listener: listener,
 		report:   listenerReport,
@@ -186,7 +184,6 @@ func (l *ListenerSubsystemTranslatorFactory) GetHybridListenerTranslators(ctx co
 		listener:        listener.GetHybridListener(),
 		parentReport:    listenerReport,
 		report:          hybridListenerReport,
-		routeConfigName: routeConfigurationName,
 	}
 
 	return listenerTranslator, routeConfigurationTranslator

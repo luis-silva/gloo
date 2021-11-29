@@ -479,7 +479,6 @@ type hybridRouteConfigurationTranslator struct {
 	parentReport *validationapi.ListenerReport
 	report       *validationapi.HybridListenerReport
 
-	routeConfigName          string
 	requireTlsOnVirtualHosts bool
 }
 
