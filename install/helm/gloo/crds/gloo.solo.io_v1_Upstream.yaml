@@ -1153,6 +1153,20 @@ spec:
                   useTls:
                     type: boolean
                 type: object
+              tg:
+                properties:
+                  port:
+                    format: int32
+                    type: integer
+                  projectId:
+                    type: string
+                  selector:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  zone:
+                    type: string
+                type: object
               useHttp2:
                 nullable: true
                 type: boolean

@@ -1490,6 +1490,9 @@ apis:
   tcp.options.gloo.solo.io.TcpProxySettings:
     relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/tcp/tcp.proto.sk/#TcpProxySettings
     package: tcp.options.gloo.solo.io
+  tg.options.gloo.solo.io.UpstreamSpec:
+    relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/plugins/tg/tg.proto.sk/#UpstreamSpec
+    package: tg.options.gloo.solo.io
   tracing.options.gloo.solo.io.ListenerTracingSettings:
     relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/tracing/tracing.proto.sk/#ListenerTracingSettings
     package: tracing.options.gloo.solo.io

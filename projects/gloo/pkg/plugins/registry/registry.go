@@ -35,6 +35,7 @@ import (
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/static"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/stats"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/tcp"
+	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/tg"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/tls_inspector"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/tracing"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/transformation"
@@ -92,6 +93,7 @@ var globalRegistry = func(opts bootstrap.Opts, pluginExtensions ...func() plugin
 		grpcjson.NewPlugin(),
 		metadata.NewPlugin(),
 		tunneling.NewPlugin(),
+		tg.NewPlugin(),
 	)
 	if opts.KubeClient != nil {
 		reg.plugins = append(reg.plugins, kubernetes.NewPlugin(opts.KubeClient, opts.KubeCoreCache))
