@@ -178,12 +178,12 @@ func (l *ListenerSubsystemTranslatorFactory) GetHybridListenerTranslators(ctx co
 	}
 
 	routeConfigurationTranslator := &hybridRouteConfigurationTranslator{
-		plugins:         l.pluginRegistry.GetPlugins(),
-		proxy:           l.proxy,
-		parentListener:  listener,
-		listener:        listener.GetHybridListener(),
-		parentReport:    listenerReport,
-		report:          hybridListenerReport,
+		plugins:        l.pluginRegistry.GetPlugins(),
+		proxy:          l.proxy,
+		parentListener: listener,
+		listener:       listener.GetHybridListener(),
+		parentReport:   listenerReport,
+		report:         hybridListenerReport,
 	}
 
 	return listenerTranslator, routeConfigurationTranslator
