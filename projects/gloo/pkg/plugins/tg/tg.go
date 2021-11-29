@@ -22,7 +22,7 @@ func NewPlugin() *plugin {
 
 func (*plugin) ProcessUpstream(params plugins.Params, in *v1.Upstream, out *envoyapi.Cluster) error {
 	// check that the upstream is our type (GCE)
-	if _, ok := in.UpstreamType.(*v1.Upstream_Tg); !ok {
+	if _, ok := in.GetUpstreamType().(*v1.Upstream_Tg); !ok {
 		// not gce, return early
 		return nil
 	}
