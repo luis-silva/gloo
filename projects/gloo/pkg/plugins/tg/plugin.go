@@ -6,8 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elbv2"
-	envoyapi "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	envoycore "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	cluster_v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	envoycore "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
 	"github.com/solo-io/gloo/projects/gloo/pkg/discovery"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins"
@@ -20,18 +20,18 @@ func NewPlugin() *plugin {
 	return &plugin{}
 }
 
-func (*plugin) ProcessUpstream(params plugins.Params, in *v1.Upstream, out *envoyapi.Cluster) error {
+func (*plugin) ProcessUpstream(params plugins.Params, in *v1.Upstream, out *cluster_v3.Cluster) error {
 	// check that the upstream is our type (GCE)
-	if _, ok := in.GetUpstreamType().(*v1.Upstream_Tg); !ok {
+	if _, ok := in.UpstreamType.(*v1.Upstream_Tg); !ok {
 		// not gce, return early
 		return nil
 	}
 	// tell Envoy to use EDS to get endpoints for this cluster
-	out.ClusterDiscoveryType = &envoyapi.Cluster_Type{
-		Type: envoyapi.Cluster_EDS,
+	out.ClusterDiscoveryType = &cluster_v3.Cluster_Type{
+		Type: cluster_v3.Cluster_EDS,
 	}
 	// tell envoy to use ADS to resolve Endpoints
-	out.EdsClusterConfig = &envoyapi.Cluster_EdsClusterConfig{
+	out.EdsClusterConfig = &cluster_v3.Cluster_EdsClusterConfig{
 		EdsConfig: &envoycore.ConfigSource{
 			ConfigSourceSpecifier: &envoycore.ConfigSource_Ads{
 				Ads: &envoycore.AggregatedConfigSource{},
