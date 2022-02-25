@@ -81,6 +81,37 @@ spec:
                         type: string
                     type: object
                 type: object
+              awsTg:
+                properties:
+                  filters:
+                    items:
+                      properties:
+                        key:
+                          type: string
+                        kvPair:
+                          properties:
+                            key:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                      type: object
+                    type: array
+                  port:
+                    format: int32
+                    type: integer
+                  region:
+                    type: string
+                  roleArn:
+                    type: string
+                  secretRef:
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    type: object
+                type: object
               azure:
                 properties:
                   functionAppName:

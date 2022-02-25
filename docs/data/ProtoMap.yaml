@@ -38,6 +38,12 @@ apis:
   aws_ec2.options.gloo.solo.io.UpstreamSpec:
     relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/aws/ec2/aws_ec2.proto.sk/#UpstreamSpec
     package: aws_ec2.options.gloo.solo.io
+  aws_tg.options.gloo.solo.io.TagFilter:
+    relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/aws/tg/aws_tg.proto.sk/#TagFilter
+    package: aws_tg.options.gloo.solo.io
+  aws_tg.options.gloo.solo.io.UpstreamSpec:
+    relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/aws/tg/aws_tg.proto.sk/#UpstreamSpec
+    package: aws_tg.options.gloo.solo.io
   azure.options.gloo.solo.io.DestinationSpec:
     relativepath: reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/options/azure/azure.proto.sk/#DestinationSpec
     package: azure.options.gloo.solo.io
