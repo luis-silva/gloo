@@ -320,6 +320,21 @@ func (m *Upstream) Equal(that interface{}) bool {
 			}
 		}
 
+	case *Upstream_AwsTg:
+		if _, ok := target.UpstreamType.(*Upstream_AwsTg); !ok {
+			return false
+		}
+
+		if h, ok := interface{}(m.GetAwsTg()).(equality.Equalizer); ok {
+			if !h.Equal(target.GetAwsTg()) {
+				return false
+			}
+		} else {
+			if !proto.Equal(m.GetAwsTg(), target.GetAwsTg()) {
+				return false
+			}
+		}
+
 	default:
 		// m is nil but target is not nil
 		if m.UpstreamType != target.UpstreamType {
