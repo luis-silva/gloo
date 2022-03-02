@@ -77,22 +77,22 @@ func (p *plugin) Init(params plugins.InitParams) error {
 
 // we do not need to update any fields, just check that the input is valid
 func (p *plugin) UpdateUpstream(original, desired *v1.Upstream) (bool, error) {
-	originalSpec, ok := original.GetUpstreamType().(*v1.Upstream_AwsEc2)
+	originalSpec, ok := original.GetUpstreamType().(*v1.Upstream_AwsTg)
 	if !ok {
 		return false, WrongUpstreamTypeError(original)
 	}
-	desiredSpec, ok := desired.GetUpstreamType().(*v1.Upstream_AwsEc2)
+	desiredSpec, ok := desired.GetUpstreamType().(*v1.Upstream_AwsTg)
 	if !ok {
 		return false, WrongUpstreamTypeError(desired)
 	}
-	if !originalSpec.AwsEc2.Equal(desiredSpec.AwsEc2) {
+	if !originalSpec.AwsTg.Equal(desiredSpec.AwsTg) {
 		return false, UpstreamDeltaError()
 	}
 	return false, nil
 }
 
 func (p *plugin) ProcessUpstream(params plugins.Params, in *v1.Upstream, out *envoy_config_cluster_v3.Cluster) error {
-	_, ok := in.GetUpstreamType().(*v1.Upstream_AwsEc2)
+	_, ok := in.GetUpstreamType().(*v1.Upstream_AwsTg)
 	if !ok {
 		return nil
 	}
@@ -116,10 +116,10 @@ var (
 	}
 
 	WrongUpstreamTypeError = func(upstream *v1.Upstream) error {
-		return eris.Errorf("internal error: expected *v1.Upstream_AwsEc2, got %v", reflect.TypeOf(upstream.GetUpstreamType()).Name())
+		return eris.Errorf("internal error: expected *v1.Upstream_AwsTg, got %v", reflect.TypeOf(upstream.GetUpstreamType()).Name())
 	}
 
 	UpstreamDeltaError = func() error {
-		return eris.New("expected no difference between *v1.Upstream_AwsEc2 upstreams")
+		return eris.New("expected no difference between *v1.Upstream_AwsTg upstreams")
 	}
 )

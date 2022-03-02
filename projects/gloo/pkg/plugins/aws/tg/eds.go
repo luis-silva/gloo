@@ -19,10 +19,10 @@ import (
 // EDS API
 // start the EDS watch which sends a new list of endpoints on any change
 func (p *plugin) WatchEndpoints(writeNamespace string, unfilteredUpstreams v1.UpstreamList, opts clients.WatchOpts) (<-chan v1.EndpointList, <-chan error, error) {
-	contextutils.LoggerFrom(opts.Ctx).Debugw("calling WatchEndpoints on EC2")
+	contextutils.LoggerFrom(opts.Ctx).Debugw("calling WatchEndpoints on TG")
 	var ec2Upstreams v1.UpstreamList
 	for _, upstream := range unfilteredUpstreams {
-		if _, ok := upstream.GetUpstreamType().(*v1.Upstream_AwsEc2); ok {
+		if _, ok := upstream.GetUpstreamType().(*v1.Upstream_AwsTg); ok {
 			ec2Upstreams = append(ec2Upstreams, upstream)
 		}
 	}
