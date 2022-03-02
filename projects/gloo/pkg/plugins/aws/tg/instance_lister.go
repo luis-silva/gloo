@@ -121,7 +121,7 @@ func (c *targetGroupLister) ListTagsWithClient(tgs []*elbv2.TargetGroup, ctx con
 
 func (c *targetGroupLister) ConvertTagDescriptionsToMap(tds []*elbv2.TagDescription) map[string][]*elbv2.Tag {
 
-	var tagMap map[string][]*elbv2.Tag
+	tagMap := make(map[string][]*elbv2.Tag)
 	for _, td := range tds {
 		tagMap[*td.ResourceArn] = td.Tags
 	}

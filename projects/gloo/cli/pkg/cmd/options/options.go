@@ -256,6 +256,7 @@ type InputAuthConfig struct {
 const (
 	UpstreamType_Aws    = "aws"
 	UpstreamType_AwsEc2 = "ec2"
+	UpstreamType_AwsTg  = "tg"
 	UpstreamType_Azure  = "azure"
 	UpstreamType_Consul = "consul"
 	UpstreamType_Kube   = "kube"
@@ -265,6 +266,7 @@ const (
 var UpstreamTypes = []string{
 	UpstreamType_Aws,
 	UpstreamType_AwsEc2,
+	UpstreamType_AwsTg,
 	UpstreamType_Azure,
 	UpstreamType_Consul,
 	UpstreamType_Kube,
@@ -275,6 +277,7 @@ type InputUpstream struct {
 	UpstreamType string
 	Aws          InputAwsSpec
 	AwsEc2       InputAwsEc2Spec
+	AwsTg        InputAwsTgSpec
 	Azure        InputAzureSpec
 	Consul       InputConsulSpec
 	Kube         InputKubeSpec
@@ -289,12 +292,25 @@ type InputAwsSpec struct {
 	Secret core.ResourceRef
 }
 
+type InputTgSpec struct {
+	Region string
+	Secret core.ResourceRef
+}
+
 type InputAwsEc2Spec struct {
 	Region          string
 	Secret          core.ResourceRef
 	Role            string
 	PublicIp        bool
 	Port            uint32
+	KeyFilters      []string
+	KeyValueFilters InputMapStringString
+}
+
+type InputAwsTgSpec struct {
+	Region          string
+	Secret          core.ResourceRef
+	Role            string
 	KeyFilters      []string
 	KeyValueFilters InputMapStringString
 }

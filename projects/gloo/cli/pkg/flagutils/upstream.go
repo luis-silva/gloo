@@ -42,6 +42,21 @@ func AddCreateUpstreamFlags(set *pflag.FlagSet, upstreamType string, upstream *o
 			"list of tag keys that must exist on EC2 instances associated with this upstream")
 		set.StringSliceVar(&upstream.AwsEc2.KeyValueFilters.Entries, "tag-key-value-filters", nil,
 			"list of tag keys and corresponding values that must exist on EC2 instances associated with this upstream")
+	case options.UpstreamType_AwsTg:
+		set.StringVar(&upstream.AwsTg.Region, "aws-region", "us-east-1",
+			"region for AWS services this upstream utilize")
+		set.StringVar(&upstream.AwsTg.Secret.Name, "aws-secret-name", "",
+			"name of a secret containing AWS credentials created with glooctl. See `glooctl create secret aws --help` "+
+				"for help creating secrets")
+		set.StringVar(&upstream.AwsTg.Secret.Namespace, "aws-secret-namespace", defaults.GlooSystem,
+			"namespace where the AWS secret lives. See `glooctl create secret aws --help` "+
+				"for help creating secrets")
+		set.StringVar(&upstream.AwsTg.Role, "aws-role-arn", "",
+			"Amazon Resource Number (ARN) of role that Gloo should assume on behalf of the upstream")
+		set.StringSliceVar(&upstream.AwsTg.KeyFilters, "tag-key-filters", nil,
+			"list of tag keys that must exist on EC2 instances associated with this upstream")
+		set.StringSliceVar(&upstream.AwsTg.KeyValueFilters.Entries, "tag-key-value-filters", nil,
+			"list of tag keys and corresponding values that must exist on EC2 instances associated with this upstream")
 	case options.UpstreamType_Azure:
 		set.StringVar(&upstream.Azure.FunctionAppName, "azure-app-name", "",
 			"name of the Azure Functions app to associate with this upstream")

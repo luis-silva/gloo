@@ -9,6 +9,7 @@ import (
 	"github.com/solo-io/gloo/projects/gloo/cli/pkg/xdsinspection"
 	plugins "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options"
 	"github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws/ec2"
+	"github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws/tg"
 	"github.com/solo-io/go-utils/cliutils"
 	"github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 
@@ -77,6 +78,8 @@ func upstreamType(up *v1.Upstream) string {
 		return "Consul"
 	case *v1.Upstream_AwsEc2:
 		return "AWS EC2"
+	case *v1.Upstream_AwsTg:
+		return "AWS TG"
 	case *v1.Upstream_Kube:
 		return "Kubernetes"
 	case *v1.Upstream_Static:
@@ -119,6 +122,20 @@ func upstreamDetails(up *v1.Upstream, xdsDump *xdsinspection.XdsDump) []string {
 			fmt.Sprintf("port:           %v", usType.AwsEc2.GetPort()),
 		)
 		add(getEc2TagFiltersString(usType.AwsEc2.GetFilters())...)
+		instances := xdsDump.GetEc2InstancesForUpstream(up.GetMetadata().Ref())
+		add(
+			"EC2 Instance Ids:",
+		)
+		add(
+			instances...,
+		)
+	case *v1.Upstream_AwsTg:
+		add(
+			fmt.Sprintf("role:           %v", usType.AwsTg.GetRoleArn()),
+			fmt.Sprintf("region:         %v", usType.AwsTg.GetRegion()),
+			fmt.Sprintf("port:           %v", usType.AwsTg.GetPort()),
+		)
+		add(getTgTagFiltersString(usType.AwsTg.GetFilters())...)
 		instances := xdsDump.GetEc2InstancesForUpstream(up.GetMetadata().Ref())
 		add(
 			"EC2 Instance Ids:",
@@ -245,6 +262,41 @@ func getEc2TagFiltersString(filters []*ec2.TagFilter) []string {
 		case *ec2.TagFilter_Key:
 			kFilters = append(kFilters, x)
 		case *ec2.TagFilter_KvPair_:
+			kvFilters = append(kvFilters, x.KvPair)
+		}
+	}
+	if len(kFilters) == 0 {
+		add(fmt.Sprintf("key filters: (none)"))
+	} else {
+		add(fmt.Sprintf("key filters:"))
+		for _, f := range kFilters {
+			add(fmt.Sprintf("- %v", f.Key))
+		}
+	}
+	if len(kvFilters) == 0 {
+		add(fmt.Sprintf("key-value filters: (none)"))
+	} else {
+		add(fmt.Sprintf("key-value filters:"))
+		for _, f := range kvFilters {
+			add(fmt.Sprintf("- %v: %v", f.GetKey(), f.GetValue()))
+		}
+	}
+	return out
+}
+
+func getTgTagFiltersString(filters []*tg.TagFilter) []string {
+	var out []string
+	add := func(s ...string) {
+		out = append(out, s...)
+	}
+
+	var kFilters []*tg.TagFilter_Key
+	var kvFilters []*tg.TagFilter_KvPair
+	for _, f := range filters {
+		switch x := f.GetSpec().(type) {
+		case *tg.TagFilter_Key:
+			kFilters = append(kFilters, x)
+		case *tg.TagFilter_KvPair_:
 			kvFilters = append(kvFilters, x.KvPair)
 		}
 	}
