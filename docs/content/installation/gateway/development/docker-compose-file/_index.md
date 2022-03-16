@@ -102,7 +102,11 @@ The updated `data` directory structure should look like this:
 │   ├── gateways
 │   │   └── gloo-system
 │   │       └── gateway-proxy.yaml
+<<<<<<< HEAD
 │   ├── graphqlschemas
+=======
+│   ├── graphqlapis
+>>>>>>> master
 │   │   └── gloo-system
 │   ├── proxies
 │   │   └── gloo-system

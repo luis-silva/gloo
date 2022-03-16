@@ -216,21 +216,24 @@ func defaultTestConstructOpts(ctx context.Context, runOptions *RunOptions) trans
 	meta := runOptions.Settings.GetMetadata()
 
 	var validation *translator.ValidationOpts
-	if runOptions.Settings != nil && runOptions.Settings.GetGateway() != nil && runOptions.Settings.GetGateway().GetValidation() != nil {
-		validation = &translator.ValidationOpts{}
-		if runOptions.Settings.GetGateway().GetValidation().GetProxyValidationServerAddr() != "" {
-			validation.ProxyValidationServerAddress = runOptions.Settings.GetGateway().GetValidation().GetProxyValidationServerAddr()
+	if runOptions.Settings.GetGateway().GetValidation().GetProxyValidationServerAddr() != "" {
+		if validation == nil {
+			validation = &translator.ValidationOpts{}
 		}
-		if runOptions.Settings.GetGateway().GetValidation().GetAllowWarnings() != nil {
-			validation.AllowWarnings = runOptions.Settings.GetGateway().GetValidation().GetAllowWarnings().GetValue()
-
-		}
-		if runOptions.Settings.GetGateway().GetValidation().GetAlwaysAccept() != nil {
-			validation.AlwaysAcceptResources = runOptions.Settings.GetGateway().GetValidation().GetAlwaysAccept().GetValue()
-		}
-
+		validation.ProxyValidationServerAddress = runOptions.Settings.GetGateway().GetValidation().GetProxyValidationServerAddr()
 	}
-
+	if runOptions.Settings.GetGateway().GetValidation().GetAllowWarnings() != nil {
+		if validation == nil {
+			validation = &translator.ValidationOpts{}
+		}
+		validation.AllowWarnings = runOptions.Settings.GetGateway().GetValidation().GetAllowWarnings().GetValue()
+	}
+	if runOptions.Settings.GetGateway().GetValidation().GetAlwaysAccept() != nil {
+		if validation == nil {
+			validation = &translator.ValidationOpts{}
+		}
+		validation.AlwaysAcceptResources = runOptions.Settings.GetGateway().GetValidation().GetAlwaysAccept().GetValue()
+	}
 	return translator.Opts{
 		GlooNamespace:           meta.GetNamespace(),
 		WriteNamespace:          runOptions.NsToWrite,
@@ -297,7 +300,13 @@ func defaultGlooOpts(ctx context.Context, runOptions *RunOptions) bootstrap.Opts
 		Artifacts:               f,
 		AuthConfigs:             f,
 		RateLimitConfigs:        f,
-		GraphQLSchemas:          f,
+		GraphQLApis:             f,
+		Gateways:                f,
+		MatchableHttpGateways:   f,
+		VirtualServices:         f,
+		RouteTables:             f,
+		RouteOptions:            f,
+		VirtualHostOptions:      f,
 		KubeServiceClient:       newServiceClient(ctx, f, runOptions),
 		WatchNamespaces:         runOptions.NsToWatch,
 		WatchOpts: clients.WatchOpts{

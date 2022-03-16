@@ -16,6 +16,7 @@ weight: 5
 - [ExtAuthExtension](#extauthextension)
 - [Settings](#settings)
 - [ApiVersion](#apiversion)
+- [GrpcService](#grpcservice)
 - [HttpService](#httpservice)
 - [Request](#request)
 - [Response](#response)
@@ -36,11 +37,11 @@ weight: 5
 - [DiscoveryOverride](#discoveryoverride)
 - [JwksOnDemandCacheRefreshPolicy](#jwksondemandcacherefreshpolicy)
 - [OidcAuthorizationCode](#oidcauthorizationcode)
-- [AccessTokenValidation](#accesstokenvalidation)
 - [JwtValidation](#jwtvalidation)
 - [RemoteJwks](#remotejwks)
 - [LocalJwks](#localjwks)
 - [IntrospectionValidation](#introspectionvalidation)
+- [AccessTokenValidation](#accesstokenvalidation)
 - [ScopeList](#scopelist)
 - [OauthSecret](#oauthsecret)
 - [ApiKeyAuth](#apikeyauth)
@@ -171,6 +172,7 @@ Global external auth settings
 ```yaml
 "extauthzServerRef": .core.solo.io.ResourceRef
 "httpService": .enterprise.gloo.solo.io.HttpService
+"grpcService": .enterprise.gloo.solo.io.GrpcService
 "userIdHeader": string
 "requestTimeout": .google.protobuf.Duration
 "failureModeAllow": bool
@@ -185,7 +187,8 @@ Global external auth settings
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
 | `extauthzServerRef` | [.core.solo.io.ResourceRef](../../../../../../../../../../solo-kit/api/v1/ref.proto.sk/#resourceref) | The upstream to ask about auth decisions. |
-| `httpService` | [.enterprise.gloo.solo.io.HttpService](../extauth.proto.sk/#httpservice) | If this is set, communication to the upstream will be via HTTP and not GRPC. |
+| `httpService` | [.enterprise.gloo.solo.io.HttpService](../extauth.proto.sk/#httpservice) | If this is set, communication to the upstream will be via HTTP and not GRPC (default). Only one of `httpService` or `grpcService` can be set. |
+| `grpcService` | [.enterprise.gloo.solo.io.GrpcService](../extauth.proto.sk/#grpcservice) | Optional, if set the communication to the upstream will be via GRPC. Only one of `grpcService` or `httpService` can be set. |
 | `userIdHeader` | `string` | If the auth server trusted id of the user, it will be set in this header. Specifically this means that this header will be sanitized form the incoming request. |
 | `requestTimeout` | [.google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/duration) | Timeout for the ext auth service to respond. Defaults to 200ms. |
 | `failureModeAllow` | `bool` | In case of a failure or timeout querying the auth server, normally a request is denied. if this is set to true, the request will be allowed. |
@@ -207,6 +210,23 @@ Describes the transport protocol version to use when connecting to the ext auth 
 | Name | Description |
 | ----- | ----------- | 
 | `V3` | Use v3 API. |
+
+
+
+
+---
+### GrpcService
+
+
+
+```yaml
+"authority": string
+
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- | 
+| `authority` | `string` | Set the authority header when calling the GRPC service. |
 
 
 
@@ -682,6 +702,7 @@ not yet in the local cache.
 | `jwksCacheRefreshPolicy` | [.enterprise.gloo.solo.io.JwksOnDemandCacheRefreshPolicy](../extauth.proto.sk/#jwksondemandcacherefreshpolicy) | If a user executes a request with a key that is not found in the JWKS, it could be that the keys have rotated on the remote source, and not yet in the local cache. This policy lets you define the behavior for how to refresh the local cache during a request where an invalid key is provided. |
 | `sessionIdHeaderName` | `string` | If set, the randomly generated session id will be sent to the token endpoint as part of the code exchange The session id is used as the key for sessions in Redis. |
 | `parseCallbackPathAsRegex` | `bool` | If set, CallbackPath will be evaluated as a regular expression. |
+<<<<<<< HEAD
 
 
 
@@ -709,6 +730,8 @@ not yet in the local cache.
 | `userinfoUrl` | `string` | The URL for the OIDC userinfo endpoint. If provided, the (opaque) access token provided or received from the oauth endpoint will be queried and the userinfo response (or cached response) will be added to the `AuthorizationRequest` state under the "introspection" key. This can be useful to leverage the userinfo response in, for example, an external auth server plugin. |
 | `cacheTimeout` | [.google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/duration) | How long the token introspection and userinfo endpoint response for a specific access token should be kept in the in-memory cache. The result will be invalidated at this timeout, or at "exp" time from the introspection result, whichever comes sooner. If omitted, defaults to 10 minutes. If zero, then no caching will be done. |
 | `requiredScopes` | [.enterprise.gloo.solo.io.AccessTokenValidation.ScopeList](../extauth.proto.sk/#scopelist) | Require access token to have all of the scopes in the given list. This configuration applies to both opaque and JWT tokens. In the case of opaque tokens, this will check the scopes returned in the "scope" member of introspection response (as described in [Section 2.2 of RFC7662](https://tools.ietf.org/html/rfc7662#section-2.2). In case of JWTs the scopes to be validated are expected to be contained in the "scope" claim of the token in the form of a space-separated string. Omitting this field means that scope validation will be skipped. |
+=======
+>>>>>>> master
 
 
 
@@ -737,16 +760,16 @@ If the JWT has been successfully validated, its set of claims will be added to t
 `AuthorizationRequest` state under the "jwtAccessToken" key.
 
 ```yaml
-"remoteJwks": .enterprise.gloo.solo.io.AccessTokenValidation.JwtValidation.RemoteJwks
-"localJwks": .enterprise.gloo.solo.io.AccessTokenValidation.JwtValidation.LocalJwks
+"remoteJwks": .enterprise.gloo.solo.io.JwtValidation.RemoteJwks
+"localJwks": .enterprise.gloo.solo.io.JwtValidation.LocalJwks
 "issuer": string
 
 ```
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `remoteJwks` | [.enterprise.gloo.solo.io.AccessTokenValidation.JwtValidation.RemoteJwks](../extauth.proto.sk/#remotejwks) | Fetches the JWKS from a remote location. Only one of `remoteJwks` or `localJwks` can be set. |
-| `localJwks` | [.enterprise.gloo.solo.io.AccessTokenValidation.JwtValidation.LocalJwks](../extauth.proto.sk/#localjwks) | Loads the JWKS from a local data source. Only one of `localJwks` or `remoteJwks` can be set. |
+| `remoteJwks` | [.enterprise.gloo.solo.io.JwtValidation.RemoteJwks](../extauth.proto.sk/#remotejwks) | Fetches the JWKS from a remote location. Only one of `remoteJwks` or `localJwks` can be set. |
+| `localJwks` | [.enterprise.gloo.solo.io.JwtValidation.LocalJwks](../extauth.proto.sk/#localjwks) | Loads the JWKS from a local data source. Only one of `localJwks` or `remoteJwks` can be set. |
 | `issuer` | `string` | Allow only tokens that have been issued by this principal (i.e. whose "iss" claim matches this value). If empty, issuer validation will be skipped. |
 
 
@@ -815,6 +838,33 @@ These values will be encoded in a basic auth header in order to authenticate the
 | `clientId` | `string` | Your client id as registered with the issuer. Optional: Use if the token introspection url requires client authentication. |
 | `clientSecretRef` | [.core.solo.io.ResourceRef](../../../../../../../../../../solo-kit/api/v1/ref.proto.sk/#resourceref) | Your client secret as registered with the issuer. Optional: Use if the token introspection url requires client authentication. |
 | `userIdAttributeName` | `string` | The name of the [introspection response](https://tools.ietf.org/html/rfc7662#section-2.2) attribute that contains the ID of the resource owner (e.g. `sub`, `username`). If specified, the external auth server will use the value of the attribute as the identifier of the authenticated user and add it to the request headers and/or dynamic metadata (depending on how the server is configured); if the field is set and the attribute cannot be found, the request will be denied. This field is optional and by default the server will not try to derive the user ID. |
+
+
+
+
+---
+### AccessTokenValidation
+
+
+
+```yaml
+"introspectionUrl": string
+"jwt": .enterprise.gloo.solo.io.JwtValidation
+"introspection": .enterprise.gloo.solo.io.IntrospectionValidation
+"userinfoUrl": string
+"cacheTimeout": .google.protobuf.Duration
+"requiredScopes": .enterprise.gloo.solo.io.AccessTokenValidation.ScopeList
+
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- | 
+| `introspectionUrl` | `string` | The URL for the [OAuth2.0 Token Introspection](https://tools.ietf.org/html/rfc7662) endpoint. If provided, the (opaque) access token provided or received from the oauth authorization endpoint will be validated against this endpoint, or locally cached responses for this access token. This field is deprecated as it does not support authenticated introspection requests. Only one of `introspectionUrl`, `jwt`, or `introspection` can be set. |
+| `jwt` | [.enterprise.gloo.solo.io.JwtValidation](../extauth.proto.sk/#jwtvalidation) | Validate access tokens that conform to the [JSON Web Token (JWT)](https://tools.ietf.org/html/rfc7519) specification. Only one of `jwt`, `introspectionUrl`, or `introspection` can be set. |
+| `introspection` | [.enterprise.gloo.solo.io.IntrospectionValidation](../extauth.proto.sk/#introspectionvalidation) | Defines how (opaque) access tokens, received from the oauth authorization endpoint, are validated [OAuth2.0 Token Introspection](https://tools.ietf.org/html/rfc7662) specification. Only one of `introspection`, `introspectionUrl`, or `jwt` can be set. |
+| `userinfoUrl` | `string` | The URL for the OIDC userinfo endpoint. If provided, the (opaque) access token provided or received from the oauth endpoint will be queried and the userinfo response (or cached response) will be added to the `AuthorizationRequest` state under the "introspection" key. This can be useful to leverage the userinfo response in, for example, an external auth server plugin. |
+| `cacheTimeout` | [.google.protobuf.Duration](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/duration) | How long the token introspection and userinfo endpoint response for a specific access token should be kept in the in-memory cache. The result will be invalidated at this timeout, or at "exp" time from the introspection result, whichever comes sooner. If omitted, defaults to 10 minutes. If zero, then no caching will be done. |
+| `requiredScopes` | [.enterprise.gloo.solo.io.AccessTokenValidation.ScopeList](../extauth.proto.sk/#scopelist) | Require access token to have all of the scopes in the given list. This configuration applies to both opaque and JWT tokens. In the case of opaque tokens, this will check the scopes returned in the "scope" member of introspection response (as described in [Section 2.2 of RFC7662](https://tools.ietf.org/html/rfc7662#section-2.2). In case of JWTs the scopes to be validated are expected to be contained in the "scope" claim of the token in the form of a space-separated string. Omitting this field means that scope validation will be skipped. |
 
 
 

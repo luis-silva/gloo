@@ -41,7 +41,11 @@ gloo:
       alwaysAcceptResources: false # reject invalid resources
       warnRouteShortCircuiting: true
 ```
+<<<<<<< HEAD
 <!--Commenting out as it’s still an experimental feature and should not be used/recommended in the docs for production until the fetaure is GA. See https://solo-io-corp.slack.com/archives/CHJV572TG/p1645032058593229
+=======
+<!--Commenting out as it’s still an experimental feature and should not be used/recommended in the docs for production until the fetaure is GA. See https://solo-io-corp.slack.com/archives/CHJV572TG/p1645032058593229 
+>>>>>>> master
 
 ### xDS Relay
 

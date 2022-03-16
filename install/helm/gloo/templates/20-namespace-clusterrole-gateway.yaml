@@ -93,7 +93,11 @@ rules:
 - apiGroups:
   - graphql.gloo.solo.io
   resources:
+<<<<<<< HEAD
   - graphqlschemas
+=======
+  - graphqlapis
+>>>>>>> master
   verbs:
   - get
   - list
@@ -186,7 +190,7 @@ rules:
 kind: {{ include "gloo.roleKind" . }}
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: gloo-graphqlschema-mutator{{ include "gloo.rbacNameSuffix" . }}
+  name: gloo-graphqlapi-mutator{{ include "gloo.rbacNameSuffix" . }}
   {{- if .Values.global.glooRbac.namespaced }}
   namespace: {{ .Release.Namespace }}
   {{- end }}
@@ -197,7 +201,11 @@ rules:
 - apiGroups:
   - graphql.gloo.solo.io
   resources:
+<<<<<<< HEAD
   - graphqlschemas
+=======
+  - graphqlapis
+>>>>>>> master
   verbs:
   - get
   - list

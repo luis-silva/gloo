@@ -3,6 +3,7 @@
 {{- $spec := (index . 2) }}
 {{- with (first .) }}
 {{- $gatewaySettings := $spec.gatewaySettings }}
+{{- if $gatewaySettings.enabled }}
 apiVersion: gateway.solo.io/v1
 kind: Gateway
 metadata:
@@ -17,6 +18,9 @@ spec:
   bindAddress: "::"
   {{- end }}
   bindPort: {{ $spec.podTemplate.httpPort }}
+{{- if $gatewaySettings.httpHybridGateway }}
+{{ toYaml $gatewaySettings.httpHybridGateway | indent 2}}
+{{- end }}
 {{- if $gatewaySettings.customHttpGateway}}
   httpGateway:
 {{ toYaml $gatewaySettings.customHttpGateway | indent 4}}
@@ -45,6 +49,7 @@ spec:
   ssl: false
   proxyNames:
   - {{ $name | kebabcase }}
+{{- end }}{{/* $gatewaySettings.enabled */}}
 {{- end }}{{/* with */}}
 {{- end }}{{/* define "defaultGateway.gateway" */}}
 
@@ -54,6 +59,7 @@ spec:
 {{- $spec := (index . 2) }}
 {{- with (first .) }}
 {{- $gatewaySettings := $spec.gatewaySettings }}
+{{- if $gatewaySettings.enabled }}
 apiVersion: gateway.solo.io/v1
 kind: Gateway
 metadata:
@@ -68,6 +74,9 @@ spec:
   bindAddress: "::"
   {{- end }}
   bindPort: {{ $spec.podTemplate.httpsPort }}
+{{- if $gatewaySettings.httpsHybridGateway }}
+{{ toYaml $gatewaySettings.httpsHybridGateway | indent 2}}
+{{- end }}
 {{- if $gatewaySettings.customHttpsGateway }}
   httpGateway:
 {{ toYaml $gatewaySettings.customHttpsGateway | indent 4}}
@@ -96,6 +105,7 @@ spec:
   ssl: true
   proxyNames:
   - {{ $name | kebabcase }}
+{{- end }}{{/* $gatewaySettings.enabled */}}
 {{- end }}{{/* with */}}
 {{- end }}{{/* define "defaultGatway.sslGateway" */}}
 
@@ -104,6 +114,7 @@ spec:
 {{- $spec := (index . 2) }}
 {{- with (first .) }}
 {{- $gatewaySettings := $spec.gatewaySettings }}
+{{- if $gatewaySettings.enabled }}
 apiVersion: gateway.solo.io/v1
 kind: Gateway
 metadata:
@@ -129,6 +140,7 @@ spec:
         forwardSniClusterName: {}
   proxyNames:
   - {{ $name | kebabcase }}
+{{- end }}{{/* $gatewaySettings.enabled */}}
 {{- end }}{{/* with */}}
 {{- end }}{{/* define "defaultGateway.failoverGateway" */}}
 

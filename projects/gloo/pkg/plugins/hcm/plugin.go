@@ -40,7 +40,6 @@ func (p *plugin) Init(_ plugins.InitParams) error {
 
 func (p *plugin) ProcessHcmNetworkFilter(params plugins.Params, _ *v1.Listener, listener *v1.HttpListener, out *envoyhttp.HttpConnectionManager) error {
 	in := listener.GetOptions().GetHttpConnectionManagerSettings()
-
 	out.UseRemoteAddress = in.GetUseRemoteAddress()
 	out.XffNumTrustedHops = in.GetXffNumTrustedHops()
 	out.SkipXffAppend = in.GetSkipXffAppend()
@@ -93,6 +92,17 @@ func (p *plugin) ProcessHcmNetworkFilter(params plugins.Params, _ *v1.Listener, 
 			out.HttpProtocolOptions = &envoycore.Http1ProtocolOptions{}
 		}
 		out.GetHttpProtocolOptions().AllowChunkedLength = in.GetAllowChunkedLength()
+<<<<<<< HEAD
+=======
+	}
+
+	if in.GetEnableTrailers() {
+		if out.GetHttpProtocolOptions() == nil {
+			out.HttpProtocolOptions = &envoycore.Http1ProtocolOptions{}
+		}
+
+		out.GetHttpProtocolOptions().EnableTrailers = in.GetEnableTrailers()
+>>>>>>> master
 	}
 
 	if in.GetIdleTimeout() != nil {
@@ -137,6 +147,17 @@ func (p *plugin) ProcessHcmNetworkFilter(params plugins.Params, _ *v1.Listener, 
 		out.GetCommonHttpProtocolOptions().HeadersWithUnderscoresAction = envoycore.HttpProtocolOptions_HeadersWithUnderscoresAction(in.GetHeadersWithUnderscoresAction())
 	}
 
+<<<<<<< HEAD
+=======
+	if in.GetStripAnyHostPort() {
+		if out.GetStripPortMode() == nil {
+			out.StripPortMode = &envoyhttp.HttpConnectionManager_StripAnyHostPort{
+				StripAnyHostPort: true,
+			}
+		}
+	}
+
+>>>>>>> master
 	// allowed upgrades
 	protocolUpgrades := in.GetUpgrades()
 

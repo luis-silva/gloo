@@ -4,6 +4,11 @@ package registry
 import (
 	"context"
 
+<<<<<<< HEAD
+=======
+	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/dynamic_forward_proxy"
+
+>>>>>>> master
 	"github.com/solo-io/gloo/projects/gloo/pkg/bootstrap"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/als"
@@ -61,7 +66,7 @@ func Plugins(opts bootstrap.Opts) []plugins.Plugin {
 		loadbalancer.NewPlugin(),
 		upstreamconn.NewPlugin(),
 		azure.NewPlugin(),
-		aws.NewPlugin(&transformationPlugin.RequireEarlyTransformation),
+		aws.NewPlugin(),
 		rest.NewPlugin(),
 		hcmPlugin,
 		als.NewPlugin(),
@@ -95,6 +100,7 @@ func Plugins(opts bootstrap.Opts) []plugins.Plugin {
 		grpcjson.NewPlugin(),
 		metadata.NewPlugin(),
 		tunneling.NewPlugin(),
+		dynamic_forward_proxy.NewPlugin(),
 	)
 
 	if opts.KubeClient != nil {

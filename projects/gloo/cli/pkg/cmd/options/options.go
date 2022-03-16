@@ -3,6 +3,7 @@ package options
 import (
 	"context"
 	"sort"
+	"time"
 
 	rltypes "github.com/solo-io/solo-apis/pkg/api/ratelimit.solo.io/v1alpha1"
 
@@ -30,6 +31,7 @@ type Options struct {
 	Istio     Istio
 	Remove    Remove
 	Cluster   Cluster
+	Check     Check
 }
 
 type Top struct {
@@ -225,6 +227,7 @@ type Delegate struct {
 type AwsDestinationSpec struct {
 	LogicalName            string
 	ResponseTransformation bool
+	UnwrapAsAlb            bool
 }
 
 type RestDestinationSpec struct {
@@ -444,4 +447,9 @@ type Register struct {
 	ClusterName                string
 	LocalClusterDomainOverride string
 	RemoteNamespace            string
+}
+
+type Check struct {
+	// The maximum length of time to wait before giving up on a secret request. A value of zero means no timeout.
+	SecretClientTimeout time.Duration
 }

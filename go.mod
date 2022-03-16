@@ -44,6 +44,7 @@ require (
 	github.com/hashicorp/go-uuid v1.0.2
 	github.com/hashicorp/vault/api v1.0.5-0.20191108163347-bdd38fca2cff
 	github.com/hinshun/vt10x v0.0.0-20180809195222-d55458df857c
+	github.com/imdario/mergo v0.3.12
 	github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf
 	github.com/jhump/protoreflect v1.5.0
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
@@ -72,7 +73,7 @@ require (
 	github.com/solo-io/go-utils v0.21.24
 	github.com/solo-io/k8s-utils v0.0.12
 	github.com/solo-io/protoc-gen-ext v0.0.16
-	github.com/solo-io/protoc-gen-openapi v0.0.1
+	github.com/solo-io/protoc-gen-openapi v0.0.4
 	github.com/solo-io/skv2 v0.21.6
 	// Pinned to the `gloo-namespaced-statuses` tag of solo-apis
 	github.com/solo-io/solo-apis v0.0.0-20210922150112-505473b2e66c

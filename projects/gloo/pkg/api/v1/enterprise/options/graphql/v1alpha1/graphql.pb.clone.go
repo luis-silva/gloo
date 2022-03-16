@@ -15,6 +15,8 @@ import (
 
 	github_com_golang_protobuf_ptypes_struct "github.com/golang/protobuf/ptypes/struct"
 
+	github_com_golang_protobuf_ptypes_wrappers "github.com/golang/protobuf/ptypes/wrappers"
+
 	github_com_solo_io_solo_kit_pkg_api_v1_resources_core "github.com/solo-io/solo-kit/pkg/api/v1/resources/core"
 )
 
@@ -208,33 +210,6 @@ func (m *GrpcResolver) Clone() proto.Message {
 }
 
 // Clone function
-func (m *QueryMatcher) Clone() proto.Message {
-	var target *QueryMatcher
-	if m == nil {
-		return target
-	}
-	target = &QueryMatcher{}
-
-	switch m.Match.(type) {
-
-	case *QueryMatcher_FieldMatcher_:
-
-		if h, ok := interface{}(m.GetFieldMatcher()).(clone.Cloner); ok {
-			target.Match = &QueryMatcher_FieldMatcher_{
-				FieldMatcher: h.Clone().(*QueryMatcher_FieldMatcher),
-			}
-		} else {
-			target.Match = &QueryMatcher_FieldMatcher_{
-				FieldMatcher: proto.Clone(m.GetFieldMatcher()).(*QueryMatcher_FieldMatcher),
-			}
-		}
-
-	}
-
-	return target
-}
-
-// Clone function
 func (m *Resolution) Clone() proto.Message {
 	var target *Resolution
 	if m == nil {
@@ -242,10 +217,10 @@ func (m *Resolution) Clone() proto.Message {
 	}
 	target = &Resolution{}
 
-	if h, ok := interface{}(m.GetMatcher()).(clone.Cloner); ok {
-		target.Matcher = h.Clone().(*QueryMatcher)
+	if h, ok := interface{}(m.GetStatPrefix()).(clone.Cloner); ok {
+		target.StatPrefix = h.Clone().(*github_com_golang_protobuf_ptypes_wrappers.StringValue)
 	} else {
-		target.Matcher = proto.Clone(m.GetMatcher()).(*QueryMatcher)
+		target.StatPrefix = proto.Clone(m.GetStatPrefix()).(*github_com_golang_protobuf_ptypes_wrappers.StringValue)
 	}
 
 	switch m.Resolver.(type) {
@@ -280,12 +255,12 @@ func (m *Resolution) Clone() proto.Message {
 }
 
 // Clone function
-func (m *GraphQLSchema) Clone() proto.Message {
-	var target *GraphQLSchema
+func (m *GraphQLApi) Clone() proto.Message {
+	var target *GraphQLApi
 	if m == nil {
 		return target
 	}
-	target = &GraphQLSchema{}
+	target = &GraphQLApi{}
 
 	if h, ok := interface{}(m.GetNamespacedStatuses()).(clone.Cloner); ok {
 		target.NamespacedStatuses = h.Clone().(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.NamespacedStatuses)
@@ -304,6 +279,40 @@ func (m *GraphQLSchema) Clone() proto.Message {
 	} else {
 		target.ExecutableSchema = proto.Clone(m.GetExecutableSchema()).(*ExecutableSchema)
 	}
+
+	if h, ok := interface{}(m.GetStatPrefix()).(clone.Cloner); ok {
+		target.StatPrefix = h.Clone().(*github_com_golang_protobuf_ptypes_wrappers.StringValue)
+	} else {
+		target.StatPrefix = proto.Clone(m.GetStatPrefix()).(*github_com_golang_protobuf_ptypes_wrappers.StringValue)
+	}
+
+	if h, ok := interface{}(m.GetPersistedQueryCacheConfig()).(clone.Cloner); ok {
+		target.PersistedQueryCacheConfig = h.Clone().(*PersistedQueryCacheConfig)
+	} else {
+		target.PersistedQueryCacheConfig = proto.Clone(m.GetPersistedQueryCacheConfig()).(*PersistedQueryCacheConfig)
+	}
+
+	if m.GetAllowedQueryHashes() != nil {
+		target.AllowedQueryHashes = make([]string, len(m.GetAllowedQueryHashes()))
+		for idx, v := range m.GetAllowedQueryHashes() {
+
+			target.AllowedQueryHashes[idx] = v
+
+		}
+	}
+
+	return target
+}
+
+// Clone function
+func (m *PersistedQueryCacheConfig) Clone() proto.Message {
+	var target *PersistedQueryCacheConfig
+	if m == nil {
+		return target
+	}
+	target = &PersistedQueryCacheConfig{}
+
+	target.CacheSize = m.GetCacheSize()
 
 	return target
 }
@@ -361,21 +370,6 @@ func (m *Executor) Clone() proto.Message {
 }
 
 // Clone function
-func (m *QueryMatcher_FieldMatcher) Clone() proto.Message {
-	var target *QueryMatcher_FieldMatcher
-	if m == nil {
-		return target
-	}
-	target = &QueryMatcher_FieldMatcher{}
-
-	target.Type = m.GetType()
-
-	target.Field = m.GetField()
-
-	return target
-}
-
-// Clone function
 func (m *Executor_Local) Clone() proto.Message {
 	var target *Executor_Local
 	if m == nil {
@@ -384,13 +378,13 @@ func (m *Executor_Local) Clone() proto.Message {
 	target = &Executor_Local{}
 
 	if m.GetResolutions() != nil {
-		target.Resolutions = make([]*Resolution, len(m.GetResolutions()))
-		for idx, v := range m.GetResolutions() {
+		target.Resolutions = make(map[string]*Resolution, len(m.GetResolutions()))
+		for k, v := range m.GetResolutions() {
 
 			if h, ok := interface{}(v).(clone.Cloner); ok {
-				target.Resolutions[idx] = h.Clone().(*Resolution)
+				target.Resolutions[k] = h.Clone().(*Resolution)
 			} else {
-				target.Resolutions[idx] = proto.Clone(v).(*Resolution)
+				target.Resolutions[k] = proto.Clone(v).(*Resolution)
 			}
 
 		}

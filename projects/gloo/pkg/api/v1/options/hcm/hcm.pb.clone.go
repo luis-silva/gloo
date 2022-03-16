@@ -99,11 +99,18 @@ func (m *HttpConnectionManagerSettings) Clone() proto.Message {
 
 	target.ServerName = m.GetServerName()
 
+	target.StripAnyHostPort = m.GetStripAnyHostPort()
+
 	target.AcceptHttp_10 = m.GetAcceptHttp_10()
 
 	target.DefaultHostForHttp_10 = m.GetDefaultHostForHttp_10()
 
 	target.AllowChunkedLength = m.GetAllowChunkedLength()
+<<<<<<< HEAD
+=======
+
+	target.EnableTrailers = m.GetEnableTrailers()
+>>>>>>> master
 
 	if h, ok := interface{}(m.GetTracing()).(clone.Cloner); ok {
 		target.Tracing = h.Clone().(*github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_tracing.ListenerTracingSettings)

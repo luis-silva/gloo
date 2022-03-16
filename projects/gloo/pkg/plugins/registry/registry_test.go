@@ -6,7 +6,11 @@ import (
 	"testing"
 
 	gloov1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
+<<<<<<< HEAD
 	gloov1snap "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
+=======
+	gloov1snap "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/gloosnapshot"
+>>>>>>> master
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/solo-io/gloo/projects/gloo/pkg/bootstrap"

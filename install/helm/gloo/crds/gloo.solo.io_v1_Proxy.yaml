@@ -189,6 +189,104 @@ spec:
                                   type: string
                                   x-kubernetes-int-or-string: true
                               type: object
+                            dynamicForwardProxy:
+                              properties:
+                                dnsCacheConfig:
+                                  properties:
+                                    appleDns:
+                                      type: object
+                                    caresDns:
+                                      properties:
+                                        dnsResolverOptions:
+                                          properties:
+                                            noDefaultSearchDomain:
+                                              type: boolean
+                                            useTcpForDnsLookups:
+                                              type: boolean
+                                          type: object
+                                        resolvers:
+                                          items:
+                                            properties:
+                                              pipe:
+                                                properties:
+                                                  mode:
+                                                    format: int32
+                                                    type: integer
+                                                  path:
+                                                    type: string
+                                                type: object
+                                              socketAddress:
+                                                properties:
+                                                  address:
+                                                    type: string
+                                                  ipv4Compat:
+                                                    type: boolean
+                                                  namedPort:
+                                                    type: string
+                                                  portValue:
+                                                    format: int32
+                                                    type: integer
+                                                  protocol:
+                                                    type: string
+                                                    x-kubernetes-int-or-string: true
+                                                  resolverName:
+                                                    type: string
+                                                type: object
+                                            type: object
+                                          type: array
+                                      type: object
+                                    dnsCacheCircuitBreaker:
+                                      properties:
+                                        maxPendingRequests:
+                                          maximum: 4294967295
+                                          minimum: 0
+                                          nullable: true
+                                          type: integer
+                                      type: object
+                                    dnsFailureRefreshRate:
+                                      properties:
+                                        baseInterval:
+                                          type: string
+                                        maxInterval:
+                                          type: string
+                                      type: object
+                                    dnsLookupFamily:
+                                      type: string
+                                      x-kubernetes-int-or-string: true
+                                    dnsQueryTimeout:
+                                      type: string
+                                    dnsRefreshRate:
+                                      type: string
+                                    hostTtl:
+                                      type: string
+                                    maxHosts:
+                                      maximum: 4294967295
+                                      minimum: 0
+                                      nullable: true
+                                      type: integer
+                                    preresolveHostnames:
+                                      items:
+                                        properties:
+                                          address:
+                                            type: string
+                                          ipv4Compat:
+                                            type: boolean
+                                          namedPort:
+                                            type: string
+                                          portValue:
+                                            format: int32
+                                            type: integer
+                                          protocol:
+                                            type: string
+                                            x-kubernetes-int-or-string: true
+                                          resolverName:
+                                            type: string
+                                        type: object
+                                      type: array
+                                  type: object
+                                saveUpstreamAddress:
+                                  type: boolean
+                              type: object
                             extauth:
                               properties:
                                 clearRouteCache:
@@ -202,6 +300,11 @@ spec:
                                   type: object
                                 failureModeAllow:
                                   type: boolean
+                                grpcService:
+                                  properties:
+                                    authority:
+                                      type: string
+                                  type: object
                                 httpService:
                                   properties:
                                     pathPrefix:
@@ -360,6 +463,8 @@ spec:
                                   type: string
                                 drainTimeout:
                                   type: string
+                                enableTrailers:
+                                  type: boolean
                                 forwardClientCertDetails:
                                   type: string
                                   x-kubernetes-int-or-string: true
@@ -431,6 +536,8 @@ spec:
                                   type: boolean
                                 streamIdleTimeout:
                                   type: string
+                                stripAnyHostPort:
+                                  type: boolean
                                 tracing:
                                   properties:
                                     datadogConfig:
@@ -654,6 +761,27 @@ spec:
                               metadata:
                                 type: object
                                 x-kubernetes-preserve-unknown-fields: true
+                              metadataStatic:
+                                properties:
+                                  sources:
+                                    items:
+                                      properties:
+                                        observedGeneration:
+                                          format: int64
+                                          type: integer
+                                          x-kubernetes-int-or-string: true
+                                        resourceKind:
+                                          type: string
+                                        resourceRef:
+                                          properties:
+                                            name:
+                                              type: string
+                                            namespace:
+                                              type: string
+                                          type: object
+                                      type: object
+                                    type: array
+                                type: object
                               name:
                                 type: string
                               options:
@@ -1408,6 +1536,9 @@ spec:
                                                 requestTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -1489,6 +1620,9 @@ spec:
                                                 responseTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -1590,6 +1724,9 @@ spec:
                                                 responseTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -1723,6 +1860,9 @@ spec:
                                                 requestTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -1804,6 +1944,9 @@ spec:
                                                 responseTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -1905,6 +2048,9 @@ spec:
                                                 responseTransformation:
                                                   properties:
                                                     headerBodyTransform:
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -2008,6 +2154,9 @@ spec:
                                       requestTransformation:
                                         properties:
                                           headerBodyTransform:
+                                            properties:
+                                              addRequestMetadata:
+                                                type: boolean
                                             type: object
                                           transformationTemplate:
                                             properties:
@@ -2089,6 +2238,9 @@ spec:
                                       responseTransformation:
                                         properties:
                                           headerBodyTransform:
+                                            properties:
+                                              addRequestMetadata:
+                                                type: boolean
                                             type: object
                                           transformationTemplate:
                                             properties:
@@ -2220,7 +2372,7 @@ spec:
                                           format: int32
                                           type: integer
                                       type: object
-                                    graphqlSchemaRef:
+                                    graphqlApiRef:
                                       properties:
                                         name:
                                           type: string
@@ -2272,6 +2424,27 @@ spec:
                                     metadata:
                                       type: object
                                       x-kubernetes-preserve-unknown-fields: true
+                                    metadataStatic:
+                                      properties:
+                                        sources:
+                                          items:
+                                            properties:
+                                              observedGeneration:
+                                                format: int64
+                                                type: integer
+                                                x-kubernetes-int-or-string: true
+                                              resourceKind:
+                                                type: string
+                                              resourceRef:
+                                                properties:
+                                                  name:
+                                                    type: string
+                                                  namespace:
+                                                    type: string
+                                                type: object
+                                            type: object
+                                          type: array
+                                      type: object
                                     name:
                                       type: string
                                     options:
@@ -2905,6 +3078,9 @@ spec:
                                                       requestTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -2986,6 +3162,9 @@ spec:
                                                       responseTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -3087,6 +3266,9 @@ spec:
                                                       responseTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -3220,6 +3402,9 @@ spec:
                                                       requestTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -3301,6 +3486,9 @@ spec:
                                                       responseTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -3402,6 +3590,9 @@ spec:
                                                       responseTransformation:
                                                         properties:
                                                           headerBodyTransform:
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -3513,6 +3704,9 @@ spec:
                                             requestTransformation:
                                               properties:
                                                 headerBodyTransform:
+                                                  properties:
+                                                    addRequestMetadata:
+                                                      type: boolean
                                                   type: object
                                                 transformationTemplate:
                                                   properties:
@@ -3594,6 +3788,9 @@ spec:
                                             responseTransformation:
                                               properties:
                                                 headerBodyTransform:
+                                                  properties:
+                                                    addRequestMetadata:
+                                                      type: boolean
                                                   type: object
                                                 transformationTemplate:
                                                   properties:
@@ -3745,6 +3942,13 @@ spec:
                                       properties:
                                         clusterHeader:
                                           type: string
+                                        dynamicForwardProxy:
+                                          properties:
+                                            autoHostRewriteHeader:
+                                              type: string
+                                            hostRewrite:
+                                              type: string
+                                          type: object
                                         multi:
                                           properties:
                                             destinations:
@@ -3777,6 +3981,8 @@ spec:
                                                               requestTransformation:
                                                                 type: boolean
                                                               responseTransformation:
+                                                                type: boolean
+                                                              unwrapAsAlb:
                                                                 type: boolean
                                                             type: object
                                                           azure:
@@ -4115,6 +4321,9 @@ spec:
                                                                     requestTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4196,6 +4405,9 @@ spec:
                                                                     responseTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4297,6 +4509,9 @@ spec:
                                                                     responseTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4430,6 +4645,9 @@ spec:
                                                                     requestTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4511,6 +4729,9 @@ spec:
                                                                     responseTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4612,6 +4833,9 @@ spec:
                                                                     responseTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -4701,6 +4925,9 @@ spec:
                                                           requestTransformation:
                                                             properties:
                                                               headerBodyTransform:
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -4782,6 +5009,9 @@ spec:
                                                           responseTransformation:
                                                             properties:
                                                               headerBodyTransform:
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -4895,6 +5125,8 @@ spec:
                                                     requestTransformation:
                                                       type: boolean
                                                     responseTransformation:
+                                                      type: boolean
+                                                    unwrapAsAlb:
                                                       type: boolean
                                                   type: object
                                                 azure:
@@ -5206,6 +5438,107 @@ spec:
                                             type: string
                                             x-kubernetes-int-or-string: true
                                         type: object
+<<<<<<< HEAD
+=======
+                                      dynamicForwardProxy:
+                                        properties:
+                                          dnsCacheConfig:
+                                            properties:
+                                              appleDns:
+                                                type: object
+                                              caresDns:
+                                                properties:
+                                                  dnsResolverOptions:
+                                                    properties:
+                                                      noDefaultSearchDomain:
+                                                        type: boolean
+                                                      useTcpForDnsLookups:
+                                                        type: boolean
+                                                    type: object
+                                                  resolvers:
+                                                    items:
+                                                      properties:
+                                                        pipe:
+                                                          properties:
+                                                            mode:
+                                                              format: int32
+                                                              type: integer
+                                                            path:
+                                                              type: string
+                                                          type: object
+                                                        socketAddress:
+                                                          properties:
+                                                            address:
+                                                              type: string
+                                                            ipv4Compat:
+                                                              type: boolean
+                                                            namedPort:
+                                                              type: string
+                                                            portValue:
+                                                              format: int32
+                                                              type: integer
+                                                            protocol:
+                                                              type: string
+                                                              x-kubernetes-int-or-string: true
+                                                            resolverName:
+                                                              type: string
+                                                          type: object
+                                                      type: object
+                                                    type: array
+                                                type: object
+                                              dnsCacheCircuitBreaker:
+                                                properties:
+                                                  maxPendingRequests:
+                                                    maximum: 4294967295
+                                                    minimum: 0
+                                                    nullable: true
+                                                    type: integer
+                                                type: object
+                                              dnsFailureRefreshRate:
+                                                properties:
+                                                  baseInterval:
+                                                    type: string
+                                                  maxInterval:
+                                                    type: string
+                                                type: object
+                                              dnsLookupFamily:
+                                                type: string
+                                                x-kubernetes-int-or-string: true
+                                              dnsQueryTimeout:
+                                                type: string
+                                              dnsRefreshRate:
+                                                type: string
+                                              hostTtl:
+                                                type: string
+                                              maxHosts:
+                                                maximum: 4294967295
+                                                minimum: 0
+                                                nullable: true
+                                                type: integer
+                                              preresolveHostnames:
+                                                items:
+                                                  properties:
+                                                    address:
+                                                      type: string
+                                                    ipv4Compat:
+                                                      type: boolean
+                                                    namedPort:
+                                                      type: string
+                                                    portValue:
+                                                      format: int32
+                                                      type: integer
+                                                    protocol:
+                                                      type: string
+                                                      x-kubernetes-int-or-string: true
+                                                    resolverName:
+                                                      type: string
+                                                  type: object
+                                                type: array
+                                            type: object
+                                          saveUpstreamAddress:
+                                            type: boolean
+                                        type: object
+>>>>>>> master
                                       extauth:
                                         properties:
                                           clearRouteCache:
@@ -5219,6 +5552,14 @@ spec:
                                             type: object
                                           failureModeAllow:
                                             type: boolean
+<<<<<<< HEAD
+=======
+                                          grpcService:
+                                            properties:
+                                              authority:
+                                                type: string
+                                            type: object
+>>>>>>> master
                                           httpService:
                                             properties:
                                               pathPrefix:
@@ -5377,6 +5718,11 @@ spec:
                                             type: string
                                           drainTimeout:
                                             type: string
+<<<<<<< HEAD
+=======
+                                          enableTrailers:
+                                            type: boolean
+>>>>>>> master
                                           forwardClientCertDetails:
                                             type: string
                                             x-kubernetes-int-or-string: true
@@ -5448,6 +5794,11 @@ spec:
                                             type: boolean
                                           streamIdleTimeout:
                                             type: string
+<<<<<<< HEAD
+=======
+                                          stripAnyHostPort:
+                                            type: boolean
+>>>>>>> master
                                           tracing:
                                             properties:
                                               datadogConfig:
@@ -5671,6 +6022,30 @@ spec:
                                         metadata:
                                           type: object
                                           x-kubernetes-preserve-unknown-fields: true
+<<<<<<< HEAD
+=======
+                                        metadataStatic:
+                                          properties:
+                                            sources:
+                                              items:
+                                                properties:
+                                                  observedGeneration:
+                                                    format: int64
+                                                    type: integer
+                                                    x-kubernetes-int-or-string: true
+                                                  resourceKind:
+                                                    type: string
+                                                  resourceRef:
+                                                    properties:
+                                                      name:
+                                                        type: string
+                                                      namespace:
+                                                        type: string
+                                                    type: object
+                                                type: object
+                                              type: array
+                                          type: object
+>>>>>>> master
                                         name:
                                           type: string
                                         options:
@@ -6425,6 +6800,12 @@ spec:
                                                           requestTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -6506,6 +6887,12 @@ spec:
                                                           responseTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -6607,6 +6994,12 @@ spec:
                                                           responseTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -6740,6 +7133,12 @@ spec:
                                                           requestTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -6821,6 +7220,12 @@ spec:
                                                           responseTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -6922,6 +7327,12 @@ spec:
                                                           responseTransformation:
                                                             properties:
                                                               headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                properties:
+                                                                  addRequestMetadata:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               transformationTemplate:
                                                                 properties:
@@ -7025,6 +7436,12 @@ spec:
                                                 requestTransformation:
                                                   properties:
                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
+>>>>>>> master
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -7106,6 +7523,12 @@ spec:
                                                 responseTransformation:
                                                   properties:
                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                      properties:
+                                                        addRequestMetadata:
+                                                          type: boolean
+>>>>>>> master
                                                       type: object
                                                     transformationTemplate:
                                                       properties:
@@ -7237,7 +7660,11 @@ spec:
                                                     format: int32
                                                     type: integer
                                                 type: object
+<<<<<<< HEAD
                                               graphqlSchemaRef:
+=======
+                                              graphqlApiRef:
+>>>>>>> master
                                                 properties:
                                                   name:
                                                     type: string
@@ -7289,6 +7716,30 @@ spec:
                                               metadata:
                                                 type: object
                                                 x-kubernetes-preserve-unknown-fields: true
+<<<<<<< HEAD
+=======
+                                              metadataStatic:
+                                                properties:
+                                                  sources:
+                                                    items:
+                                                      properties:
+                                                        observedGeneration:
+                                                          format: int64
+                                                          type: integer
+                                                          x-kubernetes-int-or-string: true
+                                                        resourceKind:
+                                                          type: string
+                                                        resourceRef:
+                                                          properties:
+                                                            name:
+                                                              type: string
+                                                            namespace:
+                                                              type: string
+                                                          type: object
+                                                      type: object
+                                                    type: array
+                                                type: object
+>>>>>>> master
                                               name:
                                                 type: string
                                               options:
@@ -7922,6 +8373,12 @@ spec:
                                                                 requestTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8003,6 +8460,12 @@ spec:
                                                                 responseTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8104,6 +8567,12 @@ spec:
                                                                 responseTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8237,6 +8706,12 @@ spec:
                                                                 requestTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8318,6 +8793,12 @@ spec:
                                                                 responseTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8419,6 +8900,12 @@ spec:
                                                                 responseTransformation:
                                                                   properties:
                                                                     headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                      properties:
+                                                                        addRequestMetadata:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     transformationTemplate:
                                                                       properties:
@@ -8530,6 +9017,12 @@ spec:
                                                       requestTransformation:
                                                         properties:
                                                           headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
+>>>>>>> master
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -8611,6 +9104,12 @@ spec:
                                                       responseTransformation:
                                                         properties:
                                                           headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                            properties:
+                                                              addRequestMetadata:
+                                                                type: boolean
+>>>>>>> master
                                                             type: object
                                                           transformationTemplate:
                                                             properties:
@@ -8762,6 +9261,16 @@ spec:
                                                 properties:
                                                   clusterHeader:
                                                     type: string
+<<<<<<< HEAD
+=======
+                                                  dynamicForwardProxy:
+                                                    properties:
+                                                      autoHostRewriteHeader:
+                                                        type: string
+                                                      hostRewrite:
+                                                        type: string
+                                                    type: object
+>>>>>>> master
                                                   multi:
                                                     properties:
                                                       destinations:
@@ -8795,6 +9304,11 @@ spec:
                                                                           type: boolean
                                                                         responseTransformation:
                                                                           type: boolean
+<<<<<<< HEAD
+=======
+                                                                        unwrapAsAlb:
+                                                                          type: boolean
+>>>>>>> master
                                                                       type: object
                                                                     azure:
                                                                       properties:
@@ -9132,6 +9646,12 @@ spec:
                                                                               requestTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9213,6 +9733,12 @@ spec:
                                                                               responseTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9314,6 +9840,12 @@ spec:
                                                                               responseTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9447,6 +9979,12 @@ spec:
                                                                               requestTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9528,6 +10066,12 @@ spec:
                                                                               responseTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9629,6 +10173,12 @@ spec:
                                                                               responseTransformation:
                                                                                 properties:
                                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                                    properties:
+                                                                                      addRequestMetadata:
+                                                                                        type: boolean
+>>>>>>> master
                                                                                     type: object
                                                                                   transformationTemplate:
                                                                                     properties:
@@ -9718,6 +10268,12 @@ spec:
                                                                     requestTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
+>>>>>>> master
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -9799,6 +10355,12 @@ spec:
                                                                     responseTransformation:
                                                                       properties:
                                                                         headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                          properties:
+                                                                            addRequestMetadata:
+                                                                              type: boolean
+>>>>>>> master
                                                                           type: object
                                                                         transformationTemplate:
                                                                           properties:
@@ -9913,6 +10475,11 @@ spec:
                                                                 type: boolean
                                                               responseTransformation:
                                                                 type: boolean
+<<<<<<< HEAD
+=======
+                                                              unwrapAsAlb:
+                                                                type: boolean
+>>>>>>> master
                                                             type: object
                                                           azure:
                                                             properties:
@@ -10296,6 +10863,11 @@ spec:
                                                                     type: boolean
                                                                   responseTransformation:
                                                                     type: boolean
+<<<<<<< HEAD
+=======
+                                                                  unwrapAsAlb:
+                                                                    type: boolean
+>>>>>>> master
                                                                 type: object
                                                               azure:
                                                                 properties:
@@ -10633,6 +11205,12 @@ spec:
                                                                         requestTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -10714,6 +11292,12 @@ spec:
                                                                         responseTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -10815,6 +11399,12 @@ spec:
                                                                         responseTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -10948,6 +11538,12 @@ spec:
                                                                         requestTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -11029,6 +11625,12 @@ spec:
                                                                         responseTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -11130,6 +11732,12 @@ spec:
                                                                         responseTransformation:
                                                                           properties:
                                                                             headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                              properties:
+                                                                                addRequestMetadata:
+                                                                                  type: boolean
+>>>>>>> master
                                                                               type: object
                                                                             transformationTemplate:
                                                                               properties:
@@ -11219,6 +11827,12 @@ spec:
                                                               requestTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
+>>>>>>> master
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -11300,6 +11914,12 @@ spec:
                                                               responseTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+<<<<<<< HEAD
+=======
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
+>>>>>>> master
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -11414,6 +12034,11 @@ spec:
                                                           type: boolean
                                                         responseTransformation:
                                                           type: boolean
+<<<<<<< HEAD
+=======
+                                                        unwrapAsAlb:
+                                                          type: boolean
+>>>>>>> master
                                                       type: object
                                                     azure:
                                                       properties:
@@ -11646,6 +12271,27 @@ spec:
                     metadata:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    metadataStatic:
+                      properties:
+                        sources:
+                          items:
+                            properties:
+                              observedGeneration:
+                                format: int64
+                                type: integer
+                                x-kubernetes-int-or-string: true
+                              resourceKind:
+                                type: string
+                              resourceRef:
+                                properties:
+                                  name:
+                                    type: string
+                                  namespace:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                      type: object
                     name:
                       type: string
                     options:
@@ -11895,6 +12541,8 @@ spec:
                                                         requestTransformation:
                                                           type: boolean
                                                         responseTransformation:
+                                                          type: boolean
+                                                        unwrapAsAlb:
                                                           type: boolean
                                                       type: object
                                                     azure:
@@ -12233,6 +12881,9 @@ spec:
                                                               requestTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12314,6 +12965,9 @@ spec:
                                                               responseTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12415,6 +13069,9 @@ spec:
                                                               responseTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12548,6 +13205,9 @@ spec:
                                                               requestTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12629,6 +13289,9 @@ spec:
                                                               responseTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12730,6 +13393,9 @@ spec:
                                                               responseTransformation:
                                                                 properties:
                                                                   headerBodyTransform:
+                                                                    properties:
+                                                                      addRequestMetadata:
+                                                                        type: boolean
                                                                     type: object
                                                                   transformationTemplate:
                                                                     properties:
@@ -12819,6 +13485,9 @@ spec:
                                                     requestTransformation:
                                                       properties:
                                                         headerBodyTransform:
+                                                          properties:
+                                                            addRequestMetadata:
+                                                              type: boolean
                                                           type: object
                                                         transformationTemplate:
                                                           properties:
@@ -12900,6 +13569,9 @@ spec:
                                                     responseTransformation:
                                                       properties:
                                                         headerBodyTransform:
+                                                          properties:
+                                                            addRequestMetadata:
+                                                              type: boolean
                                                           type: object
                                                         transformationTemplate:
                                                           properties:
@@ -13013,6 +13685,8 @@ spec:
                                               requestTransformation:
                                                 type: boolean
                                               responseTransformation:
+                                                type: boolean
+                                              unwrapAsAlb:
                                                 type: boolean
                                             type: object
                                           azure:

@@ -209,26 +209,6 @@ func (m *Settings) Hash(hasher hash.Hash64) (uint64, error) {
 		}
 	}
 
-	if h, ok := interface{}(m.GetHttpService()).(safe_hasher.SafeHasher); ok {
-		if _, err = hasher.Write([]byte("HttpService")); err != nil {
-			return 0, err
-		}
-		if _, err = h.Hash(hasher); err != nil {
-			return 0, err
-		}
-	} else {
-		if fieldValue, err := hashstructure.Hash(m.GetHttpService(), nil); err != nil {
-			return 0, err
-		} else {
-			if _, err = hasher.Write([]byte("HttpService")); err != nil {
-				return 0, err
-			}
-			if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	if _, err = hasher.Write([]byte(m.GetUserIdHeader())); err != nil {
 		return 0, err
 	}
@@ -294,6 +274,74 @@ func (m *Settings) Hash(hasher hash.Hash64) (uint64, error) {
 	}
 
 	if _, err = hasher.Write([]byte(m.GetStatPrefix())); err != nil {
+		return 0, err
+	}
+
+	switch m.ServiceType.(type) {
+
+	case *Settings_HttpService:
+
+		if h, ok := interface{}(m.GetHttpService()).(safe_hasher.SafeHasher); ok {
+			if _, err = hasher.Write([]byte("HttpService")); err != nil {
+				return 0, err
+			}
+			if _, err = h.Hash(hasher); err != nil {
+				return 0, err
+			}
+		} else {
+			if fieldValue, err := hashstructure.Hash(m.GetHttpService(), nil); err != nil {
+				return 0, err
+			} else {
+				if _, err = hasher.Write([]byte("HttpService")); err != nil {
+					return 0, err
+				}
+				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+					return 0, err
+				}
+			}
+		}
+
+	case *Settings_GrpcService:
+
+		if h, ok := interface{}(m.GetGrpcService()).(safe_hasher.SafeHasher); ok {
+			if _, err = hasher.Write([]byte("GrpcService")); err != nil {
+				return 0, err
+			}
+			if _, err = h.Hash(hasher); err != nil {
+				return 0, err
+			}
+		} else {
+			if fieldValue, err := hashstructure.Hash(m.GetGrpcService(), nil); err != nil {
+				return 0, err
+			} else {
+				if _, err = hasher.Write([]byte("GrpcService")); err != nil {
+					return 0, err
+				}
+				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+					return 0, err
+				}
+			}
+		}
+
+	}
+
+	return hasher.Sum64(), nil
+}
+
+// Hash function
+func (m *GrpcService) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.GrpcService")); err != nil {
+		return 0, err
+	}
+
+	if _, err = hasher.Write([]byte(m.GetAuthority())); err != nil {
 		return 0, err
 	}
 
@@ -1179,6 +1227,125 @@ func (m *OidcAuthorizationCode) Hash(hasher hash.Hash64) (uint64, error) {
 		return 0, err
 	}
 
+<<<<<<< HEAD
+=======
+	return hasher.Sum64(), nil
+}
+
+// Hash function
+func (m *JwtValidation) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.JwtValidation")); err != nil {
+		return 0, err
+	}
+
+	if _, err = hasher.Write([]byte(m.GetIssuer())); err != nil {
+		return 0, err
+	}
+
+	switch m.JwksSourceSpecifier.(type) {
+
+	case *JwtValidation_RemoteJwks_:
+
+		if h, ok := interface{}(m.GetRemoteJwks()).(safe_hasher.SafeHasher); ok {
+			if _, err = hasher.Write([]byte("RemoteJwks")); err != nil {
+				return 0, err
+			}
+			if _, err = h.Hash(hasher); err != nil {
+				return 0, err
+			}
+		} else {
+			if fieldValue, err := hashstructure.Hash(m.GetRemoteJwks(), nil); err != nil {
+				return 0, err
+			} else {
+				if _, err = hasher.Write([]byte("RemoteJwks")); err != nil {
+					return 0, err
+				}
+				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+					return 0, err
+				}
+			}
+		}
+
+	case *JwtValidation_LocalJwks_:
+
+		if h, ok := interface{}(m.GetLocalJwks()).(safe_hasher.SafeHasher); ok {
+			if _, err = hasher.Write([]byte("LocalJwks")); err != nil {
+				return 0, err
+			}
+			if _, err = h.Hash(hasher); err != nil {
+				return 0, err
+			}
+		} else {
+			if fieldValue, err := hashstructure.Hash(m.GetLocalJwks(), nil); err != nil {
+				return 0, err
+			} else {
+				if _, err = hasher.Write([]byte("LocalJwks")); err != nil {
+					return 0, err
+				}
+				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+					return 0, err
+				}
+			}
+		}
+
+	}
+
+	return hasher.Sum64(), nil
+}
+
+// Hash function
+func (m *IntrospectionValidation) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.IntrospectionValidation")); err != nil {
+		return 0, err
+	}
+
+	if _, err = hasher.Write([]byte(m.GetIntrospectionUrl())); err != nil {
+		return 0, err
+	}
+
+	if _, err = hasher.Write([]byte(m.GetClientId())); err != nil {
+		return 0, err
+	}
+
+	if h, ok := interface{}(m.GetClientSecretRef()).(safe_hasher.SafeHasher); ok {
+		if _, err = hasher.Write([]byte("ClientSecretRef")); err != nil {
+			return 0, err
+		}
+		if _, err = h.Hash(hasher); err != nil {
+			return 0, err
+		}
+	} else {
+		if fieldValue, err := hashstructure.Hash(m.GetClientSecretRef(), nil); err != nil {
+			return 0, err
+		} else {
+			if _, err = hasher.Write([]byte("ClientSecretRef")); err != nil {
+				return 0, err
+			}
+			if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
+				return 0, err
+			}
+		}
+	}
+
+	if _, err = hasher.Write([]byte(m.GetUserIdAttributeName())); err != nil {
+		return 0, err
+	}
+
+>>>>>>> master
 	return hasher.Sum64(), nil
 }
 
@@ -2491,7 +2658,7 @@ func (m *UserSession_CookieOptions) Hash(hasher hash.Hash64) (uint64, error) {
 }
 
 // Hash function
-func (m *AccessTokenValidation_JwtValidation) Hash(hasher hash.Hash64) (uint64, error) {
+func (m *JwtValidation_RemoteJwks) Hash(hasher hash.Hash64) (uint64, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -2499,147 +2666,7 @@ func (m *AccessTokenValidation_JwtValidation) Hash(hasher hash.Hash64) (uint64, 
 		hasher = fnv.New64()
 	}
 	var err error
-	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_JwtValidation")); err != nil {
-		return 0, err
-	}
-
-	if _, err = hasher.Write([]byte(m.GetIssuer())); err != nil {
-		return 0, err
-	}
-
-	switch m.JwksSourceSpecifier.(type) {
-
-	case *AccessTokenValidation_JwtValidation_RemoteJwks_:
-
-		if h, ok := interface{}(m.GetRemoteJwks()).(safe_hasher.SafeHasher); ok {
-			if _, err = hasher.Write([]byte("RemoteJwks")); err != nil {
-				return 0, err
-			}
-			if _, err = h.Hash(hasher); err != nil {
-				return 0, err
-			}
-		} else {
-			if fieldValue, err := hashstructure.Hash(m.GetRemoteJwks(), nil); err != nil {
-				return 0, err
-			} else {
-				if _, err = hasher.Write([]byte("RemoteJwks")); err != nil {
-					return 0, err
-				}
-				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
-					return 0, err
-				}
-			}
-		}
-
-	case *AccessTokenValidation_JwtValidation_LocalJwks_:
-
-		if h, ok := interface{}(m.GetLocalJwks()).(safe_hasher.SafeHasher); ok {
-			if _, err = hasher.Write([]byte("LocalJwks")); err != nil {
-				return 0, err
-			}
-			if _, err = h.Hash(hasher); err != nil {
-				return 0, err
-			}
-		} else {
-			if fieldValue, err := hashstructure.Hash(m.GetLocalJwks(), nil); err != nil {
-				return 0, err
-			} else {
-				if _, err = hasher.Write([]byte("LocalJwks")); err != nil {
-					return 0, err
-				}
-				if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
-					return 0, err
-				}
-			}
-		}
-
-	}
-
-	return hasher.Sum64(), nil
-}
-
-// Hash function
-func (m *AccessTokenValidation_IntrospectionValidation) Hash(hasher hash.Hash64) (uint64, error) {
-	if m == nil {
-		return 0, nil
-	}
-	if hasher == nil {
-		hasher = fnv.New64()
-	}
-	var err error
-	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_IntrospectionValidation")); err != nil {
-		return 0, err
-	}
-
-	if _, err = hasher.Write([]byte(m.GetIntrospectionUrl())); err != nil {
-		return 0, err
-	}
-
-	if _, err = hasher.Write([]byte(m.GetClientId())); err != nil {
-		return 0, err
-	}
-
-	if h, ok := interface{}(m.GetClientSecretRef()).(safe_hasher.SafeHasher); ok {
-		if _, err = hasher.Write([]byte("ClientSecretRef")); err != nil {
-			return 0, err
-		}
-		if _, err = h.Hash(hasher); err != nil {
-			return 0, err
-		}
-	} else {
-		if fieldValue, err := hashstructure.Hash(m.GetClientSecretRef(), nil); err != nil {
-			return 0, err
-		} else {
-			if _, err = hasher.Write([]byte("ClientSecretRef")); err != nil {
-				return 0, err
-			}
-			if err := binary.Write(hasher, binary.LittleEndian, fieldValue); err != nil {
-				return 0, err
-			}
-		}
-	}
-
-	if _, err = hasher.Write([]byte(m.GetUserIdAttributeName())); err != nil {
-		return 0, err
-	}
-
-	return hasher.Sum64(), nil
-}
-
-// Hash function
-func (m *AccessTokenValidation_ScopeList) Hash(hasher hash.Hash64) (uint64, error) {
-	if m == nil {
-		return 0, nil
-	}
-	if hasher == nil {
-		hasher = fnv.New64()
-	}
-	var err error
-	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_ScopeList")); err != nil {
-		return 0, err
-	}
-
-	for _, v := range m.GetScope() {
-
-		if _, err = hasher.Write([]byte(v)); err != nil {
-			return 0, err
-		}
-
-	}
-
-	return hasher.Sum64(), nil
-}
-
-// Hash function
-func (m *AccessTokenValidation_JwtValidation_RemoteJwks) Hash(hasher hash.Hash64) (uint64, error) {
-	if m == nil {
-		return 0, nil
-	}
-	if hasher == nil {
-		hasher = fnv.New64()
-	}
-	var err error
-	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_JwtValidation_RemoteJwks")); err != nil {
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.JwtValidation_RemoteJwks")); err != nil {
 		return 0, err
 	}
 
@@ -2671,7 +2698,7 @@ func (m *AccessTokenValidation_JwtValidation_RemoteJwks) Hash(hasher hash.Hash64
 }
 
 // Hash function
-func (m *AccessTokenValidation_JwtValidation_LocalJwks) Hash(hasher hash.Hash64) (uint64, error) {
+func (m *JwtValidation_LocalJwks) Hash(hasher hash.Hash64) (uint64, error) {
 	if m == nil {
 		return 0, nil
 	}
@@ -2679,12 +2706,36 @@ func (m *AccessTokenValidation_JwtValidation_LocalJwks) Hash(hasher hash.Hash64)
 		hasher = fnv.New64()
 	}
 	var err error
-	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_JwtValidation_LocalJwks")); err != nil {
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.JwtValidation_LocalJwks")); err != nil {
 		return 0, err
 	}
 
 	if _, err = hasher.Write([]byte(m.GetInlineString())); err != nil {
 		return 0, err
+	}
+
+	return hasher.Sum64(), nil
+}
+
+// Hash function
+func (m *AccessTokenValidation_ScopeList) Hash(hasher hash.Hash64) (uint64, error) {
+	if m == nil {
+		return 0, nil
+	}
+	if hasher == nil {
+		hasher = fnv.New64()
+	}
+	var err error
+	if _, err = hasher.Write([]byte("enterprise.gloo.solo.io.github.com/solo-io/gloo/projects/gloo/pkg/api/v1/enterprise/options/extauth/v1.AccessTokenValidation_ScopeList")); err != nil {
+		return 0, err
+	}
+
+	for _, v := range m.GetScope() {
+
+		if _, err = hasher.Write([]byte(v)); err != nil {
+			return 0, err
+		}
+
 	}
 
 	return hasher.Sum64(), nil

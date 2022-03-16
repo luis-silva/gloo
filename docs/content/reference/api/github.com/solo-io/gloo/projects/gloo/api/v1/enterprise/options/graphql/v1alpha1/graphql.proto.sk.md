@@ -17,10 +17,9 @@ weight: 5
 - [RESTResolver](#restresolver)
 - [GrpcDescriptorRegistry](#grpcdescriptorregistry)
 - [GrpcResolver](#grpcresolver)
-- [QueryMatcher](#querymatcher)
-- [FieldMatcher](#fieldmatcher)
 - [Resolution](#resolution)
-- [GraphQLSchema](#graphqlschema) **Top-Level Resource**
+- [GraphQLApi](#graphqlapi) **Top-Level Resource**
+- [PersistedQueryCacheConfig](#persistedquerycacheconfig)
 - [ExecutableSchema](#executableschema)
 - [Executor](#executor)
 - [Local](#local)
@@ -70,7 +69,7 @@ Defines a configuration for generating outgoing requests for a resolver.
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
 | `resultRoot` | `string` | Sets the "root" of the upstream response to be turned into a graphql type by the graphql server. For example, if the graphql type is: type Simple { name String } and the upstream response is `{"data": {"simple": {"name": "simple name"}}}`, the graphql server will not be able to marshal the upstream response into the Simple graphql type because it doesn't know where the relevant data is. If we set result_root to "data.simple", we can give the graphql server a hint of where to look in the upstream response for the relevant data that graphql type wants. |
-| `setters` | `map<string, string>` | Field-specific mapping for a graphql field to a JSON path in the upstream response. For example, if the graphql type is type Simple { name String number String } and the upstream response is `{"name": "simple name", "details": {"num": "1234567890"}}`, the graphql server will not be able to marshal the upstream response into the Simple graphql type because of the nested `number` field. We can use a simple setter here: setters: number: "details.num" and the graphql server will be able to extract data for a field given the path to the relevant data in the upstream JSON response. We don't need to have a setter for the `name` field because the JSON response has that field in a position the graphql server can understand automatically. |
+| `setters` | `map<string, string>` | Field-specific mapping for a graphql field to a JSON path in the upstream response. For example, if the graphql type is: type Person { firstname String lastname String fullname String } and the upstream response is `{"firstname": "Joe", "details": {"lastname": "Smith"}}`, the graphql server will not be able to marshal the upstream response into the Person graphql type because of the nested `lastname` field. We can use a simple setter here: setters: lastname: '{$body.details.lastname}' fullname: '{$body.details.firstname} {$body.details.lastname}' and the graphql server will be able to extract data for a field given the path to the relevant data in the upstream JSON response. We don't need to have a setter for the `firstname` field because the JSON response has that field in a position the graphql server can understand automatically. So far only the $body keyword is supported, but in the future we may add support for others such as $headers. |
 
 
 
@@ -167,69 +166,33 @@ control-plane API
 
 
 ---
-### QueryMatcher
-
-
-
-```yaml
-"fieldMatcher": .graphql.gloo.solo.io.QueryMatcher.FieldMatcher
-
-```
-
-| Field | Type | Description |
-| ----- | ---- | ----------- | 
-| `fieldMatcher` | [.graphql.gloo.solo.io.QueryMatcher.FieldMatcher](../graphql.proto.sk/#fieldmatcher) |  |
-
-
-
-
----
-### FieldMatcher
-
-
-
-```yaml
-"type": string
-"field": string
-
-```
-
-| Field | Type | Description |
-| ----- | ---- | ----------- | 
-| `type` | `string` | Object type. For example, Query. |
-| `field` | `string` | Field with in the object. |
-
-
-
-
----
 ### Resolution
 
  
-Define a resolution for each (Type).(Field)
-If a field does not have resolver, the default resolver will be used.
+Define a named resolver which can be then matched to a field using the `resolve` directive.
+if a field does not have resolver, the default resolver will be used.
 the default resolver takes the field with the same name from the parent, and uses that value
 to resolve the field.
 If a field with the same name does not exist in the parent, null will be used.
 
 ```yaml
-"matcher": .graphql.gloo.solo.io.QueryMatcher
 "restResolver": .graphql.gloo.solo.io.RESTResolver
 "grpcResolver": .graphql.gloo.solo.io.GrpcResolver
+"statPrefix": .google.protobuf.StringValue
 
 ```
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `matcher` | [.graphql.gloo.solo.io.QueryMatcher](../graphql.proto.sk/#querymatcher) | Match an object type and field. |
 | `restResolver` | [.graphql.gloo.solo.io.RESTResolver](../graphql.proto.sk/#restresolver) |  Only one of `restResolver` or `grpcResolver` can be set. |
 | `grpcResolver` | [.graphql.gloo.solo.io.GrpcResolver](../graphql.proto.sk/#grpcresolver) |  Only one of `grpcResolver` or `restResolver` can be set. |
+| `statPrefix` | [.google.protobuf.StringValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/string-value) | The stats prefix which will be used for this resolver. If empty, will generate a stats prefix ${RESOLVER_NAME}. |
 
 
 
 
 ---
-### GraphQLSchema
+### GraphQLApi
 
  
 Enterprise-Only: THIS FEATURE IS IN TECH PREVIEW. APIs are versioned as alpha and subject to change.
@@ -244,6 +207,9 @@ configure the routes to point to these schema CRs.
 "namespacedStatuses": .core.solo.io.NamespacedStatuses
 "metadata": .core.solo.io.Metadata
 "executableSchema": .graphql.gloo.solo.io.ExecutableSchema
+"statPrefix": .google.protobuf.StringValue
+"persistedQueryCacheConfig": .graphql.gloo.solo.io.PersistedQueryCacheConfig
+"allowedQueryHashes": []string
 
 ```
 
@@ -252,6 +218,27 @@ configure the routes to point to these schema CRs.
 | `namespacedStatuses` | [.core.solo.io.NamespacedStatuses](../../../../../../../../../../solo-kit/api/v1/status.proto.sk/#namespacedstatuses) | NamespacedStatuses indicates the validation status of this resource. NamespacedStatuses is read-only by clients, and set by gloo during validation. |
 | `metadata` | [.core.solo.io.Metadata](../../../../../../../../../../solo-kit/api/v1/metadata.proto.sk/#metadata) | Metadata contains the object metadata for this resource. |
 | `executableSchema` | [.graphql.gloo.solo.io.ExecutableSchema](../graphql.proto.sk/#executableschema) |  |
+| `statPrefix` | [.google.protobuf.StringValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/string-value) | The stats prefix which will be used for this route config. If empty, will generate a stats prefix ${GRAPHQLAPI_REF}. |
+| `persistedQueryCacheConfig` | [.graphql.gloo.solo.io.PersistedQueryCacheConfig](../graphql.proto.sk/#persistedquerycacheconfig) | Configuration settings for persisted query cache. |
+| `allowedQueryHashes` | `[]string` | Safelist: only allow queries to be executed that match these sha256 hashes. The hash can be computed from the query string or provided (i.e. persisted queries). |
+
+
+
+
+---
+### PersistedQueryCacheConfig
+
+ 
+This message specifies Persisted Query Cache configuration.
+
+```yaml
+"cacheSize": int
+
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- | 
+| `cacheSize` | `int` | The unit is number of queries to store, default to 1000. |
 
 
 
@@ -270,7 +257,7 @@ configure the routes to point to these schema CRs.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `schemaDefinition` | `string` | Schema to use in string format. |
+| `schemaDefinition` | `string` | The following directives are supported: - @resolve(name: string) - @cacheControl(maxAge: uint32, inheritMaxAge: bool, scope: unset/public/private) Define named resolvers on the `Executor.Local.resolutions` message, and reference them here using @resolve: ```gql type Query { author: String @resolve(name: "authorResolver") } Further, fields/types can be annotated with the @cacheControl directive, e.g. ```gql type Query @cacheControl(maxAge: 60) { author: String @resolve(name: "authorResolver") @cacheControl(maxAge: 90, scope: private) } ``` Any type-level cache control defaults are overridden by field settings, if provided. The most restrictive cache control setting (smallest maxAge and scope) across all fields in an entire query will be returned to the client in the `Cache-Control` header with appropriate `max-age` and scope (unset, `public`, or `private`) directives. |
 | `executor` | [.graphql.gloo.solo.io.Executor](../graphql.proto.sk/#executor) | how to execute the schema. |
 | `grpcDescriptorRegistry` | [.graphql.gloo.solo.io.GrpcDescriptorRegistry](../graphql.proto.sk/#grpcdescriptorregistry) | Schema extensions. |
 
@@ -301,14 +288,14 @@ configure the routes to point to these schema CRs.
 Execute schema using resolvers.
 
 ```yaml
-"resolutions": []graphql.gloo.solo.io.Resolution
+"resolutions": map<string, .graphql.gloo.solo.io.Resolution>
 "enableIntrospection": bool
 
 ```
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `resolutions` | [[]graphql.gloo.solo.io.Resolution](../graphql.proto.sk/#resolution) | The resolver map to use to resolve the schema. |
+| `resolutions` | `map<string, .graphql.gloo.solo.io.Resolution>` | Mapping of resolver name to resolver definition. The names are used to reference the resolver in the graphql schema. For example, a resolver with name "authorResolver" can be defined as ```yaml authorResolver: restResolver: upstreamRef: ... request: ... response: ... ``` and referenced in the graphql schema as ```gql type Query { author: String @resolve(name: "authorResolver") } ```. |
 | `enableIntrospection` | `bool` | Do we enable introspection for the schema? general recommendation is to disable this for production and hence it defaults to false. |
 
 

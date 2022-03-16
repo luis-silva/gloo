@@ -5,7 +5,7 @@ import (
 
 	envoy_config_cluster_v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	"github.com/solo-io/gloo/pkg/utils"
-	v1 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1"
+	v1snap "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/gloosnapshot"
 	"github.com/solo-io/gloo/projects/gloo/pkg/syncer/stats"
 	"github.com/solo-io/gloo/projects/gloo/pkg/translator"
 	"github.com/solo-io/gloo/projects/gloo/pkg/xds"
@@ -31,7 +31,7 @@ func NewUpstreamRemovingSanitizer() *UpstreamRemovingSanitizer {
 //
 func (s *UpstreamRemovingSanitizer) SanitizeSnapshot(
 	ctx context.Context,
-	glooSnapshot *v1.ApiSnapshot,
+	glooSnapshot *v1snap.ApiSnapshot,
 	xdsSnapshot envoycache.Snapshot,
 	reports reporter.ResourceReports,
 ) (envoycache.Snapshot, error) {
@@ -54,6 +54,11 @@ func (s *UpstreamRemovingSanitizer) SanitizeSnapshot(
 		if reports[up].Errors != nil {
 
 			clusterName := translator.UpstreamToClusterName(up.GetMetadata().Ref())
+			if clusters.Items[clusterName] == nil {
+				// cluster has already been removed from the snapshot
+				contextutils.LoggerFrom(ctx).Debugf("cluster %s does not exist in the xds snapshot", clusterName)
+				continue
+			}
 			endpointName := clusterName
 			cluster, _ := clusters.Items[clusterName].ResourceProto().(*envoy_config_cluster_v3.Cluster)
 			if cluster.GetType() == envoy_config_cluster_v3.Cluster_EDS {

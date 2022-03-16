@@ -54,6 +54,18 @@ func GetServiceAccountPermissions(namespace string) *manifesttestutils.ServiceAc
 	permissions.AddExpectedPermission(
 		"gloo-system.gloo",
 		namespace,
+		[]string{"gateway.solo.io"},
+		[]string{"gateways", "httpgateways", "virtualservices", "routetables", "virtualhostoptions", "routeoptions"},
+		[]string{"get", "list", "watch", "update"})
+	permissions.AddExpectedPermission(
+		"gloo-system.gloo",
+		namespace,
+		[]string{"gateway.solo.io"},
+		[]string{"gateways"},
+		[]string{"create"})
+	permissions.AddExpectedPermission(
+		"gloo-system.gloo",
+		namespace,
 		[]string{"gloo.solo.io"},
 		[]string{"settings"},
 		[]string{"get", "list", "watch", "create"})
@@ -73,7 +85,11 @@ func GetServiceAccountPermissions(namespace string) *manifesttestutils.ServiceAc
 		"gloo-system.gloo",
 		namespace,
 		[]string{"graphql.gloo.solo.io"},
+<<<<<<< HEAD
 		[]string{"graphqlschemas"},
+=======
+		[]string{"graphqlapis"},
+>>>>>>> master
 		[]string{"get", "list", "watch", "update"})
 
 	// Discovery
@@ -99,7 +115,11 @@ func GetServiceAccountPermissions(namespace string) *manifesttestutils.ServiceAc
 		"gloo-system.discovery",
 		namespace,
 		[]string{"graphql.gloo.solo.io"},
+<<<<<<< HEAD
 		[]string{"graphqlschemas"},
+=======
+		[]string{"graphqlapis"},
+>>>>>>> master
 		[]string{"get", "list", "watch", "update", "create"})
 
 	return permissions

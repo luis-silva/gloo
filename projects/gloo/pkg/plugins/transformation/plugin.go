@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/rotisserie/eris"
+	"github.com/solo-io/go-utils/contextutils"
+	"k8s.io/utils/lru"
 
 	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	envoy_type_matcher_v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
+	"github.com/golang/protobuf/ptypes/any"
 	"github.com/solo-io/gloo/pkg/utils/regexutils"
 	envoyroutev3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/route/v3"
 	envoytransformation "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/extensions/transformation"
@@ -33,6 +37,10 @@ const (
 	ExtensionName    = "transformation"
 	FilterName       = "io.solo.transformation"
 	EarlyStageNumber = 1
+<<<<<<< HEAD
+=======
+	AwsStageNumber   = 2
+>>>>>>> master
 )
 
 var (
@@ -55,10 +63,18 @@ type Plugin struct {
 	filterNeeded               bool
 	TranslateTransformation    TranslateTransformationFn
 	settings                   *v1.Settings
+
+<<<<<<< HEAD
+=======
+	// validationLruCache is a map of: (transformation hash) -> (error state)
+	validationLruCache *lru.Cache
 }
 
+>>>>>>> master
 func NewPlugin() *Plugin {
-	return &Plugin{}
+	return &Plugin{
+		validationLruCache: lru.New(1024),
+	}
 }
 
 func (p *Plugin) Name() string {
@@ -72,6 +88,22 @@ func (p *Plugin) Init(params plugins.InitParams) error {
 	p.settings = params.Settings
 	p.TranslateTransformation = TranslateTransformation
 	return nil
+}
+
+func mergeFunc(tx *envoytransformation.RouteTransformations) pluginutils.ModifyFunc {
+	return func(existing *any.Any) (proto.Message, error) {
+		if existing == nil {
+			return tx, nil
+		}
+		var transforms envoytransformation.RouteTransformations
+		err := existing.UnmarshalTo(&transforms)
+		if err != nil {
+			// this should never happen
+			return nil, err
+		}
+		transforms.Transformations = append(transforms.GetTransformations(), tx.GetTransformations()...)
+		return &transforms, nil
+	}
 }
 
 func (p *Plugin) ProcessVirtualHost(
@@ -97,7 +129,11 @@ func (p *Plugin) ProcessVirtualHost(
 
 	p.filterNeeded = true
 
+<<<<<<< HEAD
 	return pluginutils.SetVhostPerFilterConfig(out, FilterName, envoyTransformation)
+=======
+	return pluginutils.ModifyVhostPerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 func (p *Plugin) ProcessRoute(params plugins.RouteParams, in *v1.Route, out *envoy_config_route_v3.Route) error {
@@ -118,7 +154,11 @@ func (p *Plugin) ProcessRoute(params plugins.RouteParams, in *v1.Route, out *env
 	}
 
 	p.filterNeeded = true
+<<<<<<< HEAD
 	return pluginutils.SetRoutePerFilterConfig(out, FilterName, envoyTransformation)
+=======
+	return pluginutils.ModifyRoutePerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 func (p *Plugin) ProcessWeightedDestination(
@@ -143,7 +183,11 @@ func (p *Plugin) ProcessWeightedDestination(
 		return err
 	}
 	p.filterNeeded = true
+<<<<<<< HEAD
 	return pluginutils.SetWeightedClusterPerFilterConfig(out, FilterName, envoyTransformation)
+=======
+	return pluginutils.ModifyWeightedClusterPerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 // HttpFilters emits the desired set of filters. Either 0, 1 or
@@ -197,16 +241,17 @@ func (p *Plugin) convertTransformation(
 		ret.ResponseTransformation = responseTransform
 		// new config:
 		// we have to have it too, as if any new config is defined the deprecated config is ignored.
-		ret.Transformations = append(ret.GetTransformations(), &envoytransformation.RouteTransformations_RouteTransformation{
-			Match: &envoytransformation.RouteTransformations_RouteTransformation_RequestMatch_{
-				RequestMatch: &envoytransformation.RouteTransformations_RouteTransformation_RequestMatch{
-					Match:                  nil,
-					RequestTransformation:  requestTransform,
-					ClearRouteCache:        t.GetClearRouteCache(),
-					ResponseTransformation: responseTransform,
+		ret.Transformations = append(ret.GetTransformations(),
+			&envoytransformation.RouteTransformations_RouteTransformation{
+				Match: &envoytransformation.RouteTransformations_RouteTransformation_RequestMatch_{
+					RequestMatch: &envoytransformation.RouteTransformations_RouteTransformation_RequestMatch{
+						Match:                  nil,
+						RequestTransformation:  requestTransform,
+						ClearRouteCache:        t.GetClearRouteCache(),
+						ResponseTransformation: responseTransform,
+					},
 				},
-			},
-		})
+			})
 	}
 
 	if early := stagedTransformations.GetEarly(); early != nil {
@@ -227,7 +272,9 @@ func (p *Plugin) convertTransformation(
 	return ret, nil
 }
 
-func (p *Plugin) translateOSSTransformations(glooTransform *transformation.Transformation) (*envoytransformation.Transformation, error) {
+func (p *Plugin) translateOSSTransformations(
+	glooTransform *transformation.Transformation,
+) (*envoytransformation.Transformation, error) {
 	transform, err := p.TranslateTransformation(glooTransform)
 	if err != nil {
 		return nil, eris.Wrap(err, "this transformation type is not supported in open source Gloo Edge")
@@ -235,7 +282,10 @@ func (p *Plugin) translateOSSTransformations(glooTransform *transformation.Trans
 	return transform, nil
 }
 
-func TranslateTransformation(glooTransform *transformation.Transformation) (*envoytransformation.Transformation, error) {
+func TranslateTransformation(glooTransform *transformation.Transformation) (
+	*envoytransformation.Transformation,
+	error,
+) {
 	if glooTransform == nil {
 		return nil, nil
 	}
@@ -260,15 +310,36 @@ func TranslateTransformation(glooTransform *transformation.Transformation) (*env
 	return out, nil
 }
 
-func (p *Plugin) validateTransformation(ctx context.Context, transformations *envoytransformation.RouteTransformations) error {
-	err := bootstrap.ValidateBootstrap(ctx, p.settings, FilterName, transformations)
+func (p *Plugin) validateTransformation(
+	ctx context.Context,
+	transformations *envoytransformation.RouteTransformations,
+) error {
+
+	transformHash, err := transformations.Hash(nil)
+	if err != nil {
+		contextutils.LoggerFrom(ctx).DPanicf("error hashing transformation, should never happen: %v", err)
+		return err
+	}
+
+	// This transformation has already been validated, return the result
+	if err, ok := p.validationLruCache.Get(transformHash); ok {
+		// Error may be nil here since it's just the cached result
+		return err.(error)
+	}
+
+	err = bootstrap.ValidateBootstrap(ctx, p.settings, FilterName, transformations)
+	p.validationLruCache.Add(transformHash, err)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *Plugin) getTransformations(ctx context.Context, stage uint32, transformations *transformation.RequestResponseTransformations) ([]*envoytransformation.RouteTransformations_RouteTransformation, error) {
+func (p *Plugin) getTransformations(
+	ctx context.Context,
+	stage uint32,
+	transformations *transformation.RequestResponseTransformations,
+) ([]*envoytransformation.RouteTransformations_RouteTransformation, error) {
 	var outTransformations []*envoytransformation.RouteTransformations_RouteTransformation
 	for _, transformation := range transformations.GetResponseTransforms() {
 		responseTransform, err := p.TranslateTransformation(transformation.GetResponseTransformation())
@@ -363,7 +434,10 @@ func setEnvoyPathMatcher(ctx context.Context, in *matchers.Matcher, out *envoyro
 	}
 }
 
-func envoyQueryMatcher(ctx context.Context, in []*matchers.QueryParameterMatcher) []*envoyroutev3.QueryParameterMatcher {
+func envoyQueryMatcher(
+	ctx context.Context,
+	in []*matchers.QueryParameterMatcher,
+) []*envoyroutev3.QueryParameterMatcher {
 	var out []*envoyroutev3.QueryParameterMatcher
 	for _, matcher := range in {
 		envoyMatch := &envoyroutev3.QueryParameterMatcher{

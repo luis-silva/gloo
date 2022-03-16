@@ -136,12 +136,6 @@ func (m *Settings) Clone() proto.Message {
 		target.ExtauthzServerRef = proto.Clone(m.GetExtauthzServerRef()).(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.ResourceRef)
 	}
 
-	if h, ok := interface{}(m.GetHttpService()).(clone.Cloner); ok {
-		target.HttpService = h.Clone().(*HttpService)
-	} else {
-		target.HttpService = proto.Clone(m.GetHttpService()).(*HttpService)
-	}
-
 	target.UserIdHeader = m.GetUserIdHeader()
 
 	if h, ok := interface{}(m.GetRequestTimeout()).(clone.Cloner); ok {
@@ -165,6 +159,47 @@ func (m *Settings) Clone() proto.Message {
 	target.TransportApiVersion = m.GetTransportApiVersion()
 
 	target.StatPrefix = m.GetStatPrefix()
+
+	switch m.ServiceType.(type) {
+
+	case *Settings_HttpService:
+
+		if h, ok := interface{}(m.GetHttpService()).(clone.Cloner); ok {
+			target.ServiceType = &Settings_HttpService{
+				HttpService: h.Clone().(*HttpService),
+			}
+		} else {
+			target.ServiceType = &Settings_HttpService{
+				HttpService: proto.Clone(m.GetHttpService()).(*HttpService),
+			}
+		}
+
+	case *Settings_GrpcService:
+
+		if h, ok := interface{}(m.GetGrpcService()).(clone.Cloner); ok {
+			target.ServiceType = &Settings_GrpcService{
+				GrpcService: h.Clone().(*GrpcService),
+			}
+		} else {
+			target.ServiceType = &Settings_GrpcService{
+				GrpcService: proto.Clone(m.GetGrpcService()).(*GrpcService),
+			}
+		}
+
+	}
+
+	return target
+}
+
+// Clone function
+func (m *GrpcService) Clone() proto.Message {
+	var target *GrpcService
+	if m == nil {
+		return target
+	}
+	target = &GrpcService{}
+
+	target.Authority = m.GetAuthority()
 
 	return target
 }
@@ -639,6 +674,73 @@ func (m *OidcAuthorizationCode) Clone() proto.Message {
 
 	target.ParseCallbackPathAsRegex = m.GetParseCallbackPathAsRegex()
 
+<<<<<<< HEAD
+=======
+	return target
+}
+
+// Clone function
+func (m *JwtValidation) Clone() proto.Message {
+	var target *JwtValidation
+	if m == nil {
+		return target
+	}
+	target = &JwtValidation{}
+
+	target.Issuer = m.GetIssuer()
+
+	switch m.JwksSourceSpecifier.(type) {
+
+	case *JwtValidation_RemoteJwks_:
+
+		if h, ok := interface{}(m.GetRemoteJwks()).(clone.Cloner); ok {
+			target.JwksSourceSpecifier = &JwtValidation_RemoteJwks_{
+				RemoteJwks: h.Clone().(*JwtValidation_RemoteJwks),
+			}
+		} else {
+			target.JwksSourceSpecifier = &JwtValidation_RemoteJwks_{
+				RemoteJwks: proto.Clone(m.GetRemoteJwks()).(*JwtValidation_RemoteJwks),
+			}
+		}
+
+	case *JwtValidation_LocalJwks_:
+
+		if h, ok := interface{}(m.GetLocalJwks()).(clone.Cloner); ok {
+			target.JwksSourceSpecifier = &JwtValidation_LocalJwks_{
+				LocalJwks: h.Clone().(*JwtValidation_LocalJwks),
+			}
+		} else {
+			target.JwksSourceSpecifier = &JwtValidation_LocalJwks_{
+				LocalJwks: proto.Clone(m.GetLocalJwks()).(*JwtValidation_LocalJwks),
+			}
+		}
+
+	}
+
+	return target
+}
+
+// Clone function
+func (m *IntrospectionValidation) Clone() proto.Message {
+	var target *IntrospectionValidation
+	if m == nil {
+		return target
+	}
+	target = &IntrospectionValidation{}
+
+	target.IntrospectionUrl = m.GetIntrospectionUrl()
+
+	target.ClientId = m.GetClientId()
+
+	if h, ok := interface{}(m.GetClientSecretRef()).(clone.Cloner); ok {
+		target.ClientSecretRef = h.Clone().(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.ResourceRef)
+	} else {
+		target.ClientSecretRef = proto.Clone(m.GetClientSecretRef()).(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.ResourceRef)
+	}
+
+	target.UserIdAttributeName = m.GetUserIdAttributeName()
+
+>>>>>>> master
 	return target
 }
 
@@ -670,11 +772,11 @@ func (m *AccessTokenValidation) Clone() proto.Message {
 
 		if h, ok := interface{}(m.GetJwt()).(clone.Cloner); ok {
 			target.ValidationType = &AccessTokenValidation_Jwt{
-				Jwt: h.Clone().(*AccessTokenValidation_JwtValidation),
+				Jwt: h.Clone().(*JwtValidation),
 			}
 		} else {
 			target.ValidationType = &AccessTokenValidation_Jwt{
-				Jwt: proto.Clone(m.GetJwt()).(*AccessTokenValidation_JwtValidation),
+				Jwt: proto.Clone(m.GetJwt()).(*JwtValidation),
 			}
 		}
 
@@ -682,11 +784,11 @@ func (m *AccessTokenValidation) Clone() proto.Message {
 
 		if h, ok := interface{}(m.GetIntrospection()).(clone.Cloner); ok {
 			target.ValidationType = &AccessTokenValidation_Introspection{
-				Introspection: h.Clone().(*AccessTokenValidation_IntrospectionValidation),
+				Introspection: h.Clone().(*IntrospectionValidation),
 			}
 		} else {
 			target.ValidationType = &AccessTokenValidation_Introspection{
-				Introspection: proto.Clone(m.GetIntrospection()).(*AccessTokenValidation_IntrospectionValidation),
+				Introspection: proto.Clone(m.GetIntrospection()).(*IntrospectionValidation),
 			}
 		}
 
@@ -1331,65 +1433,33 @@ func (m *UserSession_CookieOptions) Clone() proto.Message {
 }
 
 // Clone function
-func (m *AccessTokenValidation_JwtValidation) Clone() proto.Message {
-	var target *AccessTokenValidation_JwtValidation
+func (m *JwtValidation_RemoteJwks) Clone() proto.Message {
+	var target *JwtValidation_RemoteJwks
 	if m == nil {
 		return target
 	}
-	target = &AccessTokenValidation_JwtValidation{}
+	target = &JwtValidation_RemoteJwks{}
 
-	target.Issuer = m.GetIssuer()
+	target.Url = m.GetUrl()
 
-	switch m.JwksSourceSpecifier.(type) {
-
-	case *AccessTokenValidation_JwtValidation_RemoteJwks_:
-
-		if h, ok := interface{}(m.GetRemoteJwks()).(clone.Cloner); ok {
-			target.JwksSourceSpecifier = &AccessTokenValidation_JwtValidation_RemoteJwks_{
-				RemoteJwks: h.Clone().(*AccessTokenValidation_JwtValidation_RemoteJwks),
-			}
-		} else {
-			target.JwksSourceSpecifier = &AccessTokenValidation_JwtValidation_RemoteJwks_{
-				RemoteJwks: proto.Clone(m.GetRemoteJwks()).(*AccessTokenValidation_JwtValidation_RemoteJwks),
-			}
-		}
-
-	case *AccessTokenValidation_JwtValidation_LocalJwks_:
-
-		if h, ok := interface{}(m.GetLocalJwks()).(clone.Cloner); ok {
-			target.JwksSourceSpecifier = &AccessTokenValidation_JwtValidation_LocalJwks_{
-				LocalJwks: h.Clone().(*AccessTokenValidation_JwtValidation_LocalJwks),
-			}
-		} else {
-			target.JwksSourceSpecifier = &AccessTokenValidation_JwtValidation_LocalJwks_{
-				LocalJwks: proto.Clone(m.GetLocalJwks()).(*AccessTokenValidation_JwtValidation_LocalJwks),
-			}
-		}
-
+	if h, ok := interface{}(m.GetRefreshInterval()).(clone.Cloner); ok {
+		target.RefreshInterval = h.Clone().(*github_com_golang_protobuf_ptypes_duration.Duration)
+	} else {
+		target.RefreshInterval = proto.Clone(m.GetRefreshInterval()).(*github_com_golang_protobuf_ptypes_duration.Duration)
 	}
 
 	return target
 }
 
 // Clone function
-func (m *AccessTokenValidation_IntrospectionValidation) Clone() proto.Message {
-	var target *AccessTokenValidation_IntrospectionValidation
+func (m *JwtValidation_LocalJwks) Clone() proto.Message {
+	var target *JwtValidation_LocalJwks
 	if m == nil {
 		return target
 	}
-	target = &AccessTokenValidation_IntrospectionValidation{}
+	target = &JwtValidation_LocalJwks{}
 
-	target.IntrospectionUrl = m.GetIntrospectionUrl()
-
-	target.ClientId = m.GetClientId()
-
-	if h, ok := interface{}(m.GetClientSecretRef()).(clone.Cloner); ok {
-		target.ClientSecretRef = h.Clone().(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.ResourceRef)
-	} else {
-		target.ClientSecretRef = proto.Clone(m.GetClientSecretRef()).(*github_com_solo_io_solo_kit_pkg_api_v1_resources_core.ResourceRef)
-	}
-
-	target.UserIdAttributeName = m.GetUserIdAttributeName()
+	target.InlineString = m.GetInlineString()
 
 	return target
 }
@@ -1410,38 +1480,6 @@ func (m *AccessTokenValidation_ScopeList) Clone() proto.Message {
 
 		}
 	}
-
-	return target
-}
-
-// Clone function
-func (m *AccessTokenValidation_JwtValidation_RemoteJwks) Clone() proto.Message {
-	var target *AccessTokenValidation_JwtValidation_RemoteJwks
-	if m == nil {
-		return target
-	}
-	target = &AccessTokenValidation_JwtValidation_RemoteJwks{}
-
-	target.Url = m.GetUrl()
-
-	if h, ok := interface{}(m.GetRefreshInterval()).(clone.Cloner); ok {
-		target.RefreshInterval = h.Clone().(*github_com_golang_protobuf_ptypes_duration.Duration)
-	} else {
-		target.RefreshInterval = proto.Clone(m.GetRefreshInterval()).(*github_com_golang_protobuf_ptypes_duration.Duration)
-	}
-
-	return target
-}
-
-// Clone function
-func (m *AccessTokenValidation_JwtValidation_LocalJwks) Clone() proto.Message {
-	var target *AccessTokenValidation_JwtValidation_LocalJwks
-	if m == nil {
-		return target
-	}
-	target = &AccessTokenValidation_JwtValidation_LocalJwks{}
-
-	target.InlineString = m.GetInlineString()
 
 	return target
 }

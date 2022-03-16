@@ -72,7 +72,7 @@ func RootCmd(opts *options.Options, optionsFunc ...cliutils.OptionsFunc) *cobra.
 					return err
 				}
 			} else {
-				printer.AppendMessage(fmt.Sprintf("No problems detected."))
+				printer.AppendMessage("No problems detected.")
 			}
 
 			CheckMulticlusterResources(opts)
@@ -87,7 +87,7 @@ func RootCmd(opts *options.Options, optionsFunc ...cliutils.OptionsFunc) *cobra.
 	pflags := cmd.PersistentFlags()
 	flagutils.AddCheckOutputFlag(pflags, &opts.Top.Output)
 	flagutils.AddNamespaceFlag(pflags, &opts.Metadata.Namespace)
-	flagutils.AddExcludecheckFlag(pflags, &opts.Top.CheckName)
+	flagutils.AddExcludeCheckFlag(pflags, &opts.Top.CheckName)
 	cliutils.ApplyOptions(cmd, optionsFunc)
 	return cmd
 }
@@ -101,13 +101,16 @@ func CheckResources(opts *options.Options) error {
 		return multiErr
 	}
 
-	deployments, err := getAndCheckDeployments(opts)
-	if err != nil {
-		multiErr = multierror.Append(multiErr, err)
+	var deployments *appsv1.DeploymentList
+	deploymentsIncluded := doesNotContain(opts.Top.CheckName, "deployments")
+	if deploymentsIncluded {
+		deployments, err = getAndCheckDeployments(opts)
+		if err != nil {
+			multiErr = multierror.Append(multiErr, err)
+		}
 	}
 
-	includePods := doesNotContain(opts.Top.CheckName, "pods")
-	if includePods {
+	if included := doesNotContain(opts.Top.CheckName, "pods"); included {
 		err := checkPods(opts)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
@@ -124,27 +127,35 @@ func CheckResources(opts *options.Options) error {
 		multiErr = multierror.Append(multiErr, err)
 	}
 
-	knownUpstreams, err := checkUpstreams(opts, namespaces)
-	if err != nil {
-		multiErr = multierror.Append(multiErr, err)
+	var knownUpstreams []string
+	if included := doesNotContain(opts.Top.CheckName, "upstreams"); included {
+		knownUpstreams, err = checkUpstreams(opts, namespaces)
+		if err != nil {
+			multiErr = multierror.Append(multiErr, err)
+		}
 	}
 
-	includeUpstreamGroup := doesNotContain(opts.Top.CheckName, "upstreamgroup")
-	if includeUpstreamGroup {
+	if included := doesNotContain(opts.Top.CheckName, "upstreamgroup"); included {
 		err := checkUpstreamGroups(opts, namespaces)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
 		}
 	}
 
-	knownAuthConfigs, err := checkAuthConfigs(opts, namespaces)
-	if err != nil {
-		multiErr = multierror.Append(multiErr, err)
+	var knownAuthConfigs []string
+	if included := doesNotContain(opts.Top.CheckName, "auth-configs"); included {
+		knownAuthConfigs, err = checkAuthConfigs(opts, namespaces)
+		if err != nil {
+			multiErr = multierror.Append(multiErr, err)
+		}
 	}
 
-	knownRateLimitConfigs, err := checkRateLimitConfigs(opts, namespaces)
-	if err != nil {
-		multiErr = multierror.Append(multiErr, err)
+	var knownRateLimitConfigs []string
+	if included := doesNotContain(opts.Top.CheckName, "rate-limit-configs"); included {
+		knownRateLimitConfigs, err = checkRateLimitConfigs(opts, namespaces)
+		if err != nil {
+			multiErr = multierror.Append(multiErr, err)
+		}
 	}
 
 	knownVirtualHostOptions, err := checkVirtualHostOptions(opts, namespaces)
@@ -157,37 +168,35 @@ func CheckResources(opts *options.Options) error {
 		multiErr = multierror.Append(multiErr, err)
 	}
 
-	includeSecrets := doesNotContain(opts.Top.CheckName, "secrets")
-	if includeSecrets {
+	if included := doesNotContain(opts.Top.CheckName, "secrets"); included {
 		err := checkSecrets(opts, namespaces)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
 		}
 	}
 
-	err = checkVirtualServices(opts, namespaces, knownUpstreams, knownAuthConfigs, knownRateLimitConfigs, knownVirtualHostOptions, knownRouteOptions)
-	if err != nil {
-		multiErr = multierror.Append(multiErr, err)
+	if included := doesNotContain(opts.Top.CheckName, "virtual-services"); included {
+		err = checkVirtualServices(opts, namespaces, knownUpstreams, knownAuthConfigs, knownRateLimitConfigs, knownVirtualHostOptions, knownRouteOptions)
+		if err != nil {
+			multiErr = multierror.Append(multiErr, err)
+		}
 	}
 
-	includeGateway := doesNotContain(opts.Top.CheckName, "gateways")
-	if includeGateway {
+	if included := doesNotContain(opts.Top.CheckName, "gateways"); included {
 		err := checkGateways(opts, namespaces)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
 		}
 	}
 
-	includeProxy := doesNotContain(opts.Top.CheckName, "proxies")
-	if includeProxy {
-		err := checkProxies(opts, namespaces, opts.Metadata.GetNamespace(), deployments)
+	if included := doesNotContain(opts.Top.CheckName, "proxies"); included {
+		err := checkProxies(opts, namespaces, opts.Metadata.GetNamespace(), deployments, deploymentsIncluded)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
 		}
 	}
 
-	includePrometheusStatsCheck := doesNotContain(opts.Top.CheckName, "xds-metrics")
-	if includePrometheusStatsCheck {
+	if included := doesNotContain(opts.Top.CheckName, "xds-metrics"); included {
 		err = checkXdsMetrics(opts, opts.Metadata.GetNamespace(), deployments)
 		if err != nil {
 			multiErr = multierror.Append(multiErr, err)
@@ -338,7 +347,7 @@ func checkPods(opts *options.Options) error {
 		printer.AppendStatus("pods", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return multiErr
 	}
-	printer.AppendStatus("pods", fmt.Sprintf("OK"))
+	printer.AppendStatus("pods", "OK")
 	return nil
 }
 
@@ -396,7 +405,7 @@ func checkUpstreams(opts *options.Options, namespaces []string) ([]string, error
 		printer.AppendStatus("upstreams", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return nil, multiErr
 	}
-	printer.AppendStatus("upstreams", fmt.Sprintf("OK"))
+	printer.AppendStatus("upstreams", "OK")
 	return knownUpstreams, nil
 }
 
@@ -439,7 +448,7 @@ func checkUpstreamGroups(opts *options.Options, namespaces []string) error {
 		printer.AppendStatus("upstream groups", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return multiErr
 	}
-	printer.AppendStatus("upstream groups", fmt.Sprintf("OK"))
+	printer.AppendStatus("upstream groups", "OK")
 	return nil
 }
 
@@ -481,7 +490,7 @@ func checkAuthConfigs(opts *options.Options, namespaces []string) ([]string, err
 		printer.AppendStatus("auth configs", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return nil, multiErr
 	}
-	printer.AppendStatus("auth configs", fmt.Sprintf("OK"))
+	printer.AppendStatus("auth configs", "OK")
 	return knownAuthConfigs, nil
 }
 
@@ -521,7 +530,7 @@ func checkRateLimitConfigs(opts *options.Options, namespaces []string) ([]string
 		return nil, multiErr
 	}
 
-	printer.AppendStatus("rate limit configs", fmt.Sprintf("OK"))
+	printer.AppendStatus("rate limit configs", "OK")
 	return knownConfigs, nil
 }
 
@@ -566,7 +575,7 @@ func checkVirtualHostOptions(opts *options.Options, namespaces []string) ([]stri
 		printer.AppendStatus("VirtualHostOptions", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return nil, multiErr
 	}
-	printer.AppendStatus("VirtualHostOptions", fmt.Sprintf("OK"))
+	printer.AppendStatus("VirtualHostOptions", "OK")
 	return knownVhOpts, nil
 }
 
@@ -611,7 +620,7 @@ func checkRouteOptions(opts *options.Options, namespaces []string) ([]string, er
 		printer.AppendStatus("RouteOptions", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return nil, multiErr
 	}
-	printer.AppendStatus("RouteOptions", fmt.Sprintf("OK"))
+	printer.AppendStatus("RouteOptions", "OK")
 	return knownVhOpts, nil
 }
 
@@ -654,7 +663,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 						if us.GetUpstream() != nil {
 							if !cliutils.Contains(knownUpstreams, renderRef(us.GetUpstream())) {
 								// TODO warning message if using rejected or warning upstream
+<<<<<<< HEAD
 								errMessage := fmt.Sprintf("Virtual service references unknown upstream: ")
+=======
+								errMessage := "Virtual service references unknown upstream: "
+>>>>>>> master
 								errMessage += fmt.Sprintf("(Virtual service: %s", renderMetadata(virtualService.GetMetadata()))
 								errMessage += fmt.Sprintf(" | Upstream: %s)", renderRef(us.GetUpstream()))
 								multiErr = multierror.Append(multiErr, fmt.Errorf(errMessage))
@@ -669,7 +682,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 				// If the virtual service points to a specific, non-existent authconfig, it is not valid.
 				if ref != nil && !cliutils.Contains(knownConfigs, renderRef(ref)) {
 					// TODO: Virtual service references rejected or warning auth config
+<<<<<<< HEAD
 					errMessage := fmt.Sprintf("Virtual service references unknown auth config:\n")
+=======
+					errMessage := "Virtual service references unknown auth config:\n"
+>>>>>>> master
 					errMessage += fmt.Sprintf("  Virtual service: %s\n", renderMetadata(virtualService.GetMetadata()))
 					errMessage += fmt.Sprintf("  Auth Config: %s\n", renderRef(ref))
 					return fmt.Errorf(errMessage)
@@ -680,7 +697,7 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 				// If the virtual host points to a specifc, non-existent VirtualHostOption, it is not valid.
 				for _, ref := range refs {
 					if ref != nil && !cliutils.Contains(knownOptions, renderRef(ref)) {
-						errMessage := fmt.Sprintf("Virtual service references unknown VirtualHostOption:\n")
+						errMessage := "Virtual service references unknown VirtualHostOption:\n"
 						errMessage += fmt.Sprintf("  Virtual service: %s\n", renderMetadata(virtualService.GetMetadata()))
 						errMessage += fmt.Sprintf("  VirtualHostOption: %s\n", renderRef(ref))
 						return fmt.Errorf(errMessage)
@@ -721,7 +738,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 				}
 				if !cliutils.Contains(knownConfigs, renderRef(resourceRef)) {
 					// TODO: check if references rate limit config with error or warning
+<<<<<<< HEAD
 					errMessage := fmt.Sprintf("Virtual service references unknown rate limit config:\n")
+=======
+					errMessage := "Virtual service references unknown rate limit config:\n"
+>>>>>>> master
 					errMessage += fmt.Sprintf("  Virtual service: %s\n", renderMetadata(virtualService.GetMetadata()))
 					errMessage += fmt.Sprintf("  Rate Limit Config: %s\n", renderRef(resourceRef))
 					return fmt.Errorf(errMessage)
@@ -749,7 +770,7 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 		printer.AppendStatus("virtual services", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return multiErr
 	}
-	printer.AppendStatus("virtual services", fmt.Sprintf("OK"))
+	printer.AppendStatus("virtual services", "OK")
 	return nil
 }
 
@@ -791,12 +812,16 @@ func checkGateways(opts *options.Options, namespaces []string) error {
 		return multiErr
 	}
 
-	printer.AppendStatus("gateways", fmt.Sprintf("OK"))
+	printer.AppendStatus("gateways", "OK")
 	return nil
 }
 
-func checkProxies(opts *options.Options, namespaces []string, glooNamespace string, deployments *appsv1.DeploymentList) error {
+func checkProxies(opts *options.Options, namespaces []string, glooNamespace string, deployments *appsv1.DeploymentList, deploymentsIncluded bool) error {
 	printer.AppendCheck("Checking proxies... ")
+	if !deploymentsIncluded {
+		printer.AppendStatus("proxies", "Skipping proxies because deployments were excluded")
+		return nil
+	}
 	if deployments == nil {
 		fmt.Println("Skipping due to an error in checking deployments")
 		return fmt.Errorf("proxy check was skipped due to an error in checking deployments")
@@ -840,14 +865,18 @@ func checkProxies(opts *options.Options, namespaces []string, glooNamespace stri
 		printer.AppendStatus("proxies", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return multiErr
 	}
-	printer.AppendStatus("proxies", fmt.Sprintf("OK"))
+	printer.AppendStatus("proxies", "OK")
 	return nil
 }
 
 func checkSecrets(opts *options.Options, namespaces []string) error {
 	printer.AppendCheck("Checking secrets... ")
 	var multiErr *multierror.Error
+<<<<<<< HEAD
 	client, err := helpers.GetSecretClient(opts.Top.Ctx, 5*time.Second, namespaces)
+=======
+	client, err := helpers.GetSecretClient(opts.Top.Ctx, opts.Check.SecretClientTimeout, namespaces)
+>>>>>>> master
 	if err != nil {
 		multiErr = multierror.Append(multiErr, err)
 		printer.AppendStatus("secrets", fmt.Sprintf("%v Errors!", multiErr.Len()))
@@ -865,7 +894,7 @@ func checkSecrets(opts *options.Options, namespaces []string) error {
 		printer.AppendStatus("secrets", fmt.Sprintf("%v Errors!", multiErr.Len()))
 		return multiErr
 	}
-	printer.AppendStatus("secrets", fmt.Sprintf("OK"))
+	printer.AppendStatus("secrets", "OK")
 	return nil
 }
 

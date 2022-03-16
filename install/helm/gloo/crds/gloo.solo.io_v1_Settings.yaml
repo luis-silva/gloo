@@ -137,6 +137,11 @@ spec:
                     type: object
                   failureModeAllow:
                     type: boolean
+                  grpcService:
+                    properties:
+                      authority:
+                        type: string
+                    type: object
                   httpService:
                     properties:
                       pathPrefix:
@@ -374,6 +379,11 @@ spec:
                       type: object
                     failureModeAllow:
                       type: boolean
+                    grpcService:
+                      properties:
+                        authority:
+                          type: string
+                      type: object
                     httpService:
                       properties:
                         pathPrefix:

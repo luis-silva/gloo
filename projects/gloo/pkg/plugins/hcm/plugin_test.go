@@ -113,6 +113,11 @@ var _ = Describe("Plugin", func() {
 			ServerHeaderTransformation:   hcm.HttpConnectionManagerSettings_OVERWRITE,
 			PathWithEscapedSlashesAction: hcm.HttpConnectionManagerSettings_REJECT_REQUEST,
 			AllowChunkedLength:           true,
+<<<<<<< HEAD
+=======
+			EnableTrailers:               true,
+			StripAnyHostPort:             true,
+>>>>>>> master
 		}
 
 		cfg := &envoyhttp.HttpConnectionManager{}
@@ -135,9 +140,13 @@ var _ = Describe("Plugin", func() {
 		Expect(cfg.HttpProtocolOptions.GetHeaderKeyFormat().GetProperCaseWords()).ToNot(BeNil()) // expect proper case words is set
 		Expect(cfg.HttpProtocolOptions.GetHeaderKeyFormat().GetStatefulFormatter()).To(BeNil())  // ...which makes stateful formatter nil
 		Expect(cfg.HttpProtocolOptions.GetAllowChunkedLength()).To(BeTrue())                     // ...which makes stateful formatter nil
+<<<<<<< HEAD
+=======
+		Expect(cfg.HttpProtocolOptions.GetEnableTrailers()).To(BeTrue())
+>>>>>>> master
 		Expect(cfg.HttpProtocolOptions.DefaultHostForHttp_10).To(Equal(settings.DefaultHostForHttp_10))
 		Expect(cfg.PreserveExternalRequestId).To(Equal(settings.PreserveExternalRequestId))
-
+		Expect(cfg.GetStripAnyHostPort()).To(Equal(settings.StripAnyHostPort))
 		Expect(cfg.CommonHttpProtocolOptions).NotTo(BeNil())
 		Expect(cfg.CommonHttpProtocolOptions.IdleTimeout).To(MatchProto(settings.IdleTimeout))
 		Expect(cfg.CommonHttpProtocolOptions.GetMaxConnectionDuration()).To(MatchProto(settings.MaxConnectionDuration))
@@ -167,6 +176,22 @@ var _ = Describe("Plugin", func() {
 		Expect(ccd.Chain).To(BeTrue())
 		Expect(ccd.Dns).To(BeTrue())
 		Expect(ccd.Uri).To(BeTrue())
+
+	})
+
+	It("should copy stateful_formatter setting to hcm filter", func() {
+		settings = &hcm.HttpConnectionManagerSettings{
+			HeaderFormat: &hcm.HttpConnectionManagerSettings_PreserveCaseHeaderKeyFormat{
+				PreserveCaseHeaderKeyFormat: true,
+			},
+		}
+
+		cfg := &envoyhttp.HttpConnectionManager{}
+		err := processHcmNetworkFilter(cfg)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(cfg.HttpProtocolOptions.GetHeaderKeyFormat().GetStatefulFormatter()).ToNot(BeNil()) // expect preserve_case_words to be set
+		Expect(cfg.HttpProtocolOptions.GetHeaderKeyFormat().GetProperCaseWords()).To(BeNil())      // ...which makes proper_case_words nil
 	})
 
 	It("should copy stateful_formatter setting to hcm filter", func() {
