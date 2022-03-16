@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 
+<<<<<<< HEAD
+=======
 	v1snap "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/gloosnapshot"
 
+>>>>>>> master
 	v3 "github.com/solo-io/gloo/projects/gloo/pkg/api/external/envoy/config/core/v3"
 
 	"github.com/onsi/ginkgo/extensions/table"

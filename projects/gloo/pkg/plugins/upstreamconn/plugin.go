@@ -21,8 +21,12 @@ var (
 )
 
 const (
+<<<<<<< HEAD
+	ExtensionName = "upstream_conn"
+=======
 	ExtensionName      = "upstream_conn"
 	PreserveCasePlugin = "envoy.http.stateful_header_formatters.preserve_case"
+>>>>>>> master
 )
 
 type plugin struct{}

@@ -65,12 +65,21 @@ type ResourceRequirements struct {
 	Requests *ResourceAllocation `json:"requests,omitempty" desc:"resource requests of this container"`
 }
 type PodSpec struct {
+<<<<<<< HEAD
+	RestartPolicy *string                  `json:"restartPolicy,omitempty" desc:"restart policy to use when the pod exits"`
+	NodeName      *string                  `json:"nodeName,omitempty" desc:"name of node to run on"`
+	NodeSelector  map[string]string        `json:"nodeSelector,omitempty" desc:"label selector for nodes"`
+	Tolerations   []*appsv1.Toleration     `json:"tolerations,omitempty"`
+	Affinity      []map[string]interface{} `json:"affinity,omitempty"`
+	HostAliases   []interface{}            `json:"hostAliases,omitempty"`
+=======
 	RestartPolicy *string                `json:"restartPolicy,omitempty" desc:"restart policy to use when the pod exits"`
 	NodeName      *string                `json:"nodeName,omitempty" desc:"name of node to run on"`
 	NodeSelector  map[string]string      `json:"nodeSelector,omitempty" desc:"label selector for nodes"`
 	Tolerations   []*appsv1.Toleration   `json:"tolerations,omitempty"`
 	Affinity      map[string]interface{} `json:"affinity,omitempty"`
 	HostAliases   []interface{}          `json:"hostAliases,omitempty"`
+>>>>>>> master
 }
 
 type JobSpec struct {
@@ -110,11 +119,19 @@ type Consul struct {
 	CertFile           *string                  `json:"certFile,omitempty" desc:"CertFile is the optional path to the certificate for Consul communication. If this is set then you need to also set KeyFile."`
 	KeyFile            *string                  `json:"keyFile,omitempty" desc:"KeyFile is the optional path to the private key for Consul communication. If this is set then you need to also set CertFile."`
 	InsecureSkipVerify *bool                    `json:"insecureSkipVerify,omitempty" desc:"InsecureSkipVerify if set to true will disable TLS host verification."`
+<<<<<<< HEAD
+	WaitTime           *Duration                `json:"waitTime,omitempty" desc:"WaitTime limits how long a watches for Consul resources will block. If not provided, the agent default values will be used."`
+	ServiceDiscovery   *ServiceDiscoveryOptions `json:"serviceDiscovery,omitempty" desc:"Enable Service Discovery via Consul with this field set to empty struct '{}' to enable with defaults"`
+	HttpAddress        *string                  `json:"httpAddress,omitempty" desc:"The address of the Consul HTTP server. Used by service discovery and key-value storage (if-enabled). Defaults to the value of the standard CONSUL_HTTP_ADDR env if set, otherwise to 127.0.0.1:8500."`
+	DnsAddress         *string                  `json:"dnsAddress,omitempty" desc:"The address of the DNS server used to resolve hostnames in the Consul service address. Used by service discovery (required when Consul service instances are stored as DNS names). Defaults to 127.0.0.1:8600. (the default Consul DNS server)"`
+	DnsPollingInterval *Duration                `json:"dnsPollingInterval,omitempty" desc:"The polling interval for the DNS server. If there is a Consul service address with a hostname instead of an IP, Gloo Edge will resolve the hostname with the configured frequency to update endpoints with any changes to DNS resolution. Defaults to 5s."`
+=======
 	WaitTime           *string                  `json:"waitTime,omitempty" desc:"WaitTime limits how long a watches for Consul resources will block. If not provided, the agent default values will be used."`
 	ServiceDiscovery   *ServiceDiscoveryOptions `json:"serviceDiscovery,omitempty" desc:"Enable Service Discovery via Consul with this field set to empty struct '{}' to enable with defaults"`
 	HttpAddress        *string                  `json:"httpAddress,omitempty" desc:"The address of the Consul HTTP server. Used by service discovery and key-value storage (if-enabled). Defaults to the value of the standard CONSUL_HTTP_ADDR env if set, otherwise to 127.0.0.1:8500."`
 	DnsAddress         *string                  `json:"dnsAddress,omitempty" desc:"The address of the DNS server used to resolve hostnames in the Consul service address. Used by service discovery (required when Consul service instances are stored as DNS names). Defaults to 127.0.0.1:8600. (the default Consul DNS server)"`
 	DnsPollingInterval *string                  `json:"dnsPollingInterval,omitempty" desc:"The polling interval for the DNS server. If there is a Consul service address with a hostname instead of an IP, Gloo Edge will resolve the hostname with the configured frequency to update endpoints with any changes to DNS resolution. Defaults to 5s."`
+>>>>>>> master
 }
 
 type ServiceDiscoveryOptions struct {
@@ -122,10 +139,17 @@ type ServiceDiscoveryOptions struct {
 }
 
 type ConsulUpstreamDiscovery struct {
+<<<<<<< HEAD
+	UseTlsDiscovery  *bool        `json:"useTlsDiscovery,omitempty" desc:"Allow Gloo Edge to automatically apply tls to consul services that are tagged the tlsTagName value. Requires RootCaResourceNamespace and RootCaResourceName to be set if true."`
+	TlsTagName       *string      `json:"tlsTagName,omitempty" desc:"The tag Gloo Edge should use to identify consul services that ought to use TLS. If splitTlsServices is true, then this tag is also used to sort serviceInstances into the tls upstream. Defaults to 'glooUseTls'."`
+	SplitTlsServices *bool        `json:"splitTlsServices,omitempty" desc:"If true, then create two upstreams to be created when a consul service contains the tls tag; one with TLS and one without."`
+	DiscoveryRootCa  *ResourceRef `json:"discoveryRootCa,omitempty" desc:"The name/namespace of the root CA needed to use TLS with consul services."`
+=======
 	UseTlsTagging    *bool        `json:"useTlsTagging,omitempty" desc:"Allow Gloo Edge to automatically apply tls to consul services that are tagged the tlsTagName value. Requires RootCaResourceNamespace and RootCaResourceName to be set if true."`
 	TlsTagName       *string      `json:"tlsTagName,omitempty" desc:"The tag Gloo Edge should use to identify consul services that ought to use TLS. If splitTlsServices is true, then this tag is also used to sort serviceInstances into the tls upstream. Defaults to 'glooUseTls'."`
 	SplitTlsServices *bool        `json:"splitTlsServices,omitempty" desc:"If true, then create two upstreams to be created when a consul service contains the tls tag; one with TLS and one without."`
 	RootCa           *ResourceRef `json:"rootCa,omitempty" desc:"The name/namespace of the root CA needed to use TLS with consul services."`
+>>>>>>> master
 }
 
 // equivalent of core.solo.io.ResourceRef
@@ -141,6 +165,14 @@ type Duration struct {
 }
 
 type Knative struct {
+<<<<<<< HEAD
+	Enabled                    *bool             `json:"enabled,omitempty" desc:"enabled knative components"`
+	Version                    *string           `json:"version,omitempty" desc:"the version of knative installed to the cluster. if using version < 0.8.0, Gloo Edge will use Knative's ClusterIngress API for configuration rather than the namespace-scoped Ingress"`
+	Proxy                      *KnativeProxy     `json:"proxy,omitempty"`
+	RequireIngressClass        *bool             `json:"requireIngressClass,omitempty" desc:"only serve traffic for Knative Ingress objects with the annotation 'networking.knative.dev/ingress.class: gloo.ingress.networking.knative.dev'."`
+	ExtraKnativeInternalLabels map[string]string `json:"extraKnativeInternalLabels,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.labels data of the knative internal deployment."`
+	ExtraKnativeExternalLabels map[string]string `json:"extraKnativeExternalLabels,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.labels data of the knative external deployment."`
+=======
 	Enabled                         *bool             `json:"enabled,omitempty" desc:"enabled knative components"`
 	Version                         *string           `json:"version,omitempty" desc:"the version of knative installed to the cluster. if using version < 0.8.0, Gloo Edge will use Knative's ClusterIngress API for configuration rather than the namespace-scoped Ingress"`
 	Proxy                           *KnativeProxy     `json:"proxy,omitempty"`
@@ -149,6 +181,7 @@ type Knative struct {
 	ExtraKnativeInternalAnnotations map[string]string `json:"extraKnativeInternalAnnotations,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.annotations data of the knative internal deployment."`
 	ExtraKnativeExternalLabels      map[string]string `json:"extraKnativeExternalLabels,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.labels data of the knative external deployment."`
 	ExtraKnativeExternalAnnotations map[string]string `json:"extraKnativeExternalAnnotations,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.annotations data of the knative external deployment."`
+>>>>>>> master
 }
 
 type KnativeProxy struct {
@@ -294,12 +327,20 @@ type Webhook struct {
 }
 
 type GatewayDeployment struct {
+<<<<<<< HEAD
+	Image              *Image            `json:"image,omitempty"`
+	Stats              *Stats            `json:"stats,omitempty" desc:"overrides for prometheus stats published by the gateway pod"`
+	FloatingUserId     *bool             `json:"floatingUserId,omitempty" desc:"set to true to allow the cluster to dynamically assign a user ID"`
+	RunAsUser          *float64          `json:"runAsUser,omitempty" desc:"Explicitly set the user ID for the container to run as. Default is 10101"`
+	ExtraGatewayLabels map[string]string `json:"extraGatewayLabels,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.labels data of the gloo edge gateway deployment."`
+=======
 	Image                   *Image            `json:"image,omitempty"`
 	Stats                   *Stats            `json:"stats,omitempty" desc:"overrides for prometheus stats published by the gateway pod"`
 	FloatingUserId          *bool             `json:"floatingUserId,omitempty" desc:"set to true to allow the cluster to dynamically assign a user ID"`
 	RunAsUser               *float64          `json:"runAsUser,omitempty" desc:"Explicitly set the user ID for the container to run as. Default is 10101"`
 	ExtraGatewayLabels      map[string]string `json:"extraGatewayLabels,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.labels data of the gloo edge gateway deployment."`
 	ExtraGatewayAnnotations map[string]string `json:"extraGatewayAnnotations,omitempty" desc:"Optional extra key-value pairs to add to the spec.template.metadata.annotations data of the gloo edge gateway deployment."`
+>>>>>>> master
 	*DeploymentSpec
 }
 

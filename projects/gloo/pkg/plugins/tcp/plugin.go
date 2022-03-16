@@ -203,7 +203,11 @@ func (p *plugin) convertToWeightedCluster(multiDest *v1.MultiDestination) (*envo
 // create a duplicate of the listener filter chain for each ssl cert we want to serve
 // if there is no SSL config on the listener, the envoy listener will have one insecure filter chain
 func (p *plugin) computeTcpFilterChain(
+<<<<<<< HEAD
+	snap *v1.ApiSnapshot,
+=======
 	snap *v1snap.ApiSnapshot,
+>>>>>>> master
 	listenerFilters []*envoy_config_listener_v3.Filter,
 	host *v1.TcpHost,
 ) (*envoy_config_listener_v3.FilterChain, error) {

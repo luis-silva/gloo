@@ -93,7 +93,11 @@ rules:
 - apiGroups:
   - graphql.gloo.solo.io
   resources:
+<<<<<<< HEAD
+  - graphqlschemas
+=======
   - graphqlapis
+>>>>>>> master
   verbs:
   - get
   - list
@@ -197,7 +201,11 @@ rules:
 - apiGroups:
   - graphql.gloo.solo.io
   resources:
+<<<<<<< HEAD
+  - graphqlschemas
+=======
   - graphqlapis
+>>>>>>> master
   verbs:
   - get
   - list

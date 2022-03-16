@@ -64,7 +64,11 @@ func NewTranslatorSyncer(
 	extensions []TranslatorSyncerExtension,
 	settings *v1.Settings,
 	statusMetrics metrics.ConfigStatusMetrics,
+<<<<<<< HEAD
+) v1.ApiSyncer {
+=======
 ) v1snap.ApiSyncer {
+>>>>>>> master
 	s := &translatorSyncer{
 		translator:    translator,
 		xdsCache:      xdsCache,

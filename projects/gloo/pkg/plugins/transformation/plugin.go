@@ -37,7 +37,10 @@ const (
 	ExtensionName    = "transformation"
 	FilterName       = "io.solo.transformation"
 	EarlyStageNumber = 1
+<<<<<<< HEAD
+=======
 	AwsStageNumber   = 2
+>>>>>>> master
 )
 
 var (
@@ -61,10 +64,13 @@ type Plugin struct {
 	TranslateTransformation    TranslateTransformationFn
 	settings                   *v1.Settings
 
+<<<<<<< HEAD
+=======
 	// validationLruCache is a map of: (transformation hash) -> (error state)
 	validationLruCache *lru.Cache
 }
 
+>>>>>>> master
 func NewPlugin() *Plugin {
 	return &Plugin{
 		validationLruCache: lru.New(1024),
@@ -123,7 +129,11 @@ func (p *Plugin) ProcessVirtualHost(
 
 	p.filterNeeded = true
 
+<<<<<<< HEAD
+	return pluginutils.SetVhostPerFilterConfig(out, FilterName, envoyTransformation)
+=======
 	return pluginutils.ModifyVhostPerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 func (p *Plugin) ProcessRoute(params plugins.RouteParams, in *v1.Route, out *envoy_config_route_v3.Route) error {
@@ -144,7 +154,11 @@ func (p *Plugin) ProcessRoute(params plugins.RouteParams, in *v1.Route, out *env
 	}
 
 	p.filterNeeded = true
+<<<<<<< HEAD
+	return pluginutils.SetRoutePerFilterConfig(out, FilterName, envoyTransformation)
+=======
 	return pluginutils.ModifyRoutePerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 func (p *Plugin) ProcessWeightedDestination(
@@ -169,7 +183,11 @@ func (p *Plugin) ProcessWeightedDestination(
 		return err
 	}
 	p.filterNeeded = true
+<<<<<<< HEAD
+	return pluginutils.SetWeightedClusterPerFilterConfig(out, FilterName, envoyTransformation)
+=======
 	return pluginutils.ModifyWeightedClusterPerFilterConfig(out, FilterName, mergeFunc(envoyTransformation))
+>>>>>>> master
 }
 
 // HttpFilters emits the desired set of filters. Either 0, 1 or

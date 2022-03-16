@@ -1227,6 +1227,8 @@ func (m *OidcAuthorizationCode) Hash(hasher hash.Hash64) (uint64, error) {
 		return 0, err
 	}
 
+<<<<<<< HEAD
+=======
 	return hasher.Sum64(), nil
 }
 
@@ -1343,6 +1345,7 @@ func (m *IntrospectionValidation) Hash(hasher hash.Hash64) (uint64, error) {
 		return 0, err
 	}
 
+>>>>>>> master
 	return hasher.Sum64(), nil
 }
 

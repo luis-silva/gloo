@@ -663,7 +663,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 						if us.GetUpstream() != nil {
 							if !cliutils.Contains(knownUpstreams, renderRef(us.GetUpstream())) {
 								// TODO warning message if using rejected or warning upstream
+<<<<<<< HEAD
+								errMessage := fmt.Sprintf("Virtual service references unknown upstream: ")
+=======
 								errMessage := "Virtual service references unknown upstream: "
+>>>>>>> master
 								errMessage += fmt.Sprintf("(Virtual service: %s", renderMetadata(virtualService.GetMetadata()))
 								errMessage += fmt.Sprintf(" | Upstream: %s)", renderRef(us.GetUpstream()))
 								multiErr = multierror.Append(multiErr, fmt.Errorf(errMessage))
@@ -678,7 +682,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 				// If the virtual service points to a specific, non-existent authconfig, it is not valid.
 				if ref != nil && !cliutils.Contains(knownConfigs, renderRef(ref)) {
 					// TODO: Virtual service references rejected or warning auth config
+<<<<<<< HEAD
+					errMessage := fmt.Sprintf("Virtual service references unknown auth config:\n")
+=======
 					errMessage := "Virtual service references unknown auth config:\n"
+>>>>>>> master
 					errMessage += fmt.Sprintf("  Virtual service: %s\n", renderMetadata(virtualService.GetMetadata()))
 					errMessage += fmt.Sprintf("  Auth Config: %s\n", renderRef(ref))
 					return fmt.Errorf(errMessage)
@@ -730,7 +738,11 @@ func checkVirtualServices(opts *options.Options, namespaces, knownUpstreams, kno
 				}
 				if !cliutils.Contains(knownConfigs, renderRef(resourceRef)) {
 					// TODO: check if references rate limit config with error or warning
+<<<<<<< HEAD
+					errMessage := fmt.Sprintf("Virtual service references unknown rate limit config:\n")
+=======
 					errMessage := "Virtual service references unknown rate limit config:\n"
+>>>>>>> master
 					errMessage += fmt.Sprintf("  Virtual service: %s\n", renderMetadata(virtualService.GetMetadata()))
 					errMessage += fmt.Sprintf("  Rate Limit Config: %s\n", renderRef(resourceRef))
 					return fmt.Errorf(errMessage)
@@ -860,7 +872,11 @@ func checkProxies(opts *options.Options, namespaces []string, glooNamespace stri
 func checkSecrets(opts *options.Options, namespaces []string) error {
 	printer.AppendCheck("Checking secrets... ")
 	var multiErr *multierror.Error
+<<<<<<< HEAD
+	client, err := helpers.GetSecretClient(opts.Top.Ctx, 5*time.Second, namespaces)
+=======
 	client, err := helpers.GetSecretClient(opts.Top.Ctx, opts.Check.SecretClientTimeout, namespaces)
+>>>>>>> master
 	if err != nil {
 		multiErr = multierror.Append(multiErr, err)
 		printer.AppendStatus("secrets", fmt.Sprintf("%v Errors!", multiErr.Len()))

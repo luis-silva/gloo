@@ -405,7 +405,11 @@ var _ = Describe("Plugin", func() {
 			})
 
 			It("will prepend the TlsInspector when NO ServerName match present", func() {
+<<<<<<< HEAD
+				snap := &v1.ApiSnapshot{}
+=======
 				snap := &v1snap.ApiSnapshot{}
+>>>>>>> master
 				out := &envoy_config_listener_v3.Listener{}
 				tl := &v1.TcpListener{
 					TcpHosts: []*v1.TcpHost{

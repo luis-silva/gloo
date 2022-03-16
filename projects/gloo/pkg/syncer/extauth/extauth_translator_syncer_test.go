@@ -103,6 +103,23 @@ var _ = Describe("ExtauthTranslatorSyncer", func() {
 			})
 		})
 
+		When("defined on VirtualHost in HybridListener", func() {
+
+			BeforeEach(func() {
+				proxy := getProxyWithHybridListenerVirtualHostExtAuthExtension(extAuthExtension)
+				apiSnapshot = &gloov1.ApiSnapshot{
+					Proxies:     gloov1.ProxyList{proxy},
+					AuthConfigs: extauth.AuthConfigList{authConfig},
+				}
+			})
+
+			It("should error", func() {
+				_, err := translator.Sync(ctx, apiSnapshot, settings, snapCache, resourceReports)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(ErrEnterpriseOnly))
+			})
+		})
+
 		When("defined on Route", func() {
 
 			BeforeEach(func() {

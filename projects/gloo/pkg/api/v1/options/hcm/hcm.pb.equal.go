@@ -159,10 +159,13 @@ func (m *HttpConnectionManagerSettings) Equal(that interface{}) bool {
 	}
 
 	if m.GetAllowChunkedLength() != target.GetAllowChunkedLength() {
+<<<<<<< HEAD
+=======
 		return false
 	}
 
 	if m.GetEnableTrailers() != target.GetEnableTrailers() {
+>>>>>>> master
 		return false
 	}
 

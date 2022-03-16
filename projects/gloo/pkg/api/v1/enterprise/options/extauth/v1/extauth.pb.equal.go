@@ -1120,6 +1120,8 @@ func (m *OidcAuthorizationCode) Equal(that interface{}) bool {
 		return false
 	}
 
+<<<<<<< HEAD
+=======
 	return true
 }
 
@@ -1233,6 +1235,7 @@ func (m *IntrospectionValidation) Equal(that interface{}) bool {
 		return false
 	}
 
+>>>>>>> master
 	return true
 }
 

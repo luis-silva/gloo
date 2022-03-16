@@ -119,7 +119,11 @@ func (h *httpFilterChainTranslator) getSslConfigurationWithDefaults() []*v1.SslC
 }
 
 func (h *httpFilterChainTranslator) createFilterChainsFromSslConfiguration(
+<<<<<<< HEAD
+	snap *v1.ApiSnapshot,
+=======
 	snap *v1snap.ApiSnapshot,
+>>>>>>> master
 	networkFilters []*envoy_config_listener_v3.Filter,
 	sslConfigurations []*v1.SslConfig,
 ) []*envoy_config_listener_v3.FilterChain {

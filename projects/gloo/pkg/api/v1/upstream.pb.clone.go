@@ -23,6 +23,8 @@ import (
 
 	github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_aws_ec2 "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws/ec2"
 
+	github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_aws_tg "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/aws/tg"
+
 	github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_azure "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/azure"
 
 	github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_consul "github.com/solo-io/gloo/projects/gloo/pkg/api/v1/options/consul"
@@ -241,6 +243,18 @@ func (m *Upstream) Clone() proto.Message {
 		} else {
 			target.UpstreamType = &Upstream_AwsEc2{
 				AwsEc2: proto.Clone(m.GetAwsEc2()).(*github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_aws_ec2.UpstreamSpec),
+			}
+		}
+
+	case *Upstream_AwsTg:
+
+		if h, ok := interface{}(m.GetAwsTg()).(clone.Cloner); ok {
+			target.UpstreamType = &Upstream_AwsTg{
+				AwsTg: h.Clone().(*github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_aws_tg.UpstreamSpec),
+			}
+		} else {
+			target.UpstreamType = &Upstream_AwsTg{
+				AwsTg: proto.Clone(m.GetAwsTg()).(*github_com_solo_io_gloo_projects_gloo_pkg_api_v1_options_aws_tg.UpstreamSpec),
 			}
 		}
 

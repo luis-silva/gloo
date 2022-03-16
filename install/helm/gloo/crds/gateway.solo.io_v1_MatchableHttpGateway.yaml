@@ -179,6 +179,8 @@ spec:
                             type: string
                             x-kubernetes-int-or-string: true
                         type: object
+<<<<<<< HEAD
+=======
                       dynamicForwardProxy:
                         properties:
                           dnsCacheConfig:
@@ -277,6 +279,7 @@ spec:
                           saveUpstreamAddress:
                             type: boolean
                         type: object
+>>>>>>> master
                       extauth:
                         properties:
                           clearRouteCache:
@@ -290,11 +293,14 @@ spec:
                             type: object
                           failureModeAllow:
                             type: boolean
+<<<<<<< HEAD
+=======
                           grpcService:
                             properties:
                               authority:
                                 type: string
                             type: object
+>>>>>>> master
                           httpService:
                             properties:
                               pathPrefix:
@@ -453,8 +459,11 @@ spec:
                             type: string
                           drainTimeout:
                             type: string
+<<<<<<< HEAD
+=======
                           enableTrailers:
                             type: boolean
+>>>>>>> master
                           forwardClientCertDetails:
                             type: string
                             x-kubernetes-int-or-string: true
@@ -526,8 +535,11 @@ spec:
                             type: boolean
                           streamIdleTimeout:
                             type: string
+<<<<<<< HEAD
+=======
                           stripAnyHostPort:
                             type: boolean
+>>>>>>> master
                           tracing:
                             properties:
                               datadogConfig:

@@ -525,6 +525,8 @@ message OidcAuthorizationCode {
 
     // If set, CallbackPath will be evaluated as a regular expression
     bool parse_callback_path_as_regex = 17;
+<<<<<<< HEAD
+=======
 }
 
 // Defines how JSON Web Token (JWT) access tokens are validated.
@@ -602,6 +604,7 @@ message IntrospectionValidation {
     // server is configured); if the field is set and the attribute cannot be found, the request will be denied.
     // This field is optional and by default the server will not try to derive the user ID.
     string user_id_attribute_name = 4;
+>>>>>>> master
 }
 
 message AccessTokenValidation {

@@ -4,13 +4,17 @@ package registry
 import (
 	"context"
 
+<<<<<<< HEAD
+=======
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/dynamic_forward_proxy"
 
+>>>>>>> master
 	"github.com/solo-io/gloo/projects/gloo/pkg/bootstrap"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/als"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/aws"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/aws/ec2"
+	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/aws/tg"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/azure"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/basicroute"
 	"github.com/solo-io/gloo/projects/gloo/pkg/plugins/buffer"
@@ -80,6 +84,7 @@ func Plugins(opts bootstrap.Opts) []plugins.Plugin {
 		linkerd.NewPlugin(),
 		stats.NewPlugin(),
 		ec2.NewPlugin(opts.WatchOpts.Ctx, opts.Secrets),
+		tg.NewPlugin(opts.WatchOpts.Ctx, opts.Secrets),
 		tracing.NewPlugin(),
 		shadowing.NewPlugin(),
 		headers.NewPlugin(),

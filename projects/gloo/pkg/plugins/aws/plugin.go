@@ -43,10 +43,14 @@ const (
 	FilterName = "io.solo.aws_lambda"
 )
 
+<<<<<<< HEAD
+var pluginStage = plugins.DuringStage(plugins.OutAuthStage)
+=======
 var (
 	pluginStage          = plugins.DuringStage(plugins.OutAuthStage)
 	transformPluginStage = plugins.BeforeStage(plugins.OutAuthStage)
 )
+>>>>>>> master
 
 type plugin struct {
 	recordedUpstreams  map[string]*aws.UpstreamSpec
@@ -58,6 +62,16 @@ type plugin struct {
 
 func NewPlugin() plugins.Plugin {
 	return &plugin{}
+}
+
+func (p *plugin) Name() string {
+	return ExtensionName
+}
+
+func NewPlugin(earlyTransformsAdded *bool) plugins.Plugin {
+	return &plugin{
+		earlyTransformsAdded: earlyTransformsAdded,
+	}
 }
 
 func (p *plugin) Name() string {

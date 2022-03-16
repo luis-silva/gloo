@@ -275,7 +275,11 @@ var _ = Describe("RBAC Test", func() {
 							},
 							{
 								APIGroups: []string{"graphql.gloo.solo.io"},
+<<<<<<< HEAD
+								Resources: []string{"graphqlschemas"},
+=======
 								Resources: []string{"graphqlapis"},
+>>>>>>> master
 								Verbs:     []string{"get", "list", "watch", "update"},
 							},
 							{
@@ -573,11 +577,14 @@ var _ = Describe("RBAC Test", func() {
 								Name:      "gateway",
 								Namespace: namespace,
 							},
+<<<<<<< HEAD
+=======
 							{
 								Kind:      "ServiceAccount",
 								Name:      "gloo",
 								Namespace: namespace,
 							},
+>>>>>>> master
 						},
 					}
 				})

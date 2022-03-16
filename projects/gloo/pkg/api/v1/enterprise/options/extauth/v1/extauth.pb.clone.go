@@ -674,6 +674,8 @@ func (m *OidcAuthorizationCode) Clone() proto.Message {
 
 	target.ParseCallbackPathAsRegex = m.GetParseCallbackPathAsRegex()
 
+<<<<<<< HEAD
+=======
 	return target
 }
 
@@ -738,6 +740,7 @@ func (m *IntrospectionValidation) Clone() proto.Message {
 
 	target.UserIdAttributeName = m.GetUserIdAttributeName()
 
+>>>>>>> master
 	return target
 }
 

@@ -160,6 +160,8 @@ func (m *Listener) Clone() proto.Message {
 			}
 		}
 
+<<<<<<< HEAD
+=======
 	}
 
 	switch m.OpaqueMetadata.(type) {
@@ -188,6 +190,7 @@ func (m *Listener) Clone() proto.Message {
 			}
 		}
 
+>>>>>>> master
 	}
 
 	return target

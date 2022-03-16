@@ -267,6 +267,8 @@ func (m *Listener) Hash(hasher hash.Hash64) (uint64, error) {
 			}
 		}
 
+<<<<<<< HEAD
+=======
 	}
 
 	switch m.OpaqueMetadata.(type) {
@@ -275,6 +277,7 @@ func (m *Listener) Hash(hasher hash.Hash64) (uint64, error) {
 
 	case *Listener_MetadataStatic:
 
+>>>>>>> master
 	}
 
 	return hasher.Sum64(), nil
