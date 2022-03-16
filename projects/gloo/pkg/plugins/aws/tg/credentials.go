@@ -13,12 +13,9 @@ type CredentialSpec struct {
 	// region is the AWS region where our credentialMap live
 	region string
 	// roleArn is an AWS Roles (specified by its Amazon Resource Number (ARN)) which should be assumed when
-	// querying for instances available to the upstream
+	// querying for targets available to the upstream
 	roleArn string
 }
-
-// https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-ec2
-const arnSegmentDelimiter = ":"
 
 func (cs *CredentialSpec) GetKey() CredentialKey {
 	return CredentialKey{

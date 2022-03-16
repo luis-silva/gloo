@@ -54,9 +54,9 @@ func AddCreateUpstreamFlags(set *pflag.FlagSet, upstreamType string, upstream *o
 		set.StringVar(&upstream.AwsTg.Role, "aws-role-arn", "",
 			"Amazon Resource Number (ARN) of role that Gloo should assume on behalf of the upstream")
 		set.StringSliceVar(&upstream.AwsTg.KeyFilters, "tag-key-filters", nil,
-			"list of tag keys that must exist on EC2 instances associated with this upstream")
+			"list of tag keys that must exist on TargetGroups associated with this upstream")
 		set.StringSliceVar(&upstream.AwsTg.KeyValueFilters.Entries, "tag-key-value-filters", nil,
-			"list of tag keys and corresponding values that must exist on EC2 instances associated with this upstream")
+			"list of tag keys and corresponding values that must exist on TargetGroups associated with this upstream")
 	case options.UpstreamType_Azure:
 		set.StringVar(&upstream.Azure.FunctionAppName, "azure-app-name", "",
 			"name of the Azure Functions app to associate with this upstream")

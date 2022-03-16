@@ -12,32 +12,32 @@ import (
 	"go.uber.org/zap"
 )
 
-const InstanceIdAnnotationKey = "AvailabilityZone"
+const AvailabilityZoneAnnotationKey = "AvailabilityZone"
 
 // In order to minimize calls to the AWS API, we group calls by credentials and apply tag filters locally.
-// This function groups upstreams by credentials, calls the AWS API, maps the instances to upstreams, and returns the
+// This function groups upstreams by credentials, calls the AWS API, maps the TargetGroups to upstreams, and returns the
 // endpoints associated with the provided upstream list
-// NOTE: MUST filter the upstreamList to ONLY EC2 upstreams before calling this function
+// NOTE: MUST filter the upstreamList to ONLY TargetGroup upstreams before calling this function
 func getLatestEndpoints(ctx context.Context, lister TargetGroupLister, secrets v1.SecretList, writeNamespace string, upstreamList v1.UpstreamList) (v1.EndpointList, error) {
 	// we want unique creds so we can query api once per unique cred
 	// we need to make sure we maintain the association between those unique creds and the upstreams that share them
-	// so that when we get the instances associated with the creds, we will know which upstreams have access to those
-	// instances.
+	// so that when we get the TargetGroups associated with the creds, we will know which upstreams have access to those
+	// TargetGroups.
 	credGroups, err := getCredGroupsFromUpstreams(upstreamList)
 	if err != nil {
 		return nil, err
 	}
-	// call the EC2 DescribeInstances once for each set of credentials and apply the output to the credential groups
-	if err := getInstancesForCredentialGroups(ctx, lister, secrets, credGroups); err != nil {
+	// call the ELBV2 APIs once for each set of credentials and apply the output to the credential groups
+	if err := getTargetGroupsForCredentialGroups(ctx, lister, secrets, credGroups); err != nil {
 		return nil, err
 	}
 	// produce the endpoints list
 	var allEndpoints v1.EndpointList
 	for _, credGroup := range credGroups {
 		for _, upstream := range credGroup.upstreams {
-			instancesForUpstream := filterInstancesForUpstream(ctx, lister, upstream, credGroup, secrets)
-			for _, instance := range instancesForUpstream {
-				if endpoint := upstreamInstanceToEndpoint(ctx, writeNamespace, upstream, instance); endpoint != nil {
+			targetsForUpstream := filterTargetGroupsForUpstreams(ctx, lister, upstream, credGroup, secrets)
+			for _, target := range targetsForUpstream {
+				if endpoint := upstreamTargetsToEndpoint(ctx, writeNamespace, upstream, target); endpoint != nil {
 					allEndpoints = append(allEndpoints, endpoint)
 				}
 			}
@@ -53,16 +53,16 @@ type credentialGroup struct {
 	credentialSpec *CredentialSpec
 	// all the upstreams that share the CredentialSpec
 	upstreams v1.UpstreamList
-	// all the instances visible to the given credentials
-	instances []*ExtendedTargetGroup
-	// one filter map exists for each instance in order to support client-side filtering
+	// all the targets visible to the given credentials
+	targets []*ExtendedTargetGroup
+	// one filter map exists for each targetgroup in order to support client-side filtering
 	filterMaps []FilterMap
 }
 
 // Initializes the credentialGroups
 // Credential groups are returned as a map to enforce the "one credentialGroup per unique credential" property that is
 // required in order to realize the benefits of batched AWS API calls.
-// NOTE: assumes that upstreams are EC2 upstreams
+// NOTE: assumes that upstreams are TargetGroups upstreams
 func getCredGroupsFromUpstreams(upstreams v1.UpstreamList) (map[CredentialKey]*credentialGroup, error) {
 	credGroups := make(map[CredentialKey]*credentialGroup)
 	for _, upstream := range upstreams {
@@ -81,30 +81,30 @@ func getCredGroupsFromUpstreams(upstreams v1.UpstreamList) (map[CredentialKey]*c
 }
 
 // calls the AWS API and attaches the output to the the provided list of credentialGroups. Modifications include:
-// - adds the instances for each credentialGroup's credential
-// - adds tag filters for each instance for later use when refining the list of instances that an upstream has
-// permission to describe to the list of instances that the upstream should route to
-func getInstancesForCredentialGroups(ctx context.Context, lister TargetGroupLister, secrets v1.SecretList, credGroups map[CredentialKey]*credentialGroup) error {
+// - adds the TargetGroups for each credentialGroup's credential
+// - adds tag filters for each TargetGroup for later use when refining the list of TargetGroups that an upstream has
+// permission to describe to the list of targets that the upstream should route to
+func getTargetGroupsForCredentialGroups(ctx context.Context, lister TargetGroupLister, secrets v1.SecretList, credGroups map[CredentialKey]*credentialGroup) error {
 	for _, credGroup := range credGroups {
-		instances, err := lister.ListForCredentials(ctx, credGroup.credentialSpec, secrets)
+		targets, err := lister.ListForCredentials(ctx, credGroup.credentialSpec, secrets)
 		if err != nil {
 			return err
 		}
-		credGroup.instances = instances
-		credGroup.filterMaps = generateFilterMaps(instances)
+		credGroup.targets = targets
+		credGroup.filterMaps = generateFilterMaps(targets)
 	}
 	return nil
 }
 
 // applies filter logic equivalent to the tag filter logic used in AWS's DescribeInstances API
-// NOTE: assumes that upstreams are EC2 upstreams
-func filterInstancesForUpstream(ctx context.Context, lister TargetGroupLister, upstream *v1.Upstream, credGroup *credentialGroup, secrets v1.SecretList) []Task {
-	var instances []Task
+// NOTE: assumes that upstreams are TargetGroup upstreams
+func filterTargetGroupsForUpstreams(ctx context.Context, lister TargetGroupLister, upstream *v1.Upstream, credGroup *credentialGroup, secrets v1.SecretList) []Target {
+	var targets []Target
 	logger := contextutils.LoggerFrom(ctx)
-	// sweep through each filter map, if all the upstream's filters are matched, add the corresponding instance to the list
+	// sweep through each filter map, if all the upstream's filters are matched, add the corresponding target to the list
 	for i, fm := range credGroup.filterMaps {
-		candidateInstance := credGroup.instances[i]
-		// logger.Debugw("considering instance for upstream", "upstream", upstream.GetMetadata().Ref().Key(), "instance-tags", candidateInstance.Tags, "instance-id", candidateInstance.InstanceId)
+		candidateTarget := credGroup.targets[i]
+		logger.Debugw("considering targetgroup for upstream", "upstream", upstream.GetMetadata().Ref().Key(), "tags", candidateTarget.Tags, "tg-arn", candidateTarget.TargetGroupArn)
 		matchesAll := true
 	ScanFilters: // label so that we can break out of the for loop rather than the switch
 		for _, filter := range upstream.GetAwsTg().GetFilters() {
@@ -126,39 +126,34 @@ func filterInstancesForUpstream(ctx context.Context, lister TargetGroupLister, u
 			if err != nil {
 				return nil
 			}
-			endpoints, err := lister.ListHealthyTasks(candidateInstance.TargetGroupArn, ctx, svc)
+			endpoints, err := lister.ListHealthyTasks(candidateTarget.TargetGroupArn, ctx, svc)
 			if err != nil {
 				return nil
 			}
 
-			instances = append(instances, endpoints...)
+			targets = append(targets, endpoints...)
 
-			logger.Debugw("instance for upstream accepted", "upstream", upstream.GetMetadata().Ref().Key(), "instance-tags", candidateInstance.Tags)
+			logger.Debugw("target for upstream accepted", "upstream", upstream.GetMetadata().Ref().Key(), "tags", candidateTarget.Tags)
 		} else {
-			logger.Debugw("instance for upstream filtered out", "upstream", upstream.GetMetadata().Ref().Key(), "instance-tags", candidateInstance.Tags)
+			logger.Debugw("target for upstream filtered out", "upstream", upstream.GetMetadata().Ref().Key(), "tags", candidateTarget.Tags)
 		}
 	}
-	return instances
+	return targets
 }
 
-// NOTE: assumes that upstreams are EC2 upstreams
-func upstreamInstanceToEndpoint(ctx context.Context, writeNamespace string, upstream *v1.Upstream, instance Task) *v1.Endpoint {
-	return nil
-	ipAddr := instance.Ip
+// NOTE: assumes that upstreams are targetgroup upstreams
+func upstreamTargetsToEndpoint(ctx context.Context, writeNamespace string, upstream *v1.Upstream, target Target) *v1.Endpoint {
+	ipAddr := target.Ip
 	if ipAddr == nil {
 		contextutils.LoggerFrom(ctx).Warnw("no ip found for config",
 			zap.Any("upstreamRef", upstream.GetMetadata().Ref()))
-		// zap.Any("instanceId", aws.StringValue(instance.InstanceId)))
 		return nil
 	}
-	port := instance.Port
-	// if port == 0 {
-	// 	port = DefaultPort
-	// }
+	port := target.Port
 	ref := upstream.GetMetadata().Ref()
-	// for easier debugging, add the instance id to the xds output
-	instanceInfo := make(map[string]string)
-	instanceInfo[InstanceIdAnnotationKey] = aws.StringValue(instance.Az)
+	// for easier debugging, add the target availability zone to the xds output
+	targetInfo := make(map[string]string)
+	targetInfo[AvailabilityZoneAnnotationKey] = aws.StringValue(target.Az)
 	endpoint := v1.Endpoint{
 		Upstreams: []*core.ResourceRef{ref},
 		Address:   aws.StringValue(ipAddr),
@@ -166,33 +161,33 @@ func upstreamInstanceToEndpoint(ctx context.Context, writeNamespace string, upst
 		Metadata: &core.Metadata{
 			Name:        generateName(ref, aws.StringValue(ipAddr)),
 			Namespace:   writeNamespace,
-			Annotations: instanceInfo,
+			Annotations: targetInfo,
 		},
 	}
-	contextutils.LoggerFrom(ctx).Debugw("instance from upstream",
+	contextutils.LoggerFrom(ctx).Debugw("target from upstream",
 		zap.Any("upstream", upstream),
-		zap.Any("instance", instance),
+		zap.Any("target", target),
 		zap.Any("endpoint", endpoint))
 	return &endpoint
 }
 
-// a FilterMap is created for each EC2 instance so we can efficiently filter the instances associated with a given
+// a FilterMap is created for each TargetGroup so we can efficiently filter the TargetGroups associated with a given
 // upstream's filter spec
 // filter maps are generated from tag lists, the keys are the tag keys, the values are the tag values
 type FilterMap map[string]string
 
-func generateFilterMap(instance *ExtendedTargetGroup) FilterMap {
+func generateFilterMap(target *ExtendedTargetGroup) FilterMap {
 	m := make(FilterMap)
-	for _, t := range instance.Tags {
+	for _, t := range target.Tags {
 		m[awsKeyCase(aws.StringValue(t.Key))] = aws.StringValue(t.Value)
 	}
 	return m
 }
 
-func generateFilterMaps(instances []*ExtendedTargetGroup) []FilterMap {
+func generateFilterMaps(targets []*ExtendedTargetGroup) []FilterMap {
 	var maps []FilterMap
-	for _, instance := range instances {
-		maps = append(maps, generateFilterMap(instance))
+	for _, target := range targets {
+		maps = append(maps, generateFilterMap(target))
 	}
 	return maps
 }

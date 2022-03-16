@@ -15,7 +15,7 @@ import (
 // This allows us to easily mock the API in our tests.
 type TargetGroupLister interface {
 	ListForCredentials(ctx context.Context, cred *CredentialSpec, secrets v1.SecretList) ([]*ExtendedTargetGroup, error)
-	ListHealthyTasks(arn *string, ctx context.Context, svc *elbv2.ELBV2) ([]Task, error)
+	ListHealthyTasks(arn *string, ctx context.Context, svc *elbv2.ELBV2) ([]Target, error)
 }
 
 type targetGroupLister struct {
@@ -27,7 +27,7 @@ func NewTargetGroupLister() *targetGroupLister {
 
 var _ TargetGroupLister = &targetGroupLister{}
 
-type Task struct {
+type Target struct {
 	Ip   *string
 	Port *int64
 	Az   *string
@@ -35,8 +35,8 @@ type Task struct {
 
 type ExtendedTargetGroup struct {
 	*elbv2.TargetGroup
-	Tags  []*elbv2.Tag
-	Tasks []*Task
+	Tags    []*elbv2.Tag
+	Targets []*Target
 }
 
 func (c *targetGroupLister) ListForCredentials(ctx context.Context, cred *CredentialSpec, secrets v1.SecretList) ([]*ExtendedTargetGroup, error) {
@@ -63,22 +63,22 @@ func (c *targetGroupLister) ListForCredentials(ctx context.Context, cred *Creden
 func (c *targetGroupLister) ListWithClient(ctx context.Context, svc *elbv2.ELBV2) ([]*elbv2.TargetGroup, error) {
 
 	var results []*elbv2.DescribeTargetGroupsOutput
-	// pass a filter to only get running instances.
+
 	input := &elbv2.DescribeTargetGroupsInput{}
 	err := svc.DescribeTargetGroupsPagesWithContext(ctx, input, func(r *elbv2.DescribeTargetGroupsOutput, more bool) bool {
 		results = append(results, r)
 		return true
 	})
 	if err != nil {
-		return nil, DescribeInstancesError(err)
+		return nil, DescribeTargeGroupError(err)
 	}
 
 	var result []*elbv2.TargetGroup
 	for _, dio := range results {
-		result = append(result, GetInstancesFromDescription(dio)...)
+		result = append(result, GetTargetGroupsFromDescription(dio)...)
 	}
 
-	contextutils.LoggerFrom(ctx).Debugw("ec2Upstream result", zap.Any("value", result))
+	contextutils.LoggerFrom(ctx).Debugw("tgUpstream result", zap.Any("value", result))
 	return result, nil
 }
 
@@ -101,19 +101,17 @@ func (c *targetGroupLister) ListTagsWithClient(tgs []*elbv2.TargetGroup, ctx con
 			arns = []*string{}
 		}
 
-		// var results []*elbv2.DescribeTagsOutput
-		// pass a filter to only get running instances.
 		input := &elbv2.DescribeTagsInput{
 			ResourceArns: queryarns,
 		}
 		results, err := svc.DescribeTagsWithContext(ctx, input)
 		if err != nil {
-			return nil, DescribeInstancesError(err)
+			return nil, DescribeTagsError(err)
 		}
 
 		tagDescriptions = append(tagDescriptions, results.TagDescriptions...)
 
-		contextutils.LoggerFrom(ctx).Debugw("ec2Upstream result", zap.Any("value", results))
+		contextutils.LoggerFrom(ctx).Debugw("tgUpstream result", zap.Any("value", results))
 	}
 
 	return tagDescriptions, nil
@@ -129,20 +127,20 @@ func (c *targetGroupLister) ConvertTagDescriptionsToMap(tds []*elbv2.TagDescript
 	return tagMap
 }
 
-func (c *targetGroupLister) ListHealthyTasks(arn *string, ctx context.Context, svc *elbv2.ELBV2) ([]Task, error) {
+func (c *targetGroupLister) ListHealthyTasks(arn *string, ctx context.Context, svc *elbv2.ELBV2) ([]Target, error) {
 
-	var healthyTargets []Task
+	var healthyTargets []Target
 	input := &elbv2.DescribeTargetHealthInput{
 		TargetGroupArn: arn,
 	}
 	results, err := svc.DescribeTargetHealthWithContext(ctx, input)
 	if err != nil {
-		return nil, DescribeInstancesError(err)
+		return nil, DescribeTargetHealthError(err)
 	}
 
 	for _, result := range results.TargetHealthDescriptions {
 		if *result.TargetHealth.State == elbv2.TargetHealthStateEnumHealthy {
-			target := Task{
+			target := Target{
 				Ip:   result.Target.Id,
 				Port: result.Target.Port,
 				Az:   result.Target.AvailabilityZone,
@@ -169,7 +167,15 @@ var (
 		return eris.Wrapf(err, "unable to get aws client")
 	}
 
-	DescribeInstancesError = func(err error) error {
-		return eris.Wrapf(err, "unable to describe instances")
+	DescribeTargetHealthError = func(err error) error {
+		return eris.Wrapf(err, "unable to describe target health")
+	}
+
+	DescribeTagsError = func(err error) error {
+		return eris.Wrapf(err, "unable to describe tags")
+	}
+
+	DescribeTargeGroupError = func(err error) error {
+		return eris.Wrapf(err, "unable to describe target group")
 	}
 )

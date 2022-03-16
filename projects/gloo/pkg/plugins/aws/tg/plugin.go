@@ -28,10 +28,9 @@ const (
 
 /*
 Steps:
-- User creates an EC2 upstream
-  - describes the instances that should be made into Endpoints
-- Discovery finds all instances that match the description with DescribeInstances
-- Gloo plugin creates an endpoint for each instance
+- User creates a TG upstream
+- Discovery finds all targets of the TargetGroups that match the description
+- Gloo plugin creates an endpoint for each target
 */
 
 type plugin struct {
@@ -104,15 +103,15 @@ func (p *plugin) ProcessUpstream(params plugins.Params, in *v1.Upstream, out *en
 
 var (
 	ConstructorInputError = func(factoryType string) error {
-		return eris.Errorf("must provide %v factory for EC2 plugin", factoryType)
+		return eris.Errorf("must provide %v factory for TG plugin", factoryType)
 	}
 
 	ConstructorGetClientError = func(name string, err error) error {
-		return eris.Wrapf(err, "unable to get %v client for EC2 plugin", name)
+		return eris.Wrapf(err, "unable to get %v client for TG plugin", name)
 	}
 
 	ConstructorRegisterClientError = func(name string, err error) error {
-		return eris.Wrapf(err, "unable to register %v client for EC2 plugin", name)
+		return eris.Wrapf(err, "unable to register %v client for TG plugin", name)
 	}
 
 	WrongUpstreamTypeError = func(upstream *v1.Upstream) error {

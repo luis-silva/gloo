@@ -20,13 +20,13 @@ import (
 // start the EDS watch which sends a new list of endpoints on any change
 func (p *plugin) WatchEndpoints(writeNamespace string, unfilteredUpstreams v1.UpstreamList, opts clients.WatchOpts) (<-chan v1.EndpointList, <-chan error, error) {
 	contextutils.LoggerFrom(opts.Ctx).Debugw("calling WatchEndpoints on TG")
-	var ec2Upstreams v1.UpstreamList
+	var tgUpstreams v1.UpstreamList
 	for _, upstream := range unfilteredUpstreams {
 		if _, ok := upstream.GetUpstreamType().(*v1.Upstream_AwsTg); ok {
-			ec2Upstreams = append(ec2Upstreams, upstream)
+			tgUpstreams = append(tgUpstreams, upstream)
 		}
 	}
-	return newEndpointsWatcher(opts.Ctx, writeNamespace, ec2Upstreams, p.secretClient, opts.RefreshRate).poll()
+	return newEndpointsWatcher(opts.Ctx, writeNamespace, tgUpstreams, p.secretClient, opts.RefreshRate).poll()
 }
 
 type edsWatcher struct {
@@ -73,12 +73,12 @@ func newEndpointsWatcher(watchCtx context.Context, writeNamespace string, upstre
 
 // TODO[eds enhancement] - since EDS is restarted each time an upstream changes, this will be ignored during periods of
 // frequent upstream changes (such as on initialization, or with new discoveries). Also, since upstreams are bundled
-// together, changes to a non-EC2 upstream will also cause EC2 EDS to restart
+// together, changes to a non-TG upstream will also cause TG EDS to restart
 // This is not ideal, but tolerable because upstreams tend to stabilize
 const minRefreshRate = 30 * time.Second
 
 // unlike the other plugins, we are calling an external service (AWS) during our watches.
-// since we don't expect EC2 changes to happen very frequently, and to avoid ratelimit concerns, we set a minimum
+// since we don't expect TargetGroup changes to happen very frequently, and to avoid ratelimit concerns, we set a minimum
 // refresh rate of thirty seconds
 func getRefreshRate(parentRefreshRate time.Duration) time.Duration {
 	if parentRefreshRate < minRefreshRate {
@@ -140,12 +140,12 @@ const DefaultPort = 80
 
 // TODO[eds enhancement] - update the EDS interface to include a registration function which would ensure uniqueness among prefixes
 // ... also include a function to ensure that the endpoint name conforms to the spec (is unique, begins with expected prefix)
-const ec2EndpointNamePrefix = "ec2"
+const tgEndpointNamePrefix = "tg"
 
 func generateName(upstreamRef *core.ResourceRef, publicIpAddress string) string {
 	return kubeutils.SanitizeNameV2(fmt.Sprintf(
 		"%v-name-%s-namespace-%s-%v",
-		ec2EndpointNamePrefix,
+		tgEndpointNamePrefix,
 		upstreamRef.GetName(),
 		upstreamRef.GetNamespace(),
 		publicIpAddress,

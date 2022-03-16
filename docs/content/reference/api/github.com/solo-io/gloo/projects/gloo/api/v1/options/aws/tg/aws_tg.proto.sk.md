@@ -28,8 +28,8 @@ weight: 5
 ### UpstreamSpec
 
  
-Upstream Spec for AWS Lambda Upstreams
-AWS Upstreams represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
+Upstream Spec for AWS TargetGroup Upstreams
+AWS Upstreams represent a collection of TargetGroup targets for a particular AWS Account (IAM Role or User account)
 in a particular region
 
 ```yaml
@@ -43,11 +43,11 @@ in a particular region
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `region` | `string` | The AWS Region where the desired EC2 instances exist. |
-| `secretRef` | [.core.solo.io.ResourceRef](../../../../../../../../../solo-kit/api/v1/ref.proto.sk/#resourceref) | Optional, if not set, Gloo will try to use the default AWS secret specified by environment variables. If a secret is not provided, the environment must specify both the AWS access key and secret. The environment variables used to indicate the AWS account can be: - for the access key: "AWS_ACCESS_KEY_ID" or "AWS_ACCESS_KEY" - for the secret: "AWS_SECRET_ACCESS_KEY" or "AWS_SECRET_KEY" If set, a [Gloo Secret Ref](https://docs.solo.io/gloo-edge/latest/reference/cli/glooctl_create_secret_aws/) to an AWS Secret AWS Secrets can be created with `glooctl secret create aws ...` If the secret is created manually, it must conform to the following structure: ``` access_key: <aws access key> secret_key: <aws secret key> ``` Gloo will create an EC2 API client with this credential. You may choose to use a credential with limited access in conjunction with a list of Roles, specified by their Amazon Resource Number (ARN). |
-| `roleArn` | `string` | Optional, Amazon Resource Number (ARN) referring to IAM Role that should be assumed when the Upstream queries for eligible EC2 instances. If provided, Gloo will create an EC2 API client with the provided role. If not provided, Gloo will not assume a role. |
+| `region` | `string` | The AWS Region where the desired TargetGroup exists. |
+| `secretRef` | [.core.solo.io.ResourceRef](../../../../../../../../../solo-kit/api/v1/ref.proto.sk/#resourceref) | Optional, if not set, Gloo will try to use the default AWS secret specified by environment variables. If a secret is not provided, the environment must specify both the AWS access key and secret. The environment variables used to indicate the AWS account can be: - for the access key: "AWS_ACCESS_KEY_ID" or "AWS_ACCESS_KEY" - for the secret: "AWS_SECRET_ACCESS_KEY" or "AWS_SECRET_KEY" If set, a [Gloo Secret Ref](https://docs.solo.io/gloo-edge/latest/reference/cli/glooctl_create_secret_aws/) to an AWS Secret AWS Secrets can be created with `glooctl secret create aws ...` If the secret is created manually, it must conform to the following structure: ``` access_key: <aws access key> secret_key: <aws secret key> ``` Gloo will create an ELBV2 API client with this credential. You may choose to use a credential with limited access in conjunction with a list of Roles, specified by their Amazon Resource Number (ARN). |
+| `roleArn` | `string` | Optional, Amazon Resource Number (ARN) referring to IAM Role that should be assumed when the Upstream queries for eligible TargetGroups. If provided, Gloo will create an ELBV2 API client with the provided role. If not provided, Gloo will not assume a role. |
 | `filters` | [[]aws_tg.options.gloo.solo.io.TagFilter](../aws_tg.proto.sk/#tagfilter) | List of tag filters for selecting instances An instance must match all the filters in order to be selected Filter keys are not case-sensitive. |
-| `port` | `int` | If set, will use this port on EC2 instances. Defaults to port 80. |
+| `port` | `int` | If set, will use this port on TargetGroup targets. Defaults to port 80. |
 
 
 

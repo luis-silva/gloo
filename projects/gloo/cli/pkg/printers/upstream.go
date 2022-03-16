@@ -136,9 +136,9 @@ func upstreamDetails(up *v1.Upstream, xdsDump *xdsinspection.XdsDump) []string {
 			fmt.Sprintf("port:           %v", usType.AwsTg.GetPort()),
 		)
 		add(getTgTagFiltersString(usType.AwsTg.GetFilters())...)
-		instances := xdsDump.GetEc2InstancesForUpstream(up.GetMetadata().Ref())
+		instances := xdsDump.GetTargetGroupTargetsForUpstream(up.GetMetadata().Ref())
 		add(
-			"EC2 Instance Ids:",
+			"Target Availability Zone:",
 		)
 		add(
 			instances...,

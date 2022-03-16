@@ -23,15 +23,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Upstream Spec for AWS Lambda Upstreams
-// AWS Upstreams represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
+// Upstream Spec for AWS TargetGroup Upstreams
+// AWS Upstreams represent a collection of TargetGroup targets for a particular AWS Account (IAM Role or User account)
 // in a particular region
 type UpstreamSpec struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The AWS Region where the desired EC2 instances exist
+	// The AWS Region where the desired TargetGroup exists
 	Region string `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	// Optional, if not set, Gloo will try to use the default AWS secret specified by environment variables.
 	// If a secret is not provided, the environment must specify both the AWS access key and secret.
@@ -45,19 +45,19 @@ type UpstreamSpec struct {
 	//  access_key: <aws access key>
 	//  secret_key: <aws secret key>
 	//  ```
-	// Gloo will create an EC2 API client with this credential. You may choose to use a credential with limited access
+	// Gloo will create an ELBV2 API client with this credential. You may choose to use a credential with limited access
 	// in conjunction with a list of Roles, specified by their Amazon Resource Number (ARN).
 	SecretRef *core.ResourceRef `protobuf:"bytes,2,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
 	// Optional, Amazon Resource Number (ARN) referring to IAM Role that should be assumed when the Upstream
-	// queries for eligible EC2 instances.
-	// If provided, Gloo will create an EC2 API client with the provided role. If not provided, Gloo will not assume
+	// queries for eligible TargetGroups.
+	// If provided, Gloo will create an ELBV2 API client with the provided role. If not provided, Gloo will not assume
 	// a role.
 	RoleArn string `protobuf:"bytes,5,opt,name=role_arn,json=roleArn,proto3" json:"role_arn,omitempty"`
 	// List of tag filters for selecting instances
 	// An instance must match all the filters in order to be selected
 	// Filter keys are not case-sensitive
 	Filters []*TagFilter `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
-	// If set, will use this port on EC2 instances. Defaults to port 80.
+	// If set, will use this port on TargetGroup targets. Defaults to port 80.
 	Port uint32 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
 }
 
